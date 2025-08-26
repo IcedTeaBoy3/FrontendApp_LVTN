@@ -9,7 +9,7 @@ class AppTheme {
       fontSize: 18,
       fontWeight: FontWeight.w500,
       fontStyle: FontStyle.normal,
-      color: Colors.black87,
+      color: Colors.black54,
     ),
     bodyMedium: GoogleFonts.roboto(
       fontSize: 16,
