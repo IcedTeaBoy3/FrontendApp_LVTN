@@ -6,10 +6,10 @@ class ServiceItem extends StatelessWidget {
   final String title;
 
   const ServiceItem({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +28,13 @@ class ServiceItem extends StatelessWidget {
             textAlign: TextAlign.center,
             softWrap: true, // Cho phép xuống dòng
             overflow: TextOverflow.visible, // Không cắt chữ
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              color: Theme.of(context).brightness == Brightness.light
-                  ? Colors.black87
-                  : Colors.white70,
-            ),
+            style: Theme.of(context).brightness == Brightness.dark
+                ? Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    )
+                : Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
           ),
         ),
       ],

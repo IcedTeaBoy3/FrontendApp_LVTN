@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'package:frontend_app/widgets/InputSearch.dart';
-import 'package:frontend_app/widgets/ServiceItem.dart';
-import 'package:frontend_app/widgets/CustomNavbar.dart';
-import 'package:frontend_app/widgets/Slider.dart';
-import 'package:frontend_app/widgets/DoctorCard.dart';
-import 'package:frontend_app/widgets/ClinicCard.dart';
-import 'package:frontend_app/widgets/SpecialtyCard.dart';
+import 'package:frontend_app/widgets/input_search.dart';
+import 'package:frontend_app/widgets/service_item.dart';
+import 'package:frontend_app/widgets/custom_navbar.dart';
+import 'package:frontend_app/widgets/custom_slider.dart';
+import 'package:frontend_app/widgets/clinic_card.dart';
+
+import 'package:frontend_app/widgets/specialty_list.dart';
+import 'package:frontend_app/widgets/doctor_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,19 +31,16 @@ class _HomeScreenState extends State<HomeScreen> {
       'name': 'Dr. John Doe',
       'specialty': 'Tim mạch',
       'rating': 4.5,
-      'image': 'assets/images/doctor_1.jpg',
     },
     {
       'name': 'Dr. Jane Smith',
       'specialty': 'Nhi khoa',
       'rating': 4.8,
-      'image': 'assets/images/doctor_2.jpg',
     },
     {
       'name': 'Dr. Alex Lee',
       'specialty': 'Da liễu',
       'rating': 4.6,
-      'image': 'assets/images/doctor_3.jpg',
     },
   ];
   final clinics = [
@@ -50,69 +48,16 @@ class _HomeScreenState extends State<HomeScreen> {
       'name': 'Phòng khám đa khoa',
       'address': '123 Đường ABC, Quận 1',
       'rating': 4.5,
-      'image': 'assets/images/Nhankhoa.png',
     },
     {
       'name': 'Phòng khám chuyên khoa',
       'address': '456 Đường DEF, Quận 2',
       'rating': 4.8,
-      'image': 'assets/images/clinic_2.jpg',
     },
     {
       'name': 'Phòng khám nha khoa',
       'address': '789 Đường GHI, Quận 3',
       'rating': 4.6,
-      'image': 'assets/images/clinic_3.jpg',
-    },
-  ];
-  final specialties = [
-    {
-      'name': 'Nhi khoa',
-      'image': 'assets/images/Nhikhoa.png',
-    },
-    {
-      'name': 'Nhãn khoa',
-      'image': 'assets/images/Nhankhoa.png',
-    },
-    {
-      'name': 'Da liễu',
-      'image': 'assets/images/Noithan.png',
-    },
-    {
-      'name': 'Nội tổng quát',
-      'image': 'assets/images/Noitongquat.png',
-    },
-    {
-      'name': 'Nhãn khoa',
-      'image': 'assets/images/Nhankhoa.png',
-    },
-    {
-      'name': 'Da liễu',
-      'image': 'assets/images/Noithan.png',
-    },
-    {
-      'name': 'Nội tổng quát',
-      'image': 'assets/images/Noitongquat.png',
-    },
-    {
-      'name': 'Da liễu',
-      'image': 'assets/images/Noithan.png',
-    },
-    {
-      'name': 'Nội tổng quát',
-      'image': 'assets/images/Noitongquat.png',
-    },
-    {
-      'name': 'Nội tổng quát',
-      'image': 'assets/images/Noitongquat.png',
-    },
-    {
-      'name': 'Da liễu',
-      'image': 'assets/images/Noithan.png',
-    },
-    {
-      'name': 'Nội tổng quát',
-      'image': 'assets/images/Noitongquat.png',
     },
   ];
 
@@ -248,211 +193,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const CustomSlider(),
               const SizedBox(height: 16),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.userDoctor,
-                              color: Colors.blue,
-                              size: 20,
-                            ),
-                            const SizedBox(
-                              width: 6,
-                            ), // khoảng cách giữa icon và text
-                            Text(
-                              'Bác sĩ',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text('Xem tất cả',
-                                  style: TextStyle(color: Colors.blue)),
-                              SizedBox(
-                                  width: 4), // khoảng cách giữa chữ và icon
-                              Icon(Icons.arrow_forward_ios,
-                                  color: Colors.blue, size: 16),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    // Danh sách bác sĩ
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.14,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: doctors.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(width: 12),
-                        itemBuilder: (context, index) {
-                          final doctor = doctors[index];
-                          return DoctorCard(
-                            name: doctor['name'] as String,
-                            specialty: doctor['specialty'] as String,
-                            rating: doctor['rating'] as double,
-                            avatar: doctor['image'] as String,
-                          );
-                        },
-                      ),
-                      // Thêm các bác sĩ vào danh sách
-                    ),
-                  ],
-                ),
-              ),
+              const ClinicCard(),
               const SizedBox(height: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.hospital,
-                              color: Colors.blue,
-                              size: 20,
-                            ),
-                            const SizedBox(
-                              width: 6,
-                            ), // khoảng cách giữa icon và text
-                            Text(
-                              'Phòng khám',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text('Xem tất cả',
-                                  style: TextStyle(color: Colors.blue)),
-                              SizedBox(
-                                  width: 4), // khoảng cách giữa chữ và icon
-                              Icon(Icons.arrow_forward_ios,
-                                  color: Colors.blue, size: 16),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    // Danh sách phòng khám
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.14,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: clinics.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(width: 12),
-                        itemBuilder: (context, index) {
-                          final clinic = clinics[index];
-                          return ClinicCard(
-                            name: clinic['name'] as String,
-                            address: clinic['address'] as String,
-                            rating: clinic['rating'] as double,
-                            image: clinic['image'] as String,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const DoctorList(),
               const SizedBox(height: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                padding: EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.stethoscope,
-                              color: Colors.blue,
-                              size: 20,
-                            ),
-                            const SizedBox(
-                              width: 6,
-                            ), // khoảng cách giữa icon và text
-                            Text(
-                              'Chuyên khoa',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ],
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text('Xem tất cả',
-                                  style: TextStyle(color: Colors.blue)),
-                              SizedBox(
-                                  width: 4), // khoảng cách giữa chữ và icon
-                              Icon(Icons.arrow_forward_ios,
-                                  color: Colors.blue, size: 16),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    // Danh sách chuyên khoa
-                    SizedBox(
-                      height: 150,
-                      child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          childAspectRatio: 0.8,
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                        ),
-                        // Nếu có nhiều hơn 8 thì chỉ lấy 8 phần tử
-                        itemCount: specialties.length,
-                        itemBuilder: (context, index) {
-                          // Hiển thị card bình thường
-                          final specialty = specialties[index];
-                          return SpecialtyCard(
-                            name: specialty['name'] as String,
-                            image: specialty['image'] as String,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const SpecialtyList(),
             ],
           ),
         ),

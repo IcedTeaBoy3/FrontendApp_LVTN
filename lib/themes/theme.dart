@@ -6,21 +6,20 @@ class AppTheme {
   // LightTextTheme
   static TextTheme lightTextTheme = TextTheme(
     bodyLarge: GoogleFonts.roboto(
-      fontSize: 18,
       fontWeight: FontWeight.w500,
       fontStyle: FontStyle.normal,
-      color: Colors.black54,
+      color: Colors.black87,
     ),
     bodyMedium: GoogleFonts.roboto(
-      fontSize: 16,
       fontWeight: FontWeight.w400,
-      color: Colors.black54,
+      color: Colors.black87,
     ),
     bodySmall: GoogleFonts.roboto(
-      fontSize: 14,
       fontWeight: FontWeight.w400,
-      color: Colors.black45,
+      color: Colors.black87,
     ),
+    // có cái này fontsize 12
+
     headlineMedium: GoogleFonts.roboto(
       color: AppColors.primaryBlue,
       fontWeight: FontWeight.bold,
@@ -29,19 +28,19 @@ class AppTheme {
   // DarkTextTheme
   static TextTheme darkTextTheme = TextTheme(
     bodyLarge: GoogleFonts.roboto(
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: FontWeight.w400,
       color: Colors.white70,
     ),
     bodyMedium: GoogleFonts.roboto(
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-      color: Colors.white54,
-    ),
-    bodySmall: GoogleFonts.roboto(
       fontSize: 14,
       fontWeight: FontWeight.w400,
-      color: Colors.white38,
+      color: Colors.white70,
+    ),
+    bodySmall: GoogleFonts.roboto(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: Colors.white70,
     ),
   );
   // Light Theme

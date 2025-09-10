@@ -6,7 +6,7 @@ import 'package:frontend_app/screens/register_screen.dart';
 
 GoRouter createRouter() {
   return GoRouter(
-    initialLocation: '/auth',
+    initialLocation: '/home',
     // redirect: (context, GoRouterState state) {},
     routes: [
       GoRoute(

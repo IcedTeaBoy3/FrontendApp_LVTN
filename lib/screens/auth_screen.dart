@@ -258,7 +258,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Widget _buildPasswordField() {
     return TextFormField(
-      obscureText: _isPasswordVisible,
+      obscureText: !_isPasswordVisible,
       style: const TextStyle(
         color: Colors.black54, // màu chữ khi nhập
         fontSize: 16,
