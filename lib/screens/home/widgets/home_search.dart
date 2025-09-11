@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-class InputSearch extends StatelessWidget {
+class HomeSearch extends StatelessWidget {
   final String searchText;
-  const InputSearch({super.key, required this.searchText});
+  const HomeSearch({super.key, required this.searchText});
 
   @override
   Widget build(BuildContext context) {

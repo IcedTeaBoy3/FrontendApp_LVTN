@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class CustomSlider extends StatefulWidget {
-  const CustomSlider({super.key});
+class HomeSlider extends StatefulWidget {
+  const HomeSlider({super.key});
 
   @override
-  State<CustomSlider> createState() => _CustomSliderState();
+  State<HomeSlider> createState() => _HomeSliderState();
 }
 
-class _CustomSliderState extends State<CustomSlider> {
+class _HomeSliderState extends State<HomeSlider> {
   int activeIndex = 0;
 
   final controller = CarouselSliderController();
@@ -41,8 +41,9 @@ class _CustomSliderState extends State<CustomSlider> {
             height: 200,
             autoPlay: true,
             enlargeCenterPage: true,
-            onPageChanged: (index, reason) =>
-                setState(() => activeIndex = index),
+            onPageChanged: (index, reason) => setState(
+              () => activeIndex = index,
+            ),
           ),
         ),
         const SizedBox(height: 12),

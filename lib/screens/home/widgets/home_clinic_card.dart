@@ -5,14 +5,14 @@ import 'package:frontend_app/providers/clinic_provider.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:provider/provider.dart';
 
-class ClinicCard extends StatefulWidget {
-  const ClinicCard({super.key});
+class HomeClinicCard extends StatefulWidget {
+  const HomeClinicCard({super.key});
 
   @override
-  State<ClinicCard> createState() => _ClinicCardState();
+  State<HomeClinicCard> createState() => _HomeClinicCardState();
 }
 
-class _ClinicCardState extends State<ClinicCard> {
+class _HomeClinicCardState extends State<HomeClinicCard> {
   @override
   void initState() {
     super.initState();
@@ -85,7 +85,7 @@ class _ClinicCardState extends State<ClinicCard> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(
                         10), // nhỏ hơn 1 chút để viền thấy rõ
-                    child: (clinic.images != null && clinic.images.isNotEmpty)
+                    child: (clinic.images.isNotEmpty)
                         ? Image.network(
                             ApiConfig.backendUrl + clinic.images.first,
                             width: 80,
@@ -94,14 +94,20 @@ class _ClinicCardState extends State<ClinicCard> {
                             errorBuilder: (context, error, stackTrace) =>
                                 Container(
                               color: Colors.grey[200],
-                              child: const Icon(Icons.broken_image,
-                                  size: 30, color: Colors.grey),
+                              child: const Icon(
+                                Icons.broken_image,
+                                size: 30,
+                                color: Colors.grey,
+                              ),
                             ),
                           )
                         : Container(
                             color: Colors.grey[200],
-                            child: const Icon(Icons.image_not_supported,
-                                size: 30, color: Colors.grey),
+                            child: const Icon(
+                              Icons.image_not_supported,
+                              size: 30,
+                              color: Colors.grey,
+                            ),
                           ),
                   ),
                 ),

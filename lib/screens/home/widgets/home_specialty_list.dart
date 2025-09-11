@@ -5,14 +5,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:frontend_app/widgets/specialty_card.dart';
 
-class SpecialtyList extends StatefulWidget {
-  const SpecialtyList({super.key});
+class HomeSpecialtyList extends StatefulWidget {
+  const HomeSpecialtyList({super.key});
 
   @override
-  State<SpecialtyList> createState() => _SpecialtyListState();
+  State<HomeSpecialtyList> createState() => _HomeSpecialtyListState();
 }
 
-class _SpecialtyListState extends State<SpecialtyList> {
+class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
   @override
   void initState() {
     super.initState();

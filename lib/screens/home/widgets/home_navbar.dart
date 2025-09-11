@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class CustomNavbar extends StatelessWidget {
+class HomeNavbar extends StatelessWidget {
   final int _selectedIndex;
   final Function(int) _onItemTapped;
 
-  const CustomNavbar(
+  const HomeNavbar(
       {super.key,
       required int selectedIndex,
       required Function(int) onItemTapped})
@@ -37,14 +37,26 @@ class CustomNavbar extends StatelessWidget {
         ),
         child: BottomNavigationBar(
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Trang chủ'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.account_circle), label: 'Hồ sơ'),
+              icon: Icon(Icons.home),
+              label: 'Trang chủ',
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.file_copy), label: 'Phiếu khám'),
+              icon: Icon(Icons.account_circle),
+              label: 'Hồ sơ',
+            ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.notifications), label: 'Thông báo'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Cá nhân'),
+              icon: Icon(Icons.file_copy),
+              label: 'Phiếu khám',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.notifications),
+              label: 'Thông báo',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Cá nhân',
+            ),
           ],
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,

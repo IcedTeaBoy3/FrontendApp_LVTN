@@ -4,14 +4,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:provider/provider.dart';
 
-class DoctorList extends StatefulWidget {
-  const DoctorList({super.key});
+class HomeDoctorList extends StatefulWidget {
+  const HomeDoctorList({super.key});
 
   @override
-  State<DoctorList> createState() => _DoctorListState();
+  State<HomeDoctorList> createState() => _HomeDoctorListState();
 }
 
-class _DoctorListState extends State<DoctorList> {
+class _HomeDoctorListState extends State<HomeDoctorList> {
   @override
   void initState() {
     super.initState();

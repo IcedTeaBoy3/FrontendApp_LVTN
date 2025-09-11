@@ -1,6 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:frontend_app/models/clinic.dart';
 import 'api_client.dart';
-import 'package:flutter/material.dart';
 
 class ClinicService {
   static Future<Clinic> getClinic() async {

@@ -1,32 +1,44 @@
 import 'package:go_router/go_router.dart';
-import 'package:frontend_app/screens/auth_screen.dart';
-import 'package:frontend_app/screens/home_screen.dart';
-import 'package:frontend_app/screens/error_screen.dart';
-import 'package:frontend_app/screens/register_screen.dart';
+import 'package:frontend_app/screens/login/login_screen.dart';
+import 'package:frontend_app/screens/home/home_screen.dart';
+import 'package:frontend_app/screens/error/error_screen.dart';
+import 'package:frontend_app/screens/register/register_screen.dart';
 
-GoRouter createRouter() {
-  return GoRouter(
-    initialLocation: '/home',
-    // redirect: (context, GoRouterState state) {},
-    routes: [
+class AppRoutes {
+  static final GoRouter router = GoRouter(
+    initialLocation: '/',
+    routes: <RouteBase>[
       GoRoute(
-        name: 'auth',
-        path: '/auth',
-        builder: (context, state) {
-          return AuthScreen();
-        },
+          name: 'home',
+          path: '/',
+          builder: (context, state) => const HomeScreen(),
+          routes: [
+            GoRoute(
+              name: 'clinicDetail',
+              path: 'clinic/:clinicId',
+              builder: (context, state) {
+                // final clinicId = state.params['clinicId']!;
+                // return HomeScreen(clinicId: clinicId);
+              },
+            ),
+            GoRoute(
+              name: 'doctorDetail',
+              path: 'doctor/:doctorId',
+              builder: (context, state) {
+                // final doctorId = state.params['doctorId']!;
+                // return DoctorDetailScreen(doctorId: doctorId);
+              },
+            ),
+          ]),
+      GoRoute(
+        name: 'login',
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
         name: 'register',
         path: '/register',
-        builder: (context, state) {
-          return const RegisterScreen();
-        },
-      ),
-      GoRoute(
-        name: 'home',
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) => const RegisterScreen(),
       ),
     ],
     errorBuilder: (context, state) => const ErrorScreen(),
