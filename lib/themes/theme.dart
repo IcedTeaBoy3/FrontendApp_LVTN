@@ -6,11 +6,12 @@ class AppTheme {
   // LightTextTheme
   static TextTheme lightTextTheme = TextTheme(
     bodyLarge: GoogleFonts.roboto(
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
       color: Colors.black87,
     ),
     bodyMedium: GoogleFonts.roboto(
+      fontSize: 14,
       fontWeight: FontWeight.w400,
       color: Colors.black87,
     ),
@@ -48,12 +49,8 @@ class AppTheme {
     brightness: Brightness.light,
     primaryColor: AppColors.primaryBlue,
     appBarTheme: AppBarTheme(
-      foregroundColor: Colors.black87,
-      titleTextStyle: GoogleFonts.roboto(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primaryBlue,
-      ),
+      backgroundColor: Colors.blue.shade700,
+      foregroundColor: Colors.white,
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
@@ -78,11 +75,6 @@ class AppTheme {
     primarySwatch: Colors.blue,
     appBarTheme: AppBarTheme(
       foregroundColor: Colors.white70,
-      titleTextStyle: GoogleFonts.roboto(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        color: AppColors.primaryBlue,
-      ),
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: Colors.black87,

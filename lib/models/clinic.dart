@@ -6,6 +6,7 @@ class Clinic {
   final List<String> images;
   final String phone;
   final String? email;
+  final String? website;
   final String? workHours;
   final List<String>? services;
 
@@ -17,6 +18,7 @@ class Clinic {
     required this.phone,
     required this.description,
     this.email,
+    this.website,
     this.workHours,
     this.services,
   });
@@ -29,6 +31,7 @@ class Clinic {
       phone: json['phone'] ?? '',
       description: json['description'] ?? '',
       email: json['email'] ?? '',
+      website: json['website'] ?? '',
       workHours: json['workHours'] ?? '',
       services:
           json['services'] != null ? List<String>.from(json['services']) : null,
@@ -45,6 +48,7 @@ class Clinic {
       'phone': phone,
       'description': description,
       'email': email,
+      'website': website,
       'workHours': workHours,
       'services': services,
     };

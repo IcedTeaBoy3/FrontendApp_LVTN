@@ -13,20 +13,18 @@ class HomeSpecialtyList extends StatefulWidget {
 }
 
 class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
+  late Future<void> _fetchSpecialties;
   @override
   void initState() {
     super.initState();
     // Lấy dữ liệu chuyên khoa khi khởi tạo widget
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final specialtyProvider = context.read<SpecialtyProvider>();
-      specialtyProvider.fetchSpecialties(page: 1, limit: 100);
-    });
+    _fetchSpecialties =
+        context.read<SpecialtyProvider>().fetchSpecialties(page: 1, limit: 100);
   }
 
-  void _openSpecialtySheet(BuildContext context) {
-    final specialtyProvider = context.read<SpecialtyProvider>();
-    final specialties = specialtyProvider.specialties;
-    final total = specialtyProvider.total;
+  void _openSpecialtySheet(BuildContext context, SpecialtyProvider provider) {
+    final specialties = provider.specialties;
+    final total = provider.total;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -122,7 +120,8 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
                 ],
               ),
               TextButton(
-                onPressed: () => _openSpecialtySheet(context),
+                onPressed: () =>
+                    _openSpecialtySheet(context, specialtyProvider),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
@@ -136,34 +135,48 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
           ),
           // Danh sách chuyên khoa
           const SizedBox(height: 8),
-          specialtyProvider.isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : SizedBox(
-                  height: 230,
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      childAspectRatio: 0.8,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 4,
-                    ),
-                    // Nếu có nhiều hơn 8 thì chỉ lấy 8 phần tử
-                    itemCount: specialtyProvider.specialties.length > 8
-                        ? 8
-                        : specialtyProvider.specialties.length,
-                    itemBuilder: (context, index) {
-                      // Hiển thị card bình thường
-                      final specialty = specialtyProvider.specialties[index];
-                      return SpecialtyCard(
-                        name: specialty.name,
-                        image: specialty.image,
-                      );
-                    },
+          FutureBuilder(
+            future: _fetchSpecialties,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text(
+                    'Đã có lỗi xảy ra: ${snapshot.error}',
+                    style: TextStyle(color: Colors.red[700]),
                   ),
+                );
+              } else if (specialtyProvider.specialties.isEmpty) {
+                return const Center(
+                    child: Text(
+                  'Không có chuyên khoa nào',
+                ));
+              }
+              final specialties = specialtyProvider.specialties;
+              return SizedBox(
+                height: 230,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    childAspectRatio: 0.8,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 4,
+                  ),
+                  // Nếu có nhiều hơn 8 thì chỉ lấy 8 phần tử
+                  itemCount: specialties.length > 8 ? 8 : specialties.length,
+                  itemBuilder: (context, index) {
+                    // Hiển thị card bình thường
+                    final specialty = specialties[index];
+                    return SpecialtyCard(
+                      name: specialty.name,
+                      image: specialty.image,
+                    );
+                  },
                 ),
+              );
+            },
+          )
         ],
       ),
     );

@@ -6,6 +6,7 @@ import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:frontend_app/screens/my_app.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [

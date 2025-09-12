@@ -22,7 +22,7 @@ class _HomeSliderState extends State<HomeSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
         CarouselSlider.builder(
           carouselController: controller,
@@ -47,15 +47,21 @@ class _HomeSliderState extends State<HomeSlider> {
           ),
         ),
         const SizedBox(height: 12),
-        AnimatedSmoothIndicator(
-          activeIndex: activeIndex,
-          count: images.length,
-          effect: const WormEffect(
-            dotHeight: 8,
-            dotWidth: 8,
-            spacing: 4,
-            activeDotColor: Colors.blue,
-            dotColor: Colors.grey,
+        Positioned(
+          bottom: 16,
+          left: MediaQuery.of(context).size.width * 0.5 -
+              (images.length * 10) / 2,
+          right: 0,
+          child: AnimatedSmoothIndicator(
+            activeIndex: activeIndex,
+            count: images.length,
+            effect: const ExpandingDotsEffect(
+              dotHeight: 8,
+              dotWidth: 8,
+              spacing: 4,
+              activeDotColor: Colors.blue,
+              dotColor: Colors.grey,
+            ),
           ),
         ),
       ],

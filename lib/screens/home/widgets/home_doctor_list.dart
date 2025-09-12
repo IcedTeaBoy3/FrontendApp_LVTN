@@ -12,25 +12,17 @@ class HomeDoctorList extends StatefulWidget {
 }
 
 class _HomeDoctorListState extends State<HomeDoctorList> {
+  late Future<void> _fetchDoctors;
   @override
   void initState() {
     super.initState();
     // Lấy dữ liệu bác sĩ khi khởi tạo widget
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final doctorProvider = context.read<DoctorProvider>();
-      doctorProvider.fetchDoctors(page: 1, limit: 100);
-    });
+    _fetchDoctors = context.read<DoctorProvider>().fetchDoctors();
   }
 
   @override
   Widget build(BuildContext context) {
     final doctorProvider = context.watch<DoctorProvider>();
-    if (doctorProvider.isLoading) {
-      return Center(child: CircularProgressIndicator());
-    }
-
-    final doctors = doctorProvider.doctors;
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -82,21 +74,42 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
               )
             ],
           ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.14,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: doctors.length > 8 ? 8 : doctors.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final doctor = doctors[index];
-                return DoctorCard(
-                  name: doctor.user.name as String,
-                  specialtyName: doctor.primarySpecialtyName,
-                  avatar: doctor.user.avatar as String,
-                );
-              },
-            ),
+          FutureBuilder(
+            future: _fetchDoctors,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(
+                    child: Text(
+                  'Lỗi khi tải dữ liệu: ${snapshot.error}',
+                  style: const TextStyle(color: Colors.red),
+                ));
+              } else if (doctorProvider.doctors.isEmpty) {
+                return const Center(
+                    child: Text(
+                  'Không có bác sĩ nào',
+                ));
+              }
+              final doctors = doctorProvider.doctors;
+              return SizedBox(
+                height: MediaQuery.of(context).size.height * 0.14,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: doctors.length > 8 ? 8 : doctors.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final doctor = doctors[index];
+                    return DoctorCard(
+                      name: doctor.user.name as String,
+                      specialtyName: doctor.primarySpecialtyName,
+                      avatar: doctor.user.avatar as String,
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ],
       ),
