@@ -102,6 +102,7 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
                   itemBuilder: (context, index) {
                     final doctor = doctors[index];
                     return DoctorCard(
+                      doctorId: doctor.doctorId,
                       name: doctor.user.name as String,
                       specialtyName: doctor.primarySpecialtyName,
                       avatar: doctor.user.avatar as String,

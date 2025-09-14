@@ -28,4 +28,12 @@ class DoctorProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Doctor? findById(String doctorId) {
+    final index = _doctors.indexWhere((doctor) => doctor.doctorId == doctorId);
+    if (index >= 0) {
+      return _doctors[index];
+    }
+    return null;
+  }
 }

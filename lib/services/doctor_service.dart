@@ -13,12 +13,10 @@ class DoctorService {
           'limit': limit,
         },
       );
-      debugPrint(
-          'Response data: ${response.data}'); // In dữ liệu nhận được để kiểm tra
+      debugPrint('response ${response.data}');
       if (response.statusCode == 200) {
         final data = response.data['data'];
         final doctors = Doctor.doctorsFromJson(data['doctors']);
-        debugPrint('length ${doctors.length}');
         final total = data['total'] as int;
         debugPrint('total $total');
         return {
