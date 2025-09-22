@@ -19,6 +19,7 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
   void initState() {
     super.initState();
     // / Gọi fetch sau khi frame đầu tiên build xong, tránh setState trong build
+
     _fetchClinic = context.read<ClinicProvider>().fetchClinic();
   }
 

@@ -3,7 +3,7 @@ import 'package:frontend_app/models/clinic.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_googlemap.dart';
+import 'package:frontend_app/widgets/clinic_detail_googlemap.dart';
 import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_workhours.dart';
 import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_description.dart';
 import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_specialty.dart';

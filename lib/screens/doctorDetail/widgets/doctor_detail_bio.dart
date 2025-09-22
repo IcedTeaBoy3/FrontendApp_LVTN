@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:html/parser.dart' as html_parser;
 
-class ClinicDetailDescription extends StatefulWidget {
-  final String? description;
-
-  const ClinicDetailDescription({super.key, this.description});
+class DoctorDetailBio extends StatefulWidget {
+  final String doctorId;
+  const DoctorDetailBio({super.key, required this.doctorId});
 
   @override
-  State<ClinicDetailDescription> createState() =>
-      _ClinicDetailDescriptionState();
+  State<DoctorDetailBio> createState() => _DoctorDetailBioState();
 }
 
-class _ClinicDetailDescriptionState extends State<ClinicDetailDescription> {
+class _DoctorDetailBioState extends State<DoctorDetailBio> {
   bool _isExpanded = false;
   final int _maxLength = 150; // giới hạn ký tự hiển thị
   String _stripHtmlTags(String htmlString) {
@@ -23,8 +23,10 @@ class _ClinicDetailDescriptionState extends State<ClinicDetailDescription> {
 
   @override
   Widget build(BuildContext context) {
+    final doctorId = widget.doctorId;
+    final doctor = context.read<DoctorProvider>().findById(doctorId);
     // Chuyển đổi HTML sang plain text để đếm ký tự
-    final String rawHtml = widget.description ?? "";
+    final String rawHtml = doctor?.bio ?? "";
     final String plainText = _stripHtmlTags(rawHtml);
 
     // Tại sao phải chuyển về plain text?
@@ -32,11 +34,11 @@ class _ClinicDetailDescriptionState extends State<ClinicDetailDescription> {
     final bool shouldTruncate = plainText.length > _maxLength;
     final String displayText =
         shouldTruncate ? "${plainText.substring(0, _maxLength)}..." : plainText;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,15 +46,20 @@ class _ClinicDetailDescriptionState extends State<ClinicDetailDescription> {
           Row(
             children: [
               const FaIcon(
-                FontAwesomeIcons.circleInfo,
+                FontAwesomeIcons.circleUser,
+                color: Colors.grey,
               ),
               const SizedBox(width: 8),
               Text(
                 "Giới thiệu",
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
+          const SizedBox(height: 8),
 
           /// Nội dung
           AnimatedCrossFade(

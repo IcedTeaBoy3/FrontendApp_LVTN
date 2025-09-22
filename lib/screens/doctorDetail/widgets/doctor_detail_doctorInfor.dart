@@ -63,7 +63,7 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
                   children: [
                     Text(
                       "BS.$degreeName",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: Colors.blueAccent,
                           ),
@@ -86,7 +86,9 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       "${doctor?.primaryPositionName} tại ${doctor?.primaryWorkplaceName}",
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -100,43 +102,55 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
             children: [
               Text(
                 "Chuyên khoa:",
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(width: 8),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: specialties.isNotEmpty
-                      ? specialties
-                          .map((spec) => Container(
-                                margin: const EdgeInsets.only(right: 6),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.shade100,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  spec,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.copyWith(
-                                        color: Colors.blue.shade800,
-                                      ),
-                                ),
-                              ))
-                          .toList()
-                      : [
-                          Text(
-                            "Chưa cập nhật",
-                            style: Theme.of(context).textTheme.bodySmall,
-                          )
-                        ],
-                ),
-              )
+              specialties.isNotEmpty
+                  ? Expanded(
+                      child: Text(
+                        specialties.join(', '),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : Text(
+                      "Chưa cập nhật",
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+              // Expanded(
+              //   child: Wrap(
+              //     spacing: 6,
+              //     children: specialties.isNotEmpty
+              //         ? specialties
+              //             .map((spec) => Container(
+              //                   margin: const EdgeInsets.only(right: 6),
+              //                   padding: const EdgeInsets.symmetric(
+              //                       horizontal: 8, vertical: 4),
+              //                   decoration: BoxDecoration(
+              //                     color: Colors.blue.shade100,
+              //                     borderRadius: BorderRadius.circular(12),
+              //                   ),
+              //                   child: Text(
+              //                     spec,
+              //                     style: Theme.of(context)
+              //                         .textTheme
+              //                         .bodyMedium
+              //                         ?.copyWith(
+              //                           color: Colors.blue.shade800,
+              //                         ),
+              //                   ),
+              //                 ))
+              //             .toList()
+              //         : [
+              //             Text(
+              //               "Chưa cập nhật",
+              //               style: Theme.of(context).textTheme.bodySmall,
+              //             )
+              //           ],
+              //   ),
+              // )
             ],
           ),
           // Nếu có nhiều chuyên khoa thì thêm list chỗ này

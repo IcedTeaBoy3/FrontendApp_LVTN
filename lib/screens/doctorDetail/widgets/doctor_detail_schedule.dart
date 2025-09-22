@@ -187,7 +187,6 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                       height: 160,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         itemCount: schedules.length,
                         itemBuilder: (context, index) {
                           final schedule = schedules[index];
@@ -209,7 +208,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                                 ),
                                 color: _selectedSchedule?.scheduleId ==
                                         schedule.scheduleId
-                                    ? Colors.blue.shade200
+                                    ? Colors.blue.shade100
                                     : Colors.white,
                                 child: Stack(
                                   children: [
@@ -307,7 +306,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
             ..._selectedSchedule!.shifts.map(
               (shift) {
                 return SizedBox(
-                  height: 100,
+                  height: 70,
                   width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,61 +329,74 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                           const SizedBox(width: 8),
                           Text(
                             shift.name,
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
                       ),
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: shift.slots.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(width: 8),
-                            itemBuilder: (context, index) {
-                              final slot = shift.slots[index];
-                              final isAvailable = slot.status == 'available';
-                              return ElevatedButton(
-                                onPressed: isAvailable ? () {} : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: isAvailable
-                                      ? Colors.blue
-                                      : Colors.grey.shade300,
-                                  foregroundColor: isAvailable
-                                      ? Colors.white
-                                      : Colors.grey.shade600,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: shift.slots.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(width: 8),
+                          itemBuilder: (context, index) {
+                            final slot = shift.slots[index];
+                            final isAvailable = slot.status == 'available';
+                            return ElevatedButton(
+                              onPressed: isAvailable ? () {} : null,
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size(100, 40),
+                                backgroundColor: isAvailable
+                                    ? Colors.blue
+                                    : Colors.grey.shade300,
+                                foregroundColor: isAvailable
+                                    ? Colors.white
+                                    : Colors.grey.shade600,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: Text(
-                                  '${DateFormat.Hm().format(slot.startTime)} - ${DateFormat.Hm().format(slot.endTime)}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: isAvailable
-                                            ? Colors.white
-                                            : Colors.grey.shade600,
-                                      ),
-                                ),
-                              );
-                            },
-                          ),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                              ),
+                              child: Text(
+                                '${DateFormat.Hm().format(slot.startTime)} - ${DateFormat.Hm().format(slot.endTime)}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: isAvailable
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
+                                    ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
                   ),
                 );
               },
-            )
+            ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              FaIcon(
+                FontAwesomeIcons.handPointUp, // icon tay chỉ lên
+                size: 14,
+                color: Colors.grey,
+              ),
+              SizedBox(width: 4),
+              Text(
+                '*Chọn một khung giờ để đặt lịch khám',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+            ],
+          ),
         ],
       ),
     );
