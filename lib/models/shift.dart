@@ -17,15 +17,19 @@ class Shift {
 
   factory Shift.fromJson(Map<String, dynamic> json) {
     return Shift(
-      shiftId: json['shiftId'],
+      shiftId: json['shiftId'] ?? json['_id'],
       name: json['name'],
-      startTime: DateTime.parse(json['startTime']),
-      endTime: DateTime.parse(json['endTime']),
+      startTime: DateTime.parse(json['startTime']).toLocal(),
+      endTime: DateTime.parse(json['endTime']).toLocal(),
       slots: Slot.slotsFromJson(json['slots'] ?? []),
     );
   }
   static List<Shift> shiftsFromJson(List<dynamic> jsonList) {
     return jsonList.map((json) => Shift.fromJson(json)).toList();
+  }
+
+  int get availableSlotsCount {
+    return slots.where((slot) => slot.status != "isBooked").length;
   }
 
   Map<String, dynamic> toJson() {

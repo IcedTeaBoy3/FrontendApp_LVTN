@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/specialty_provider.dart';
 import 'package:frontend_app/providers/clinic_provider.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
+import 'package:frontend_app/providers/schedule_provider.dart';
 import 'package:frontend_app/screens/my_app.dart';
 
 void main() {
@@ -13,6 +14,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => SpecialtyProvider()),
         ChangeNotifierProvider(create: (_) => ClinicProvider()),
         ChangeNotifierProvider(create: (_) => DoctorProvider()),
+        ChangeNotifierProvider(create: (_) => ScheduleProvider()),
       ],
       child: const MyApp(),
     ),
