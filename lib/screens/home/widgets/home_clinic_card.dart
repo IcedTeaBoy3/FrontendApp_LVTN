@@ -143,11 +143,11 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
                             const SizedBox(height: 8),
                             // Địa chỉ
                             Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 const FaIcon(
                                   FontAwesomeIcons.locationDot,
-                                  size: 14,
+                                  size: 16,
                                   color: Colors.blue,
                                 ),
                                 const SizedBox(width: 8),
@@ -166,10 +166,11 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
                             ),
                             // Thời gian làm việc
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 const FaIcon(
                                   FontAwesomeIcons.clock,
-                                  size: 14,
+                                  size: 16,
                                   color: Colors.blue,
                                 ),
                                 const SizedBox(width: 8),
@@ -180,7 +181,7 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
                                         .textTheme
                                         .bodyMedium
                                         ?.copyWith(color: Colors.grey[700]),
-                                    maxLines: 2,
+                                    maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),

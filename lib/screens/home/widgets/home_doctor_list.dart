@@ -17,7 +17,7 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
     super.initState();
     // Lấy dữ liệu bác sĩ khi khởi tạo widget
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DoctorProvider>().fetchDoctors();
+      context.read<DoctorProvider>().fetchDoctors(page: 1, limit: 100);
     });
   }
 
@@ -80,7 +80,9 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
             }
             final doctors = doctorProvider.doctors;
             if (doctors.isEmpty) {
-              return const Text('Không thể tải thông tin bác sĩ.');
+              return Center(
+                child: const Text('Không thể tải thông tin bác sĩ.'),
+              );
             }
             return SizedBox(
               height: MediaQuery.of(context).size.height * 0.14,

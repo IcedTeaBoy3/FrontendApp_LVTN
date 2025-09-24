@@ -13,18 +13,18 @@ class HomeSpecialtyList extends StatefulWidget {
 }
 
 class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
-  late Future<void> _fetchSpecialties;
   @override
   void initState() {
     super.initState();
-    // Lấy dữ liệu chuyên khoa khi khởi tạo widget
-    _fetchSpecialties =
-        context.read<SpecialtyProvider>().fetchSpecialties(page: 1, limit: 100);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SpecialtyProvider>().fetchSpecialties(page: 1, limit: 100);
+    });
   }
 
-  void _openSpecialtySheet(BuildContext context, SpecialtyProvider provider) {
-    final specialties = provider.specialties;
-    final total = provider.total;
+  void _openSpecialtySheet(BuildContext context) {
+    final specialtyProvider = context.read<SpecialtyProvider>();
+    final specialties = specialtyProvider.specialties;
+    final total = specialties.length;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -80,7 +80,6 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
 
   @override
   Widget build(BuildContext context) {
-    final specialtyProvider = context.watch<SpecialtyProvider>();
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -97,66 +96,41 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const FaIcon(
-                    FontAwesomeIcons.stethoscope,
-                    color: Colors.blue,
-                    size: 20,
-                  ),
-                  const SizedBox(
-                    width: 6,
-                  ), // khoảng cách giữa icon và text
-                  Text(
-                    'Chuyên khoa',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
+              const FaIcon(
+                FontAwesomeIcons.stethoscope,
+                color: Colors.blue,
+                size: 20,
               ),
-              TextButton(
-                onPressed: () =>
-                    _openSpecialtySheet(context, specialtyProvider),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text('Xem tất cả', style: TextStyle(color: Colors.blue)),
-                    SizedBox(width: 4), // khoảng cách giữa chữ và icon
-                    Icon(Icons.arrow_forward_ios, color: Colors.blue, size: 16),
-                  ],
-                ),
-              )
+              const SizedBox(
+                width: 6,
+              ), // khoảng cách giữa icon và text
+              Text(
+                'Chuyên khoa',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
             ],
           ),
           // Danh sách chuyên khoa
           const SizedBox(height: 8),
-          FutureBuilder(
-            future: _fetchSpecialties,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          Consumer<SpecialtyProvider>(
+            builder: (context, specialtyProvider, child) {
+              if (specialtyProvider.isLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text(
-                    'Đã có lỗi xảy ra: ${snapshot.error}',
-                    style: TextStyle(color: Colors.red[700]),
-                  ),
-                );
-              } else if (specialtyProvider.specialties.isEmpty) {
-                return const Center(
-                    child: Text(
-                  'Không có chuyên khoa nào',
-                ));
               }
               final specialties = specialtyProvider.specialties;
+              if (specialties.isEmpty) {
+                return const Center(
+                  child: Text('Không thể tải thông tin chuyên khoa'),
+                );
+              }
               return SizedBox(
                 height: 230,
                 child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
                     childAspectRatio: 0.8,
@@ -176,7 +150,27 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
                 ),
               );
             },
-          )
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _openSpecialtySheet(context),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                side: BorderSide(color: Colors.grey.shade300),
+                backgroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 12.0),
+              ),
+              child: Text(
+                'Xem tất cả các chuyên khoa',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );

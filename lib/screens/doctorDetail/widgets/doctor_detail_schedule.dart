@@ -16,8 +16,6 @@ class DoctorDetailSchedule extends StatefulWidget {
 }
 
 class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
-  late Future<void> _fetchDoctorSchedules;
-
   DateTime? _selectedMonth;
   Schedule? _selectedSchedule;
   void showMonthPickerDialog() {
@@ -72,12 +70,9 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
         setState(() {
           _selectedMonth = selectedDate;
           _selectedSchedule = null;
-          debugPrint('selectedDate: $_selectedMonth');
         });
-        _fetchDoctorSchedules = context
-            .read<ScheduleProvider>()
-            .fetchDoctorSchedules(
-                doctorId: widget.doctorId, date: _selectedMonth);
+        context.read<ScheduleProvider>().fetchDoctorSchedules(
+            doctorId: widget.doctorId, date: _selectedMonth);
       }
     });
   }
@@ -86,9 +81,10 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
   void initState() {
     super.initState();
     _selectedMonth = DateTime.now();
-    _fetchDoctorSchedules = context
-        .read<ScheduleProvider>()
-        .fetchDoctorSchedules(doctorId: widget.doctorId, date: _selectedMonth);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ScheduleProvider>().fetchDoctorSchedules(
+          doctorId: widget.doctorId, date: _selectedMonth);
+    });
   }
 
   @override
@@ -158,147 +154,132 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
             onPressed: () => showMonthPickerDialog(),
           ),
           const SizedBox(height: 12),
-          FutureBuilder(
-            future: _fetchDoctorSchedules,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+          Consumer<ScheduleProvider>(
+            builder: (context, scheduleProvider, child) {
+              if (scheduleProvider.isLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error: ${snapshot.error}'),
+              }
+              final schedules = scheduleProvider.schedules;
+              if (schedules.isEmpty) {
+                return const Center(
+                  child: Text('Không có lịch khám trong tháng này.'),
                 );
-              } else {
-                return Consumer<ScheduleProvider>(
-                  builder: (context, scheduleProvider, child) {
-                    final schedules = scheduleProvider.schedules;
-                    if (schedules.isEmpty) {
-                      return const Center(
-                        child: Text('Không có lịch khám trong tháng này.'),
-                      );
-                    }
-                    if (_selectedSchedule == null && schedules.isNotEmpty) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
+              }
+              if (_selectedSchedule == null && schedules.isNotEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _selectedSchedule = schedules.first;
+                  });
+                });
+              }
+              return SizedBox(
+                height: 160,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: schedules.length,
+                  itemBuilder: (context, index) {
+                    final schedule = schedules[index];
+                    final slotCount = schedule.availableSlotCount;
+                    return GestureDetector(
+                      onTap: () {
                         setState(() {
-                          _selectedSchedule = schedules.first;
+                          _selectedSchedule = schedule;
                         });
-                      });
-                    }
-                    return SizedBox(
-                      height: 160,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: schedules.length,
-                        itemBuilder: (context, index) {
-                          final schedule = schedules[index];
-                          final slotCount = schedule.availableSlotCount;
-
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedSchedule = schedule;
-                              });
-                            },
-                            child: Container(
-                              width: 100,
-                              margin: const EdgeInsets.only(right: 12),
-                              child: Card(
-                                elevation: 3,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                      },
+                      child: Container(
+                        width: 100,
+                        margin: const EdgeInsets.only(right: 12),
+                        child: Card(
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          color: _selectedSchedule?.scheduleId ==
+                                  schedule.scheduleId
+                              ? Colors.blue.shade100
+                              : Colors.white,
+                          child: Stack(
+                            children: [
+                              // Badge Hết lịch
+                              if (slotCount == 0)
+                                Positioned(
+                                  top: 6,
+                                  right: 6,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.shade100,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      'Đầy lịch',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                color: _selectedSchedule?.scheduleId ==
-                                        schedule.scheduleId
-                                    ? Colors.blue.shade100
-                                    : Colors.white,
-                                child: Stack(
+
+                              // Nội dung chính
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    // Badge Hết lịch
-                                    if (slotCount == 0)
-                                      Positioned(
-                                        top: 6,
-                                        right: 6,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red.shade100,
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: const Text(
-                                            'Đầy lịch',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
+                                    Text(
+                                      getWeekdayName(schedule.workday),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    CircleAvatar(
+                                      radius: 22,
+                                      backgroundColor: Colors.blue.shade50,
+                                      child: Text(
+                                        '${schedule.workday.day}',
+                                        style: const TextStyle(
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
                                         ),
                                       ),
-
-                                    // Nội dung chính
-                                    Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            getWeekdayName(schedule.workday),
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 8),
-                                          CircleAvatar(
-                                            radius: 22,
-                                            backgroundColor:
-                                                Colors.blue.shade50,
-                                            child: Text(
-                                              '${schedule.workday.day}',
-                                              style: const TextStyle(
-                                                color: Colors.blue,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ),
-                                          // Badge số khung giờ
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: slotCount > 0
-                                                  ? Colors.green.shade100
-                                                  : Colors.grey.shade200,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: Text(
-                                              '$slotCount slot',
-                                              style: TextStyle(
-                                                color: slotCount > 0
-                                                    ? Colors.green.shade800
-                                                    : Colors.grey.shade600,
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                    ),
+                                    // Badge số khung giờ
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: slotCount > 0
+                                            ? Colors.green.shade100
+                                            : Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        '$slotCount slot',
+                                        style: TextStyle(
+                                          color: slotCount > 0
+                                              ? Colors.green.shade800
+                                              : Colors.grey.shade600,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            ],
+                          ),
+                        ),
                       ),
                     );
                   },
-                );
-              }
+                ),
+              );
             },
           ),
           const SizedBox(height: 12),

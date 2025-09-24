@@ -34,7 +34,6 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
             } else if (!snapshot.hasData) {
               return const Text('No User');
             }
-
             final userData = snapshot.data!;
             return Row(
               children: [
@@ -82,15 +81,42 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.menu,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            // Handle settings action
-          },
-        ),
+        Stack(
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.notifications,
+                size: 28,
+              ),
+              onPressed: () {
+                // Xử lý khi nhấn vào biểu tượng thông báo
+              },
+            ),
+            Positioned(
+              right: 11,
+              top: 11,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 14,
+                  minHeight: 14,
+                ),
+                child: const Text(
+                  '3', // Số lượng thông báo chưa đọc
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 8,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
+        )
       ],
     );
   }

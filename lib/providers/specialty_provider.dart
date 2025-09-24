@@ -12,6 +12,9 @@ class SpecialtyProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> fetchSpecialties({int page = 1, int limit = 10}) async {
+    if (_isLoading) return; // Tránh gọi fetch nhiều lần cùng lúc
+    _isLoading = true;
+    notifyListeners();
     try {
       final result =
           await SpecialtyService.getAllSpecialties(page: page, limit: limit);

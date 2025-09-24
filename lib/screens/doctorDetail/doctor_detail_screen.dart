@@ -40,12 +40,6 @@ class DoctorDetailScreen extends StatelessWidget {
                 onPressed: () {},
                 icon: const Icon(Icons.favorite_border, color: Colors.white),
               ),
-              IconButton(
-                onPressed: () {
-                  // Handle share button press
-                },
-                icon: const Icon(Icons.share, color: Colors.white),
-              ),
             ],
           )
         ],

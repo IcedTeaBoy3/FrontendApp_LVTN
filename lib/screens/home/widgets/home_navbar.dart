@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeNavbar extends StatelessWidget {
   final int _selectedIndex;
@@ -32,7 +33,7 @@ class HomeNavbar extends StatelessWidget {
           topRight: Radius.circular(20),
         ),
         child: BottomNavigationBar(
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Trang chủ',
@@ -42,16 +43,45 @@ class HomeNavbar extends StatelessWidget {
               label: 'Hồ sơ',
             ),
             BottomNavigationBarItem(
+              icon: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.white,
+                      Colors.lightBlueAccent,
+                      Colors.white,
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.withAlpha(100),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: FaIcon(
+                    FontAwesomeIcons.robot,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ),
+              label: 'Trợ lý',
+            ),
+            BottomNavigationBarItem(
               icon: Icon(Icons.file_copy),
               label: 'Phiếu khám',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.notifications),
-              label: 'Thông báo',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'Cá nhân',
+              label: 'Tài khoản',
             ),
           ],
           currentIndex: _selectedIndex,
