@@ -10,6 +10,7 @@ class ClinicProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<void> fetchClinic() async {
+    if (_isLoading) return; // Tránh gọi fetch nhiều lần cùng lúc
     _isLoading = true;
     notifyListeners();
     try {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'package:frontend_app/providers/clinic_provider.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:go_router/go_router.dart';
@@ -14,18 +13,16 @@ class HomeClinicCard extends StatefulWidget {
 }
 
 class _HomeClinicCardState extends State<HomeClinicCard> {
-  late Future<void> _fetchClinic;
   @override
   void initState() {
     super.initState();
-    // / Gọi fetch sau khi frame đầu tiên build xong, tránh setState trong build
-
-    _fetchClinic = context.read<ClinicProvider>().fetchClinic();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ClinicProvider>().fetchClinic();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final clinicProvider = context.watch<ClinicProvider>();
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -64,145 +61,137 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
             ),
             const SizedBox(height: 16),
             // Nội dung
-            FutureBuilder(
-              future: _fetchClinic,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            Consumer<ClinicProvider>(
+              builder: (context, clinicProvider, child) {
+                if (clinicProvider.isLoading) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text(
-                      'Đã có lỗi xảy ra: ${snapshot.error}',
-                      style: TextStyle(color: Colors.red[700]),
-                    ),
-                  );
-                } else {
-                  final clinic = clinicProvider.clinic;
-                  return InkWell(
-                    onTap: () => context.goNamed(
-                      'clinicDetail',
-                      extra: clinic,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Ảnh phòng khám
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.blueAccent,
-                              width: 2,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
+                }
+                final clinic = clinicProvider.clinic;
+                if (clinic == null) {
+                  return const Text('Không thể tải thông tin phòng khám.');
+                }
+                return InkWell(
+                  onTap: () => context.goNamed(
+                    'clinicDetail',
+                    extra: clinic,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Ảnh phòng khám
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.blueAccent,
+                            width: 2,
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ), // nhỏ hơn 1 chút để viền thấy rõ
-                            child: (clinic!.images.isNotEmpty)
-                                ? Image.network(
-                                    ApiConfig.backendUrl + clinic.images.first,
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            Container(
-                                      color: Colors.grey[200],
-                                      child: const Icon(
-                                        Icons.broken_image,
-                                        size: 30,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  )
-                                : Container(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                            10,
+                          ), // nhỏ hơn 1 chút để viền thấy rõ
+                          child: (clinic.images.isNotEmpty)
+                              ? Image.network(
+                                  ApiConfig.backendUrl + clinic.images.first,
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
                                     color: Colors.grey[200],
                                     child: const Icon(
-                                      Icons.image_not_supported,
+                                      Icons.broken_image,
                                       size: 30,
                                       color: Colors.grey,
                                     ),
                                   ),
-                          ),
+                                )
+                              : Container(
+                                  color: Colors.grey[200],
+                                  child: const Icon(
+                                    Icons.image_not_supported,
+                                    size: 30,
+                                    color: Colors.grey,
+                                  ),
+                                ),
                         ),
-                        const SizedBox(width: 16),
-                        // Thông tin
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Tên
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      clinic.name,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge
-                                          ?.copyWith(
-                                              fontWeight: FontWeight.w600),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                      ),
+                      const SizedBox(width: 16),
+                      // Thông tin
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Tên
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    clinic.name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(fontWeight: FontWeight.w600),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              // Địa chỉ
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const FaIcon(
-                                    FontAwesomeIcons.locationDot,
-                                    size: 14,
-                                    color: Colors.blue,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // Địa chỉ
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.locationDot,
+                                  size: 14,
+                                  color: Colors.blue,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    clinic.address,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: Colors.grey[700]),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      clinic.address,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(color: Colors.grey[700]),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                ),
+                              ],
+                            ),
+                            // Thời gian làm việc
+                            Row(
+                              children: [
+                                const FaIcon(
+                                  FontAwesomeIcons.clock,
+                                  size: 14,
+                                  color: Colors.blue,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    clinic.workHours ?? 'Chưa cập nhật',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(color: Colors.grey[700]),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                              ),
-                              // Thời gian làm việc
-                              Row(
-                                children: [
-                                  const FaIcon(
-                                    FontAwesomeIcons.clock,
-                                    size: 14,
-                                    color: Colors.blue,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      clinic.workHours ?? 'Chưa cập nhật',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(color: Colors.grey[700]),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                }
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],

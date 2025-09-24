@@ -41,9 +41,14 @@ class _HomeSliderState extends State<HomeSlider> {
             height: 200,
             autoPlay: true,
             enlargeCenterPage: true,
-            onPageChanged: (index, reason) => setState(
-              () => activeIndex = index,
-            ),
+            onPageChanged: (index, reason) => {
+              if (index != activeIndex)
+                {
+                  setState(() {
+                    activeIndex = index;
+                  })
+                }
+            },
           ),
         ),
         const SizedBox(height: 12),
