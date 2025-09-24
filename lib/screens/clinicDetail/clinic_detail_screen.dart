@@ -32,6 +32,13 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
           ? Colors.grey.shade200
           : Colors.grey.shade800,
       appBar: AppBar(
+        title: Text(
+          'Thông tin phòng khám',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.blue.shade700,
         actions: [
           IconButton(

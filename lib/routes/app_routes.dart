@@ -5,8 +5,9 @@ import 'package:frontend_app/screens/error/error_screen.dart';
 import 'package:frontend_app/screens/register/register_screen.dart';
 import 'package:frontend_app/screens/clinicDetail/clinic_detail_screen.dart';
 import 'package:frontend_app/screens/doctorDetail/doctor_detail_screen.dart';
+import 'package:frontend_app/screens/addPatientProfile/add_patient_profile.dart';
+import 'package:frontend_app/screens/verifyOtp/verify_otp_screen.dart';
 import 'package:frontend_app/models/clinic.dart';
-import 'package:frontend_app/models/doctor.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -33,17 +34,39 @@ class AppRoutes {
               return DoctorDetailScreen(doctorId: doctorId);
             },
           ),
+          GoRoute(
+            name: 'addPatientProfile',
+            path: 'addPatientProfile',
+            builder: (context, state) => const AddPatientProfile(),
+          ),
+          GoRoute(
+            name: 'login',
+            path: 'login',
+            builder: (context, state) => const LoginScreen(),
+            routes: [
+              GoRoute(
+                name: 'register',
+                path: 'register',
+                builder: (context, state) => const RegisterScreen(),
+                routes: [
+                  GoRoute(
+                    name: 'verifyOtp',
+                    path: 'verifyOtp',
+                    builder: (context, state) {
+                      final args = state.extra as Map<String, dynamic>;
+                      final verificationId = args['verificationId'] as String;
+                      final phone = args['phone'] as String;
+                      return VerifyOtpScreen(
+                        verificationId: verificationId,
+                        phone: phone,
+                      );
+                    },
+                  )
+                ],
+              ),
+            ],
+          ),
         ],
-      ),
-      GoRoute(
-        name: 'login',
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        name: 'register',
-        path: '/register',
-        builder: (context, state) => const RegisterScreen(),
       ),
     ],
     errorBuilder: (context, state) => const ErrorScreen(),

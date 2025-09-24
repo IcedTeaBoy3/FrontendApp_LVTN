@@ -2,23 +2,29 @@ class User {
   final String userId;
   final String? name;
   final String email;
+  final String? avatar;
+  final String role;
+  final String type;
   final String phone;
   final DateTime? dateOfBirth;
   final String? gender;
-  final String? avatar;
   final String? address;
-  final String role;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   User({
     required this.userId,
     this.name,
+    this.avatar,
     required this.email,
     required this.phone,
     this.dateOfBirth,
     this.gender,
-    this.avatar,
     this.address,
     required this.role,
+    required this.type,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   /// Parse từ JSON sang object
@@ -27,14 +33,17 @@ class User {
       userId: json['userId'] as String,
       name: json['name'] ?? '',
       email: json['email'] ?? '',
+      avatar: json['avatar'] ?? '',
+      role: json['role'] ?? '',
+      type: json['type'] ?? '',
       phone: json['phone'] ?? '',
       dateOfBirth: json['dateOfBirth'] != null
           ? DateTime.tryParse(json['dateOfBirth'])
           : null,
       gender: json['gender'] ?? '',
-      avatar: json['avatar'] ?? '',
       address: json['address'] ?? '',
-      role: json['role'] ?? '',
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 
@@ -50,6 +59,8 @@ class User {
       'avatar': avatar,
       'address': address,
       'role': role,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 }

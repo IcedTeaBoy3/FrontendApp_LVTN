@@ -17,7 +17,7 @@ class HomeNavbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).brightness == Brightness.light
             ? Colors.white
-            : Colors.black87,
+            : Colors.black,
         boxShadow: [
           BoxShadow(
             color: Colors.black26,
@@ -25,10 +25,6 @@ class HomeNavbar extends StatelessWidget {
             offset: Offset(0, -2),
           ),
         ],
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
       ),
       child: ClipRRect(
         borderRadius: const BorderRadius.only(

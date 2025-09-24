@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/themes/colors.dart';
+import 'package:frontend_app/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,6 +23,28 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       // Handle login action
+    }
+  }
+
+  void _handeGoogleSignIn() async {
+    final success = await AuthService.googleAuth();
+    if (success) {
+      if (context.mounted) {
+        context.goNamed('home');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đăng nhập Google thành công!'),
+          ),
+        );
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đăng nhập Google thất bại. Vui lòng thử lại.'),
+          ),
+        );
+      }
     }
   }
 
@@ -123,6 +146,11 @@ class _LoginScreenState extends State<LoginScreen> {
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => context.pop(),
+              color: Colors.black,
+            ),
             backgroundColor: Colors.transparent,
           ),
           body: SafeArea(
@@ -175,6 +203,75 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
+                            const SizedBox(
+                              height: 20.0,
+                            ),
+                            // Hoặc tiếp tục với google
+                            Center(
+                              child: Text(
+                                'Hoặc tiếp tục với',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 12.0,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Google
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withAlpha(30),
+                                        blurRadius: 6,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: IconButton(
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.google,
+                                      color: Colors.red,
+                                      size: 28,
+                                    ),
+                                    onPressed: _handeGoogleSignIn,
+                                  ),
+                                ),
+                                const SizedBox(width: 25),
+
+                                // Facebook
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withAlpha(30),
+                                        blurRadius: 6,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: IconButton(
+                                    icon: FaIcon(
+                                      FontAwesomeIcons.facebook,
+                                      color: Colors.blue,
+                                      size: 28,
+                                    ),
+                                    onPressed: () {
+                                      // Handle Facebook sign-in
+                                    },
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         ),
                       ),
@@ -331,10 +428,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          // Handle registration action
-          context.push('/register');
-        },
+        onPressed: () => context.goNamed('register'),
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.black54,
           padding: const EdgeInsets.symmetric(
