@@ -24,12 +24,11 @@ dependencies:
   html: ^0.15.0 # Xử lý HTML
   intl: ^0.19.0 # Định dạng ngày tháng
   month_picker_dialog: ^6.5.0 # Lọc lịch làm việc của bs theo tháng
-  firebase_core: ^3.5.0
-  firebase_auth: ^5.2.0
   google_sign_in: ^6.1.0 # đăng nhập với google
   shared_preferences: ^2.2.3
   flutter_secure_storage: ^8.0.0
   jwt_decode: ^0.3.1
+  lottie: ^2.2.0 
   flutter_localizations:  
     sdk: flutter
 
@@ -47,3 +46,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/animations/

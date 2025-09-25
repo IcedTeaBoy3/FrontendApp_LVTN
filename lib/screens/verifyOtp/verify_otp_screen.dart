@@ -16,7 +16,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   final _otpController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  final FirebaseService _authService = FirebaseService();
+  // final FirebaseService _authService = FirebaseService();
 
   @override
   void dispose() {
@@ -32,17 +32,17 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
       // TODO: Thêm logic xác thực OTP tại đây
       // Ví dụ: Gọi hàm verifyOtp từ FirebaseAuthService của bạn
-      final userCredential = _authService.verifyOtp(
-        widget.verificationId,
-        _otpController.text,
-      );
+      // final userCredential = _authService.verifyOtp(
+      //   widget.verificationId,
+      //   _otpController.text,
+      // );
 
-      if (userCredential != null) {
-        debugPrint('Xác thực OTP thành công!');
-      } else {
-        // Hiển thị lỗi
-        debugPrint('Xác thực OTP thất bại.');
-      }
+      // if (userCredential != null) {
+      //   debugPrint('Xác thực OTP thành công!');
+      // } else {
+      //   // Hiển thị lỗi
+      //   debugPrint('Xác thực OTP thất bại.');
+      // }
 
       setState(() {
         _isLoading = false;

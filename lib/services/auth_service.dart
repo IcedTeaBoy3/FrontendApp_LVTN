@@ -1,6 +1,8 @@
 import 'api_client.dart';
 import 'package:frontend_app/models/user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:frontend_app/models/response_api.dart';
+import 'package:dio/dio.dart';
 
 class AuthService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -9,49 +11,86 @@ class AuthService {
         '763500997258-mlhs837o79q1ftelhqqi7kp5op7garn9.apps.googleusercontent.com',
   );
 
-  static Future<Map<String, dynamic>?> loginWithGoogle() async {
+  static Future<ResponseApi> loginWithGoogle() async {
     try {
       // Nếu muốn lần nào cũng cho chọn tài khoản:
       await _googleSignIn.signOut();
-
       final googleUser = await _googleSignIn.signIn();
-
       if (googleUser == null) {
-        print("❌ Google sign-in bị hủy");
-        return null;
+        return ResponseApi(status: 'error', message: 'Google sign-in bị hủy');
       }
       final googleAuth = await googleUser.authentication;
       final idToken = googleAuth.idToken;
       if (idToken == null) {
-        print("❌ Không lấy được idToken từ Google");
-        return null;
+        return ResponseApi(
+          status: 'error',
+          message: 'Không lấy được idToken từ Google',
+        );
       }
-
       // Gửi token về backend
       final response = await ApiClient.dio.post(
         '/auth/google/mobile',
         data: {'idToken': idToken},
       );
-
-      print("Google login response: ${response.data}");
-      // Xử lý phản hồi từ backend
-      if (response.statusCode == 200) {
-        final data = response.data['data'];
-        final accessToken = data['accessToken'];
-        final refreshToken = data['refreshToken'];
-        final user = User.fromJson(data['user']);
-        return {
-          'user': user,
-          'accessToken': accessToken,
-          'refreshToken': refreshToken,
-        };
-      } else {
-        print("❌ Google login thất bại với mã: ${response.statusCode}");
-        return null;
-      }
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Đăng nhập thất bại',
+      );
     } catch (e) {
-      print("Error Google login: $e");
-      return null;
+      return ResponseApi(status: 'error', message: 'Đăng nhập Google thất bại');
+    }
+  }
+
+  static Future<ResponseApi> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/login',
+        data: {
+          'identifier': email,
+          'password': password,
+        },
+      );
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Đăng nhập thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Đăng nhập thất bại');
+    }
+  }
+
+  static Future<ResponseApi> register({
+    required String email,
+    required String password,
+    required String confirmPassword,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/register',
+        data: {
+          'identifier': email,
+          'password': password,
+          'confirmPassword': confirmPassword,
+        },
+      );
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Đăng nhập thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Đăng ký thất bại');
     }
   }
 
@@ -66,7 +105,7 @@ class AuthService {
         return User.fromJson(response.data['data']);
       }
     } catch (e) {
-      print("Error fetching user: $e");
+      print("Error get user: $e");
       return null;
     }
   }

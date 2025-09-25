@@ -61,13 +61,17 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     Text(
-                      user?.name ?? 'Đăng ký/Đăng nhập',
+                      user == null
+                          ? 'Đăng nhập/Đăng ký'
+                          : (user!.name?.isNotEmpty == true
+                              ? user!.name!
+                              : (user!.email ?? 'Đăng nhập/Đăng ký')),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         fontSize: 16,
                       ),
-                    ),
+                    )
                   ],
                 ),
               ],

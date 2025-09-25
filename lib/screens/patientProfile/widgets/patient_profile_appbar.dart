@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend_app/providers/auth_provider.dart';
+import 'package:frontend_app/widgets/confirm_dialog.dart';
+import 'package:frontend_app/themes/colors.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 class PatientProfileAppbar extends StatelessWidget
@@ -9,6 +13,7 @@ class PatientProfileAppbar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+    final isAuthenticated = context.read<AuthProvider>().isAuthenticated;
     return AppBar(
       leading: IconButton(
         onPressed: onBackToHome,
@@ -35,6 +40,20 @@ class PatientProfileAppbar extends StatelessWidget
             size: 20,
           ),
           onPressed: () {
+            if (!isAuthenticated) {
+              ConfirmDialog.show(
+                context,
+                title: 'Xác nhận',
+                content: 'Bạn cần đăng nhập để thực hiện hành động này.',
+                confirmText: 'Đăng nhập',
+                cancelText: 'Hủy',
+                confirmColor: AppColors.primaryBlue,
+                onConfirm: () {
+                  context.goNamed('login');
+                },
+              );
+              return;
+            }
             _showOptionsDialog(context);
           },
         )

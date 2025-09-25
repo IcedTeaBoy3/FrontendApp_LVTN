@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend_app/models/response_api.dart';
 import 'package:frontend_app/models/user.dart';
 import 'package:frontend_app/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,22 +21,45 @@ class AuthProvider extends ChangeNotifier {
   String? get refreshToken => _refreshToken;
   bool get isAuthenticated => _user != null && _accessToken != null;
 
-  Future<bool> loginWithGoogle() async {
+  Future<ResponseApi> loginWithGoogle() async {
     try {
       final result = await AuthService.loginWithGoogle();
-      if (result != null) {
-        _user = result['user'];
-        _accessToken = result['accessToken'];
-        _refreshToken = result['refreshToken'];
+      if (result.status == 'success') {
+        _user = result.user;
+        _accessToken = result.accessToken;
+        _refreshToken = result.refreshToken;
         // Lưu token và user vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
+        notifyListeners();
       }
-      notifyListeners();
-      return true;
+      return result;
     } catch (e) {
-      print('Login with Google failed: $e');
-      return false;
+      return ResponseApi(status: 'error', message: 'Đăng nhập Google thất bại');
+    }
+  }
+
+  Future<ResponseApi> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final result = await AuthService.login(email: email, password: password);
+      if (result.status == 'success') {
+        _user = result.user;
+        _accessToken = result.accessToken;
+        _refreshToken = result.refreshToken;
+        // Lưu token và user vào secure storage
+        await _storage.write(key: 'accessToken', value: _accessToken);
+        await _storage.write(key: 'refreshToken', value: _refreshToken);
+        notifyListeners();
+      }
+      return result;
+    } catch (e) {
+      return ResponseApi(
+        status: 'error',
+        message: 'Đăng nhập thất bại',
+      );
     }
   }
 

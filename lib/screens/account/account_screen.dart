@@ -2,40 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
+import 'package:frontend_app/widgets/confirm_dialog.dart';
 import 'package:provider/provider.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
   void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Xác nhận đăng xuất'),
-          content: Text('Bạn có chắc chắn muốn đăng xuất không?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Đóng dialog
-              },
-              child: Text('Hủy'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop(); // Đóng dialog
-                context.read<AuthProvider>().logout();
-                context.goNamed('login');
-              },
-              child: Text('Đăng xuất'),
-            ),
-          ],
-        );
+    ConfirmDialog.show(
+      context,
+      title: "Xác nhận đăng xuất",
+      content: "Bạn có chắc chắn muốn đăng xuất không?",
+      cancelText: "Hủy",
+      confirmText: "Đăng xuất",
+      confirmColor: Colors.red,
+      onConfirm: () {
+        context.read<AuthProvider>().logout();
+        context.goNamed('login');
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isAuthenticated = context.watch<AuthProvider>().isAuthenticated;
     return SafeArea(
       child: Container(
         color: Colors.grey[100],
@@ -237,18 +226,18 @@ class AccountScreen extends StatelessWidget {
                       color: Colors.grey[200],
                       thickness: 1,
                     ),
-                    ListTile(
-                      leading: Icon(Icons.logout, color: Colors.black),
-                      title: Text('Đăng xuất'),
-                      trailing: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: Colors.black45,
-                      ),
-                      onTap: () {
-                        _showLogoutDialog(context);
-                      },
-                    ),
+                    isAuthenticated
+                        ? ListTile(
+                            leading: Icon(Icons.logout, color: Colors.black),
+                            title: Text('Đăng xuất'),
+                            trailing: Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Colors.black45,
+                            ),
+                            onTap: () => _showLogoutDialog(context),
+                          )
+                        : SizedBox.shrink(),
                   ],
                 ),
               )

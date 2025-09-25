@@ -6,12 +6,12 @@ import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:frontend_app/providers/schedule_provider.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:frontend_app/screens/my_app.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:frontend_app/services/api_client.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
   final authProvider = AuthProvider();
   ApiClient.init(authProvider);
   runApp(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/themes/colors.dart';
-import 'package:frontend_app/services/firebase_service.dart';
+import 'package:frontend_app/services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,45 +13,43 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool _isButtonEnabled = false;
-  final FirebaseService _authService = FirebaseService();
-  bool _isLoading = false;
-  final Map<String, String> _registerData = {
-    'phone': '',
-  };
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  bool _isPasswordVisible = false;
 
   void _onSubmit() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      setState(() {
-        _isLoading = true;
-      });
-
-      // Bắt đầu quá trình gửi OTP
-      await _authService.sendOtp(
-        '+84${_registerData['phone']}', // Thêm mã quốc gia
-        codeSent: (String verificationId, int? resendToken) {
-          // TODO: Chuyển hướng đến màn hình xác thực OTP
-          // Truyền verificationId để sử dụng khi xác thực OTP
-          context.pushNamed('verifyOtp', extra: {
-            'verificationId': verificationId,
-            'phone': _registerData['phone'],
-          });
-        },
-        verificationFailed: (e) {
-          // Hiển thị lỗi cho người dùng
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${e.message}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        },
+      // Xử lý đăng ký tài khoản tại đây
+      print('Email: ${_emailController.text}');
+      print('Password: ${_passwordController.text}');
+      print('Confirm Password: ${_confirmPasswordController.text}');
+      final response = await AuthService.register(
+        email: _emailController.text,
+        password: _passwordController.text,
+        confirmPassword: _confirmPasswordController.text,
       );
+      if (!mounted) return;
+      if (response.status == 'success') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message),
+            backgroundColor: Colors.green,
+          ),
+        );
+        context.pop();
 
-      setState(() {
-        _isLoading = false;
-      });
+        context.goNamed('login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -183,16 +181,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               height: 16.0,
                             ),
                             Text(
-                              'Nhập vào số điện thoại đăng ký',
+                              'Nhập vào thông tin đăng ký của bạn',
                               style: TextStyle(
                                   fontSize: 18, color: Colors.black87),
                             ),
                             const SizedBox(
                               height: 8.0,
                             ),
-                            _buildPhoneNumberField(),
+                            _buildEmailField(),
                             const SizedBox(
                               height: 16.0,
+                            ),
+                            _buildPasswordField(),
+                            const SizedBox(
+                              height: 16.0,
+                            ),
+                            _buildConfirmPasswordField(),
+                            const SizedBox(
+                              height: 24.0,
                             ),
                             const Text(
                               'Bằng việc tiếp tục, bạn đã đồng ý với các Điều khoản, điều kiện sử dụng của chúng tôi.',
@@ -206,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                     ),
-                    _buildRegisterLink(),
+                    _buildContinueButton(),
                     const SizedBox(
                       height: 6.0,
                     )
@@ -220,62 +226,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // lib/screens/login_screen.dart
-
-  Widget _buildPhoneNumberField() {
+  Widget _buildEmailField() {
     return TextFormField(
+      controller: _emailController,
       style: const TextStyle(
         color: Colors.black, // Màu chữ khi nhập
         fontSize: 16,
       ),
-      keyboardType: TextInputType.phone,
+      keyboardType: TextInputType.emailAddress,
       validator: (value) {
-        if (value == null || value.isEmpty || value.length < 9) {
-          return 'Vui lòng nhập số điện thoại';
+        if (value == null ||
+            value.isEmpty ||
+            !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+          return '* Vui lòng nhập địa chỉ email hợp lệ';
         }
         return null;
       },
-      onChanged: (value) => {
-        setState(() {
-          _isButtonEnabled = RegExp(r'^[0-9]{9,10}$').hasMatch(value);
-        })
-      },
-      onSaved: (value) {
-        _registerData['phone'] = value!;
-      },
       decoration: InputDecoration(
-        hintText: 'Số điện thoại',
+        hintText: 'Email',
         hintStyle: const TextStyle(
           color: Colors.grey,
           fontSize: 16,
         ),
         // --- Phần đã được sửa đổi ---
-        prefixIcon: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: TextButton.icon(
-            onPressed: null,
-            icon: Icon(
-              Icons.phone,
-              color: Colors.black87,
-            ),
-            label: Text(
-              '+84',
-              style: TextStyle(
-                color: Colors.black87,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-        // --- Kết thúc phần sửa đổi ---
-        filled: true,
-        fillColor: Colors.grey[200], // Thêm màu nền để dễ nhìn hơn
-        contentPadding: const EdgeInsets.symmetric(
+        prefixIcon: const Icon(Icons.email),
+        contentPadding: EdgeInsets.symmetric(
           vertical: 8,
           horizontal: 12,
         ),
+        filled: true,
+        fillColor: Colors.white,
         border: const OutlineInputBorder(
           borderSide: BorderSide(
             color: Colors.blue,
@@ -310,47 +290,178 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildRegisterLink() {
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      style: const TextStyle(
+        color: Colors.black, // Màu chữ khi nhập
+        fontSize: 16,
+      ),
+      keyboardType: TextInputType.visiblePassword,
+      obscureText: !_isPasswordVisible,
+      validator: (value) {
+        if (value == null || value.isEmpty || value.length < 6) {
+          return '* Mật khẩu phải có ít nhất 6 ký tự';
+        }
+        if (value != _confirmPasswordController.text) {
+          return '* Mật khẩu không khớp';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        hintText: 'Mật khẩu',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontSize: 16,
+        ),
+        // --- Phần đã được sửa đổi ---
+        prefixIcon: const Icon(Icons.lock),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: _isPasswordVisible ? Colors.blue : Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 12,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.0,
+          ),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.5,
+          ),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 1.0,
+          ),
+        ),
+        errorStyle: const TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+        errorMaxLines: 2,
+      ),
+    );
+  }
+
+  Widget _buildConfirmPasswordField() {
+    return TextFormField(
+      controller: _confirmPasswordController,
+      style: const TextStyle(
+        color: Colors.black, // Màu chữ khi nhập
+        fontSize: 16,
+      ),
+      keyboardType: TextInputType.visiblePassword,
+      obscureText: !_isPasswordVisible,
+      validator: (value) {
+        if (value == null || value.isEmpty || value.length < 6) {
+          return '* Mật khẩu phải có ít nhất 6 ký tự';
+        }
+        if (value != _passwordController.text) {
+          return '* Mật khẩu không khớp';
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        hintText: 'Nhập lại mật khẩu',
+        hintStyle: const TextStyle(
+          color: Colors.grey,
+          fontSize: 16,
+        ),
+        // --- Phần đã được sửa đổi ---
+        prefixIcon: const Icon(Icons.lock),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 12,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.0,
+          ),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.5,
+          ),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        errorBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 1.0,
+          ),
+        ),
+        errorStyle: const TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+        errorMaxLines: 2,
+      ),
+    );
+  }
+
+  Widget _buildContinueButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _isLoading
-            ? null
-            : _isButtonEnabled
-                ? () {
-                    setState(() {
-                      _isLoading = true;
-                    });
-                    _onSubmit();
-                  }
-                : null,
+        onPressed: _onSubmit,
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
-          backgroundColor: Color(0xFF1976D2), // Màu nền xanh
+          backgroundColor: AppColors.primaryBlue, // Màu nền xanh
           padding: const EdgeInsets.symmetric(
             vertical: 12.0,
-          ),
-          side: BorderSide(
-            color: Colors.black45,
-            width: 1.0,
           ),
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
-        child: _isLoading
-            ? SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.0,
-                ),
-              )
-            : const Text(
-                'Tiếp tục',
-              ),
+        child: const Text(
+          'Tiếp tục',
+        ),
       ),
     );
   }

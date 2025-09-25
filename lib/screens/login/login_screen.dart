@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend_app/widgets/message_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,39 +15,247 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final Map<String, String> _loginData = {
-    'phone': '',
-    'password': '',
-  };
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
-  void _onSubmit() {
+  void onSubmit() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Handle login action
+      final email = _emailController.text;
+      final password = _passwordController.text;
+      final response = await context
+          .read<AuthProvider>()
+          .login(email: email, password: password);
+      if (!mounted) return;
+
+      if (response.status == 'success') {
+        LottieDialog.show(
+          context,
+          animationPath: "assets/animations/Success.json",
+          type: response.status,
+          message: response.message,
+          duration: 2,
+          onClosed: () {
+            context.goNamed('home'); // navigate sau khi dialog đóng
+          },
+        );
+        // context.goNamed('home');
+      } else {
+        LottieDialog.show(
+          context,
+          animationPath: "assets/animations/Error.json",
+          type: response.status,
+          message: response.message,
+          duration: 2,
+        );
+      }
     }
   }
 
-  void _handleGoogleSignIn() async {
-    final success = await context.read<AuthProvider>().loginWithGoogle();
-    if (success) {
-      if (context.mounted) {
-        context.goNamed('home');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đăng nhập Google thành công!'),
-          ),
-        );
-      }
+  Future<void> handleGoogleSignIn() async {
+    final result = await context.read<AuthProvider>().loginWithGoogle();
+    if (!mounted) return;
+    if (result.status == 'success') {
+      context.goNamed('home');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đăng nhập Google thành công!'),
+        ),
+      );
     } else {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đăng nhập Google thất bại. Vui lòng thử lại.'),
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đăng nhập Google thất bại. Vui lòng thử lại.'),
+        ),
+      );
     }
+  }
+
+  Widget buildEmailField() {
+    return TextFormField(
+      controller: _emailController,
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 16,
+      ),
+      decoration: const InputDecoration(
+        hintText: 'Email',
+        hintStyle: TextStyle(
+          color: Colors.grey,
+          fontSize: 16,
+        ),
+        prefixIcon: Icon(Icons.email),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 12,
+        ),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.0,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.5,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 1.0,
+          ),
+        ),
+        errorStyle: TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+        errorMaxLines: 2,
+      ),
+      keyboardType: TextInputType.emailAddress,
+      validator: (value) {
+        if (value == null ||
+            value.isEmpty ||
+            !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+          return '* Vui lòng nhập địa chỉ email hợp lệ';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: !_isPasswordVisible,
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 16,
+      ),
+      decoration: InputDecoration(
+        hintText: 'Mật khẩu',
+        hintStyle: TextStyle(
+          color: Colors.grey,
+          fontSize: 16,
+        ),
+        prefixIcon: Icon(Icons.lock),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: _isPasswordVisible ? Colors.blue : Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _isPasswordVisible = !_isPasswordVisible;
+            });
+          },
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.0,
+          ),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 8,
+          horizontal: 12,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.blue,
+            width: 1.5,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.grey,
+            width: 1.0,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 1.0,
+          ),
+        ),
+        errorStyle: TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+        errorMaxLines: 2,
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty || value.length < 6) {
+          return '* Mật khẩu phải có ít nhất 6 ký tự';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget buildRegisterLink() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => context.goNamed('register'),
+        style: ElevatedButton.styleFrom(
+          foregroundColor: Colors.black54,
+          padding: const EdgeInsets.symmetric(
+            vertical: 12.0,
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        child: const Text(
+          'Đăng ký tài khoản',
+          style: TextStyle(color: Colors.black87),
+        ),
+      ),
+    );
+  }
+
+  Widget buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onSubmit,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryBlue,
+          foregroundColor: AppColors.white,
+          padding: const EdgeInsets.symmetric(
+            vertical: 12.0,
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        child: const Text('Đăng nhập'),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -184,11 +393,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(
                               height: 8.0,
                             ),
-                            _buildPhoneNumberField(),
+                            buildEmailField(),
                             const SizedBox(
                               height: 12.0,
                             ),
-                            _buildPasswordField(),
+                            buildPasswordField(),
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
@@ -260,7 +469,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: Colors.red,
                                       size: 32,
                                     ),
-                                    onPressed: _handleGoogleSignIn,
+                                    onPressed: handleGoogleSignIn,
                                   ),
                                 ),
                                 const SizedBox(width: 25),
@@ -301,11 +510,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    _buildRegisterLink(),
+                    buildRegisterLink(),
                     const SizedBox(
                       height: 6.0,
                     ),
-                    _buildSubmitButton(),
+                    buildSubmitButton(),
                   ],
                 ),
               ),
@@ -313,183 +522,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildPhoneNumberField() {
-    return TextFormField(
-      style: const TextStyle(
-        color: Colors.black54, // màu chữ khi nhập
-        fontSize: 16,
-      ),
-      decoration: const InputDecoration(
-        hintText: 'Số điện thoại',
-        hintStyle: TextStyle(
-          color: Colors.grey,
-          fontSize: 16,
-        ),
-        prefixIcon: Icon(Icons.phone),
-        filled: true,
-        contentPadding: EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: 12,
-        ), // giảm padding
-        border: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.blue,
-            width: 1.0,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.blue,
-            width: 1.5,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey,
-            width: 1.0,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.red,
-            width: 1.0,
-          ),
-        ),
-        errorStyle: TextStyle(
-          color: Colors.red,
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-        errorMaxLines: 2,
-      ),
-      keyboardType: TextInputType.phone,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Vui lòng nhập số điện thoại';
-        }
-        return null;
-      },
-      onSaved: (value) {
-        _loginData['phone'] = value!;
-      },
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return TextFormField(
-      obscureText: !_isPasswordVisible,
-      style: const TextStyle(
-        color: Colors.black54, // màu chữ khi nhập
-        fontSize: 16,
-      ),
-      decoration: InputDecoration(
-        hintText: 'Mật khẩu',
-        hintStyle: TextStyle(
-          color: Colors.grey,
-          fontSize: 16,
-        ),
-        prefixIcon: Icon(Icons.lock),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: _isPasswordVisible ? Colors.blue : Colors.grey,
-          ),
-          onPressed: () {
-            setState(() {
-              _isPasswordVisible = !_isPasswordVisible;
-            });
-          },
-        ),
-        filled: true,
-        border: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.blue,
-            width: 1.0,
-          ),
-        ),
-        contentPadding: EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: 12,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.blue,
-            width: 1.5,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.grey,
-            width: 1.0,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Colors.red,
-            width: 1.0,
-          ),
-        ),
-        errorStyle: TextStyle(
-          color: Colors.red,
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-        errorMaxLines: 2,
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Vui lòng nhập mật khẩu';
-        }
-        return null;
-      },
-      onSaved: (newValue) => _loginData['password'] = newValue!,
-    );
-  }
-
-  Widget _buildRegisterLink() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () => context.goNamed('register'),
-        style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.black54,
-          padding: const EdgeInsets.symmetric(
-            vertical: 12.0,
-          ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        child: const Text(
-          'Đăng ký tài khoản',
-          style: TextStyle(color: Colors.black87),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _onSubmit,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryBlue,
-          foregroundColor: AppColors.white,
-          padding: const EdgeInsets.symmetric(
-            vertical: 12.0,
-          ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        child: const Text('Đăng nhập'),
-      ),
     );
   }
 }
