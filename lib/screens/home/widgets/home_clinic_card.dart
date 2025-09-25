@@ -68,7 +68,12 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
                 }
                 final clinic = clinicProvider.clinic;
                 if (clinic == null) {
-                  return const Text('Không thể tải thông tin phòng khám.');
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: const Text('Không thể tải thông tin phòng khám.'),
+                    ),
+                  );
                 }
                 return InkWell(
                   onTap: () => context.goNamed(

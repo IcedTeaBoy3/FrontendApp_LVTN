@@ -59,8 +59,8 @@ class HomeNavbar extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blue.withAlpha(100),
-                      blurRadius: 10,
+                      color: Colors.lightBlueAccent.withAlpha(100),
+                      blurRadius: 8,
                       spreadRadius: 2,
                     ),
                   ],

@@ -12,23 +12,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^6.3.0
-  font_awesome_flutter: ^10.7.0
-  carousel_slider: ^5.0.0
-  smooth_page_indicator: ^1.2.0
-  go_router: ^16.0.0
-  dio: ^5.7.0
-  provider: ^6.1.5
-  url_launcher: ^6.3.0
-  flutter_html: ^3.0.0
-  html: ^0.15.0
-  intl: ^0.19.0
-  month_picker_dialog: ^6.5.0
+  google_fonts: ^6.3.0 # Font chữ đẹp
+  font_awesome_flutter: ^10.7.0 # Icon đẹp
+  carousel_slider: ^5.0.0 # Slider ảnh
+  smooth_page_indicator: ^1.2.0 # Hiệu ứng chuyển trang
+  go_router: ^16.0.0 # Quản lý điều hướng
+  dio: ^5.7.0 # Gửi request HTTP
+  provider: ^6.1.5 # Quản lý trạng thái
+  url_launcher: ^6.3.0 # Mở link ngoài
+  flutter_html: ^3.0.0 # Hiển thị nội dung HTML
+  html: ^0.15.0 # Xử lý HTML
+  intl: ^0.19.0 # Định dạng ngày tháng
+  month_picker_dialog: ^6.5.0 # Lọc lịch làm việc của bs theo tháng
   firebase_core: ^3.5.0
   firebase_auth: ^5.2.0
-  google_sign_in: ^6.1.0
+  google_sign_in: ^6.1.0 # đăng nhập với google
   shared_preferences: ^2.2.3
-  flutter_localizations:  # Thêm dòng này
+  flutter_secure_storage: ^8.0.0
+  jwt_decode: ^0.3.1
+  flutter_localizations:  
     sdk: flutter
 
 

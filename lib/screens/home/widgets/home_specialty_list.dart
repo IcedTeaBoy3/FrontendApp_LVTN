@@ -124,7 +124,10 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
               final specialties = specialtyProvider.specialties;
               if (specialties.isEmpty) {
                 return const Center(
-                  child: Text('Không thể tải thông tin chuyên khoa'),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('Không thể tải thông tin chuyên khoa'),
+                  ),
                 );
               }
               return SizedBox(
@@ -157,7 +160,7 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
               onPressed: () => _openSpecialtySheet(context),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 side: BorderSide(color: Colors.grey.shade300),
                 backgroundColor: Colors.white,

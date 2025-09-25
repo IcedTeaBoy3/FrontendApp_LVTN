@@ -1,8 +1,6 @@
 import 'api_client.dart';
 import 'package:frontend_app/models/user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 class AuthService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -11,7 +9,7 @@ class AuthService {
         '763500997258-mlhs837o79q1ftelhqqi7kp5op7garn9.apps.googleusercontent.com',
   );
 
-  static Future<bool> googleAuth() async {
+  static Future<Map<String, dynamic>?> loginWithGoogle() async {
     try {
       // Nếu muốn lần nào cũng cho chọn tài khoản:
       await _googleSignIn.signOut();
@@ -20,13 +18,13 @@ class AuthService {
 
       if (googleUser == null) {
         print("❌ Google sign-in bị hủy");
-        return false;
+        return null;
       }
       final googleAuth = await googleUser.authentication;
       final idToken = googleAuth.idToken;
       if (idToken == null) {
         print("❌ Không lấy được idToken từ Google");
-        return false;
+        return null;
       }
 
       // Gửi token về backend
@@ -42,45 +40,34 @@ class AuthService {
         final accessToken = data['accessToken'];
         final refreshToken = data['refreshToken'];
         final user = User.fromJson(data['user']);
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('accessToken', accessToken);
-        await prefs.setString('refreshToken', refreshToken);
-        await prefs.setString('user', jsonEncode(user.toJson()));
-
-        return true;
+        return {
+          'user': user,
+          'accessToken': accessToken,
+          'refreshToken': refreshToken,
+        };
       } else {
         print("❌ Google login thất bại với mã: ${response.statusCode}");
-        return false;
+        return null;
       }
     } catch (e) {
       print("Error Google login: $e");
-      return false;
+      return null;
     }
   }
 
   /// 👉 Lấy thông tin user đã lưu
   static Future<User?> getUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userString = prefs.getString('user');
-    if (userString != null) {
-      return User.fromJson(jsonDecode(userString));
+    try {
+      final response = await ApiClient.dio.get(
+        '/user/profile',
+      );
+      print("Get user response: ${response.data}");
+      if (response.statusCode == 200) {
+        return User.fromJson(response.data['data']);
+      }
+    } catch (e) {
+      print("Error fetching user: $e");
+      return null;
     }
-    return null;
-  }
-
-  /// 👉 Kiểm tra có login chưa
-  static Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('accessToken') != null;
-  }
-
-  /// 👉 Đăng xuất
-  static Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('accessToken');
-    await prefs.remove('refreshToken');
-    await prefs.remove('user');
-    await _googleSignIn.signOut();
-    print("🚪 Logged out");
   }
 }

@@ -4,6 +4,7 @@ import 'package:frontend_app/screens/home/widgets/home_appbar.dart';
 
 import 'package:frontend_app/screens/home/home_page_content.dart';
 import 'package:frontend_app/screens/patientProfile/patient_profile_screen.dart';
+import 'package:frontend_app/screens/account/account_screen.dart';
 import 'package:frontend_app/screens/patientProfile/widgets/patient_profile_appbar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,17 +26,23 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     const HomePageContent(),
     const PatientProfileScreen(),
+    const AccountScreen(),
+    const AccountScreen(),
+    const AccountScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final List<PreferredSizeWidget?> _appBars = [
+    final List<PreferredSizeWidget?> appBars = [
       const HomeAppbar(),
       PatientProfileAppbar(onBackToHome: () => _onItemTapped(0)),
+      null,
+      null,
+      null,
     ];
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: _appBars[_selectedIndex],
+      backgroundColor: Colors.white,
+      appBar: appBars[_selectedIndex],
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,

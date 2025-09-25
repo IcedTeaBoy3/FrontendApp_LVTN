@@ -81,7 +81,10 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
             final doctors = doctorProvider.doctors;
             if (doctors.isEmpty) {
               return Center(
-                child: const Text('Không thể tải thông tin bác sĩ.'),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: const Text('Không thể tải thông tin bác sĩ.'),
+                ),
               );
             }
             return SizedBox(

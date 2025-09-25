@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend_app/services/auth_service.dart';
+import 'package:frontend_app/configs/api_config.dart';
+import 'package:frontend_app/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppbar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final user = AuthService.getUser();
-    // Viết hàm chào buổi sáng/chiều/tối dựa trên giờ hiện tại
     String getGreetingMessage() {
       final hour = DateTime.now().hour;
       if (hour < 12) {
@@ -24,26 +24,21 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: InkWell(
         onTap: () => context.goNamed('login'),
-        child: FutureBuilder(
-          future: user,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return const Text('Error');
-            } else if (!snapshot.hasData) {
-              return const Text('No User');
-            }
-            final userData = snapshot.data!;
+        child: Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            final user = authProvider.user;
+
             return Row(
               children: [
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.blue.shade100,
-                  child: userData.avatar != null
+                  child: (user?.avatar != null && user!.avatar!.isNotEmpty)
                       ? ClipOval(
                           child: Image.network(
-                            userData.avatar!,
+                            user.avatar!.startsWith('http')
+                                ? user.avatar!
+                                : '${ApiConfig.backendUrl}/${user.avatar}',
                             width: 40,
                             height: 40,
                             fit: BoxFit.cover,
@@ -51,7 +46,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                         )
                       : const Icon(
                           FontAwesomeIcons.user,
-                          color: Colors.blue,
+                          color: Colors.blueAccent,
                         ),
                 ),
                 const SizedBox(width: 8),
@@ -60,21 +55,21 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     Text(
                       getGreetingMessage(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                       ),
                     ),
                     Text(
-                      userData.name ?? userData.email ?? 'Đăng ký/Đăng nhập',
-                      style: TextStyle(
+                      user?.name ?? 'Đăng ký/Đăng nhập',
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         fontSize: 16,
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             );
           },

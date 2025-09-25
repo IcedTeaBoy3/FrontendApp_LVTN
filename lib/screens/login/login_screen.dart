@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/themes/colors.dart';
-import 'package:frontend_app/services/auth_service.dart';
+import 'package:frontend_app/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,8 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _handeGoogleSignIn() async {
-    final success = await AuthService.googleAuth();
+  void _handleGoogleSignIn() async {
+    final success = await context.read<AuthProvider>().loginWithGoogle();
     if (success) {
       if (context.mounted) {
         context.goNamed('home');
@@ -207,14 +208,27 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: 20.0,
                             ),
                             // Hoặc tiếp tục với google
-                            Center(
-                              child: Text(
-                                'Hoặc tiếp tục với',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Divider(
+                                  color: Colors.grey.withAlpha(50),
+                                  thickness: 1,
                                 ),
-                              ),
+                                Container(
+                                  color: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0,
+                                  ),
+                                  child: const Text(
+                                    'Hoặc tiếp tục với',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(
                               height: 12.0,
@@ -227,21 +241,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.grey.withAlpha(50),
+                                      width: 1.0,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.grey.withAlpha(30),
+                                        color: Colors.grey.withAlpha(50),
                                         blurRadius: 6,
-                                        offset: Offset(0, 3),
+                                        spreadRadius: 3,
                                       ),
                                     ],
                                   ),
                                   child: IconButton(
+                                    padding: EdgeInsets.all(8),
                                     icon: FaIcon(
                                       FontAwesomeIcons.google,
                                       color: Colors.red,
-                                      size: 28,
+                                      size: 32,
                                     ),
-                                    onPressed: _handeGoogleSignIn,
+                                    onPressed: _handleGoogleSignIn,
                                   ),
                                 ),
                                 const SizedBox(width: 25),
@@ -251,19 +270,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.grey.withAlpha(50),
+                                      width: 1.0,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.grey.withAlpha(30),
                                         blurRadius: 6,
+                                        spreadRadius: 3,
                                         offset: Offset(0, 3),
                                       ),
                                     ],
                                   ),
                                   child: IconButton(
+                                    padding: EdgeInsets.all(8),
                                     icon: FaIcon(
                                       FontAwesomeIcons.facebook,
                                       color: Colors.blue,
-                                      size: 28,
+                                      size: 34,
                                     ),
                                     onPressed: () {
                                       // Handle Facebook sign-in
@@ -434,10 +459,6 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.symmetric(
             vertical: 12.0,
           ),
-          side: BorderSide(
-            color: Colors.black45,
-            width: 1.0,
-          ),
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -457,18 +478,14 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton(
         onPressed: _onSubmit,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFF1976D2), // Màu nền xanh
-          foregroundColor: Colors.white, // Màu chữ trắng
+          backgroundColor: AppColors.primaryBlue,
+          foregroundColor: AppColors.white,
           padding: const EdgeInsets.symmetric(
             vertical: 12.0,
           ),
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-          ),
-          side: BorderSide(
-            color: Colors.blue,
-            width: 1.0,
           ),
         ),
         child: const Text('Đăng nhập'),
