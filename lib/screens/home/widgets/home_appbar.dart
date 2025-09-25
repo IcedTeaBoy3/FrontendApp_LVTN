@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend_app/widgets/confirm_dialog.dart';
+import 'package:frontend_app/themes/colors.dart';
 
 class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppbar({super.key});
@@ -20,6 +22,8 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
         return 'Chào buổi tối!';
       }
     }
+
+    final isAuthenticated = context.watch<AuthProvider>().isAuthenticated;
 
     return AppBar(
       title: InkWell(
@@ -88,7 +92,22 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                 size: 28,
               ),
               onPressed: () {
-                // Xử lý khi nhấn vào biểu tượng thông báo
+                if (isAuthenticated) {
+                  context.goNamed('notifications');
+                } else {
+                  ConfirmDialog.show(
+                    context,
+                    title: 'Xác nhận',
+                    content: 'Bạn cần đăng nhập để thực hiện hành động này.',
+                    confirmText: 'Đăng nhập',
+                    cancelText: 'Hủy',
+                    confirmColor: AppColors.primaryBlue,
+                    onConfirm: () {
+                      context.goNamed('login');
+                    },
+                  );
+                  return;
+                }
               },
             ),
             Positioned(

@@ -31,6 +31,15 @@ class LottieDialog {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Title theo type
+                Text(
+                  _translateType(type),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: _getColorByType(type),
+                  ),
+                ),
                 // Animation
                 Lottie.asset(
                   animationPath,
@@ -38,16 +47,6 @@ class LottieDialog {
                   height: 120,
                   fit: BoxFit.cover,
                   repeat: false, // chạy 1 lần
-                ),
-                const SizedBox(height: 12),
-                // Title theo type
-                Text(
-                  type.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: _getColorByType(type),
-                  ),
                 ),
                 const SizedBox(height: 8),
                 // Message
@@ -77,6 +76,22 @@ class LottieDialog {
         return Colors.blue;
       default:
         return Colors.grey;
+    }
+  }
+
+  // Helper chuyển từ tiếng anh sang tiếng việt
+  static String _translateType(String type) {
+    switch (type.toLowerCase()) {
+      case "success":
+        return "Thành công";
+      case "error":
+        return "Lỗi";
+      case "warning":
+        return "Cảnh báo";
+      case "info":
+        return "Thông tin";
+      default:
+        return "Thông báo";
     }
   }
 }

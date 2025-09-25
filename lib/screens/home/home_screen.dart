@@ -6,6 +6,8 @@ import 'package:frontend_app/screens/home/home_page_content.dart';
 import 'package:frontend_app/screens/patientProfile/patient_profile_screen.dart';
 import 'package:frontend_app/screens/account/account_screen.dart';
 import 'package:frontend_app/screens/patientProfile/widgets/patient_profile_appbar.dart';
+import 'package:frontend_app/screens/appointment/appointment_screen.dart';
+import 'package:frontend_app/screens/appointment/widgets/appointment_appbar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const HomePageContent(),
     const PatientProfileScreen(),
     const AccountScreen(),
-    const AccountScreen(),
+    const AppointmentScreen(),
     const AccountScreen(),
   ];
 
@@ -37,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const HomeAppbar(),
       PatientProfileAppbar(onBackToHome: () => _onItemTapped(0)),
       null,
-      null,
+      AppointmentAppbar(onBackToHome: () => _onItemTapped(0)),
       null,
     ];
     return Scaffold(

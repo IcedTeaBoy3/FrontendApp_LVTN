@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
-  void onSubmit() async {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final email = _emailController.text;
@@ -57,17 +57,23 @@ class _LoginScreenState extends State<LoginScreen> {
     final result = await context.read<AuthProvider>().loginWithGoogle();
     if (!mounted) return;
     if (result.status == 'success') {
-      context.goNamed('home');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đăng nhập Google thành công!'),
-        ),
+      LottieDialog.show(
+        context,
+        animationPath: "assets/animations/Success.json",
+        type: result.status,
+        message: result.message,
+        duration: 2,
+        onClosed: () {
+          context.goNamed('home'); // navigate sau khi dialog đóng
+        },
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đăng nhập Google thất bại. Vui lòng thử lại.'),
-        ),
+      LottieDialog.show(
+        context,
+        animationPath: "assets/animations/Error.json",
+        type: result.status,
+        message: result.message,
+        duration: 2,
       );
     }
   }
@@ -234,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: onSubmit,
+        onPressed: _handleLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryBlue,
           foregroundColor: AppColors.white,
