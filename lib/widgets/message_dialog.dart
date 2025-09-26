@@ -85,7 +85,7 @@ class LottieDialog {
       case "success":
         return "Thành công";
       case "error":
-        return "Lỗi";
+        return "Thất bại";
       case "warning":
         return "Cảnh báo";
       case "info":

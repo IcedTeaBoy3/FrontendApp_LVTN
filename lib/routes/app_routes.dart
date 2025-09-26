@@ -42,7 +42,12 @@ class AppRoutes {
           GoRoute(
             name: 'login',
             path: 'login',
-            builder: (context, state) => const LoginScreen(),
+            builder: (context, state) {
+              final email = state.extra as String?;
+              return LoginScreen(
+                email: email,
+              );
+            },
             routes: [
               GoRoute(
                 name: 'register',
@@ -53,12 +58,9 @@ class AppRoutes {
                     name: 'verifyOtp',
                     path: 'verifyOtp',
                     builder: (context, state) {
-                      final args = state.extra as Map<String, dynamic>;
-                      final verificationId = args['verificationId'] as String;
-                      final phone = args['phone'] as String;
+                      final email = state.extra as String?;
                       return VerifyOtpScreen(
-                        verificationId: verificationId,
-                        phone: phone,
+                        email: email!,
                       );
                     },
                   )

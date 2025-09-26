@@ -94,6 +94,52 @@ class AuthService {
     }
   }
 
+  static Future<ResponseApi> verifyOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/verify-otp',
+        data: {
+          'email': email,
+          'otp': otp,
+        },
+      );
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Xác thực OTP thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Xác thực OTP thất bại');
+    }
+  }
+
+  static Future<ResponseApi> resendOtp({
+    required String email,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/resend-otp',
+        data: {
+          'email': email,
+        },
+      );
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Gửi lại OTP thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Gửi lại OTP thất bại');
+    }
+  }
+
   /// 👉 Lấy thông tin user đã lưu
   static Future<User?> getUser() async {
     try {

@@ -18,14 +18,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
 
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
 
   void _onSubmit() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       // Xử lý đăng ký tài khoản tại đây
-      print('Email: ${_emailController.text}');
-      print('Password: ${_passwordController.text}');
-      print('Confirm Password: ${_confirmPasswordController.text}');
+      setState(() {
+        _isLoading = true;
+      });
       final response = await AuthService.register(
         email: _emailController.text,
         password: _passwordController.text,
@@ -41,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         context.pop();
 
-        context.goNamed('login');
+        context.goNamed('verifyOtp', extra: _emailController.text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -50,6 +51,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         );
       }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -229,11 +233,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildEmailField() {
     return TextFormField(
       controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
       style: const TextStyle(
         color: Colors.black, // Màu chữ khi nhập
         fontSize: 16,
       ),
-      keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value == null ||
             value.isEmpty ||
@@ -447,7 +451,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _onSubmit,
+        onPressed: _isLoading ? null : _onSubmit, // disable khi đang loading
         style: ElevatedButton.styleFrom(
           foregroundColor: Colors.white,
           backgroundColor: AppColors.primaryBlue, // Màu nền xanh
@@ -459,9 +463,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        child: const Text(
-          'Tiếp tục',
-        ),
+        child: _isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : const Text('Tiếp tục'),
       ),
     );
   }

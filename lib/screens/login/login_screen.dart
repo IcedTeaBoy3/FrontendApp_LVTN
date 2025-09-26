@@ -7,7 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/message_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? email;
+  const LoginScreen({super.key, this.email});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -18,16 +19,40 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint("Email nhận: ${widget.email}");
+    if (widget.email != null) {
+      _emailController.text = widget.email!;
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+
+    super.dispose();
+  }
 
   void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final email = _emailController.text;
       final password = _passwordController.text;
+
+      setState(() {
+        _isLoading = true;
+      });
+
       final response = await context
           .read<AuthProvider>()
           .login(email: email, password: password);
-      if (!mounted) return;
+
+      if (!mounted) return; // kiểm tra ngay sau await
 
       if (response.status == 'success') {
         LottieDialog.show(
@@ -37,10 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
           message: response.message,
           duration: 2,
           onClosed: () {
-            context.goNamed('home'); // navigate sau khi dialog đóng
+            if (mounted) {
+              context.goNamed('home');
+            }
           },
         );
-        // context.goNamed('home');
       } else {
         LottieDialog.show(
           context,
@@ -49,6 +75,12 @@ class _LoginScreenState extends State<LoginScreen> {
           message: response.message,
           duration: 2,
         );
+      }
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -219,6 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton(
         onPressed: () => context.goNamed('register'),
         style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
           foregroundColor: Colors.black54,
           padding: const EdgeInsets.symmetric(
             vertical: 12.0,
@@ -240,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _handleLogin,
+        onPressed: _isLoading ? null : _handleLogin,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryBlue,
           foregroundColor: AppColors.white,
@@ -252,16 +285,21 @@ class _LoginScreenState extends State<LoginScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        child: const Text('Đăng nhập'),
+        child: _isLoading
+            ? const SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : const Text(
+                'Đăng nhập',
+                style: TextStyle(color: Colors.white),
+              ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 
   @override
