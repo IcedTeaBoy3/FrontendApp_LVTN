@@ -18,6 +18,7 @@ class DoctorProvider extends ChangeNotifier {
     try {
       final result =
           await DoctorService.getAllDoctors(page: page, limit: limit);
+      debugPrint('Fetched doctors: ${result['doctors']}');
       _doctors = result['doctors'] as List<Doctor>;
       _total = result['total'] as int;
     } catch (e) {

@@ -1,12 +1,14 @@
 import 'package:frontend_app/models/doctorworkplace.dart';
+import 'package:frontend_app/models/person.dart';
 
-import 'user.dart';
+import 'account.dart';
 import 'degree.dart';
 import 'doctorspecialty.dart';
 
 class Doctor {
   final String doctorId;
-  final User user;
+  final Account account;
+  final Person person;
   final Degree degree;
   final String? bio;
   final String? notes;
@@ -15,7 +17,8 @@ class Doctor {
 
   Doctor({
     required this.doctorId,
-    required this.user,
+    required this.account,
+    required this.person,
     required this.degree,
     required this.doctorSpecialties,
     required this.doctorWorplaces,
@@ -27,8 +30,9 @@ class Doctor {
   factory Doctor.fromJson(Map<String, dynamic> json) {
     return Doctor(
       doctorId: json['doctorId'] as String,
-      user: User.fromJson(json['user']),
+      account: Account.fromJson(json['account']),
       degree: Degree.fromJson(json['degree']),
+      person: Person.fromJson(json['person']),
       bio: json['bio'] ?? '',
       notes: json['notes'] ?? '',
       doctorSpecialties: json['doctorSpecialties'] != null
@@ -97,7 +101,7 @@ class Doctor {
   Map<String, dynamic> toJson() {
     return {
       'doctorId': doctorId,
-      'user': user.toJson(),
+      'account': account.toJson(),
       'degree': degree.toJson(),
       'bio': bio,
       'notes': notes,

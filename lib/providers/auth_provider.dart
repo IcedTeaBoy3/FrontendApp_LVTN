@@ -1,7 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend_app/models/response_api.dart';
-import 'package:frontend_app/models/user.dart';
+import 'package:frontend_app/models/authresponse.dart';
+import 'package:frontend_app/models/responseapi.dart';
+import 'package:frontend_app/models/account.dart';
 import 'package:frontend_app/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
@@ -12,23 +12,24 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider() {
     _loadFromStorage();
   }
-  User? _user;
+  Account? _account;
   String? _accessToken;
   String? _refreshToken;
 
-  User? get user => _user;
+  Account? get account => _account;
   String? get accessToken => _accessToken;
   String? get refreshToken => _refreshToken;
-  bool get isAuthenticated => _user != null && _accessToken != null;
+  bool get isAuthenticated => _account != null && _accessToken != null;
 
-  Future<ResponseApi> loginWithGoogle() async {
+  Future<ResponseApi<AuthResponse>> loginWithGoogle() async {
     try {
       final result = await AuthService.loginWithGoogle();
+      print("Login with Google result: ${result.toJson()}");
       if (result.status == 'success') {
-        _user = result.user;
-        _accessToken = result.accessToken;
-        _refreshToken = result.refreshToken;
-        // Lưu token và user vào secure storage
+        _account = result.data?.account;
+        _accessToken = result.data?.accessToken;
+        _refreshToken = result.data?.refreshToken;
+        // Lưu token và account vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
         notifyListeners();
@@ -39,16 +40,16 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<ResponseApi> login({
+  Future<ResponseApi<AuthResponse>> login({
     required String email,
     required String password,
   }) async {
     try {
       final result = await AuthService.login(email: email, password: password);
       if (result.status == 'success') {
-        _user = result.user;
-        _accessToken = result.accessToken;
-        _refreshToken = result.refreshToken;
+        _account = result.data?.account;
+        _accessToken = result.data?.accessToken;
+        _refreshToken = result.data?.refreshToken;
         // Lưu token và user vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
@@ -69,19 +70,19 @@ class AuthProvider extends ChangeNotifier {
     if (_accessToken != null) {
       bool isExpired = Jwt.isExpired(_accessToken!);
       if (!isExpired) {
-        _user = await AuthService.getUser();
+        _account = await AuthService.getAccount();
       } else {
         _accessToken = null;
         await _storage.delete(key: 'accessToken');
       }
     } else {
-      _user = null;
+      _account = null;
     }
     notifyListeners();
   }
 
   Future<void> logout() async {
-    _user = null;
+    _account = null;
     _accessToken = null;
     _refreshToken = null;
     await _storage.delete(key: 'accessToken');

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend_app/configs/api_config.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/confirm_dialog.dart';
@@ -30,28 +29,16 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
         onTap: () => context.goNamed('login'),
         child: Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
-            final user = authProvider.user;
-
+            final account = authProvider.account;
             return Row(
               children: [
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.blue.shade100,
-                  child: (user?.avatar != null && user!.avatar!.isNotEmpty)
-                      ? ClipOval(
-                          child: Image.network(
-                            user.avatar!.startsWith('http')
-                                ? user.avatar!
-                                : '${ApiConfig.backendUrl}/${user.avatar}',
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : const Icon(
-                          FontAwesomeIcons.user,
-                          color: Colors.blueAccent,
-                        ),
+                  child: const Icon(
+                    FontAwesomeIcons.user,
+                    color: Colors.blueAccent,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Column(
@@ -65,11 +52,9 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     Text(
-                      user == null
-                          ? 'Đăng nhập/Đăng ký'
-                          : (user!.name?.isNotEmpty == true
-                              ? user!.name!
-                              : (user!.email ?? 'Đăng nhập/Đăng ký')),
+                      account?.userName?.isNotEmpty == true
+                          ? account!.userName
+                          : (account?.email ?? 'Đăng ký/Đăng nhập'),
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,

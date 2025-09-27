@@ -11,8 +11,8 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Doctor? doctor = context.read<DoctorProvider>().findById(doctorId);
-    final avatarUrl = (doctor?.user.avatar != null)
-        ? ApiConfig.backendUrl + doctor!.user.avatar!
+    final avatarUrl = (doctor?.person.avatar != null)
+        ? ApiConfig.backendUrl + doctor!.person.avatar!
         : null;
     final degreeName = doctor?.degree.title ?? "Chưa cập nhật";
     final specialties =
@@ -70,7 +70,7 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      doctor?.user.name ?? "Chưa cập nhật",
+                      doctor?.person.fullName ?? "Chưa cập nhật",
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

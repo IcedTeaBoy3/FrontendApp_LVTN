@@ -1,7 +1,8 @@
 import 'api_client.dart';
-import 'package:frontend_app/models/user.dart';
+import 'package:frontend_app/models/account.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:frontend_app/models/response_api.dart';
+import 'package:frontend_app/models/authresponse.dart';
+import 'package:frontend_app/models/responseapi.dart';
 import 'package:dio/dio.dart';
 
 class AuthService {
@@ -11,13 +12,16 @@ class AuthService {
         '763500997258-mlhs837o79q1ftelhqqi7kp5op7garn9.apps.googleusercontent.com',
   );
 
-  static Future<ResponseApi> loginWithGoogle() async {
+  static Future<ResponseApi<AuthResponse>> loginWithGoogle() async {
     try {
       // Nếu muốn lần nào cũng cho chọn tài khoản:
       await _googleSignIn.signOut();
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        return ResponseApi(status: 'error', message: 'Google sign-in bị hủy');
+        return ResponseApi(
+          status: 'error',
+          message: 'Người dùng hủy đăng nhập Google',
+        );
       }
       final googleAuth = await googleUser.authentication;
       final idToken = googleAuth.idToken;
@@ -32,7 +36,11 @@ class AuthService {
         '/auth/google/mobile',
         data: {'idToken': idToken},
       );
-      return ResponseApi.fromJson(response.data);
+
+      return ResponseApi<AuthResponse>.fromJson(
+        response.data,
+        funtionParser: (dataJson) => AuthResponse.fromJson(dataJson),
+      );
     } on DioException catch (e) {
       // 👇 Lấy message từ server nếu có
       return ResponseApi(
@@ -40,11 +48,12 @@ class AuthService {
         message: e.response?.data['message'] ?? 'Đăng nhập thất bại',
       );
     } catch (e) {
+      print("Error in loginWithGoogle: $e");
       return ResponseApi(status: 'error', message: 'Đăng nhập Google thất bại');
     }
   }
 
-  static Future<ResponseApi> login({
+  static Future<ResponseApi<AuthResponse>> login({
     required String email,
     required String password,
   }) async {
@@ -56,7 +65,10 @@ class AuthService {
           'password': password,
         },
       );
-      return ResponseApi.fromJson(response.data);
+      return ResponseApi<AuthResponse>.fromJson(
+        response.data,
+        funtionParser: (dataJson) => AuthResponse.fromJson(dataJson),
+      );
     } on DioException catch (e) {
       // 👇 Lấy message từ server nếu có
       return ResponseApi(
@@ -82,7 +94,9 @@ class AuthService {
           'confirmPassword': confirmPassword,
         },
       );
-      return ResponseApi.fromJson(response.data);
+      return ResponseApi.fromJson(
+        response.data,
+      );
     } on DioException catch (e) {
       // 👇 Lấy message từ server nếu có
       return ResponseApi(
@@ -140,18 +154,18 @@ class AuthService {
     }
   }
 
-  /// 👉 Lấy thông tin user đã lưu
-  static Future<User?> getUser() async {
+  /// 👉 Lấy thông tin account đã lưu
+  static Future<Account?> getAccount() async {
     try {
       final response = await ApiClient.dio.get(
-        '/user/profile',
+        '/auth/me',
       );
-      print("Get user response: ${response.data}");
+      print("Get account response: ${response.data}");
       if (response.statusCode == 200) {
-        return User.fromJson(response.data['data']);
+        return Account.fromJson(response.data['data']);
       }
     } catch (e) {
-      print("Error get user: $e");
+      print("Error get account: $e");
       return null;
     }
   }

@@ -97,9 +97,9 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
                   final doctor = doctors[index];
                   return DoctorCard(
                     doctorId: doctor.doctorId,
-                    name: doctor.user.name as String,
+                    name: doctor.person.fullName as String,
                     specialtyName: doctor.primarySpecialtyName,
-                    avatar: doctor.user.avatar as String,
+                    avatar: doctor.person.avatar as String,
                   );
                 },
               ),
