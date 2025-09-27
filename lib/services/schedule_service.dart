@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/models/schedule.dart';
-import 'package:intl/intl.dart';
 import 'api_client.dart';
 
 class ScheduleService {

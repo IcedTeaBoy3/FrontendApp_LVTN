@@ -36,8 +36,9 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                   radius: 20,
                   backgroundColor: Colors.blue.shade100,
                   child: const Icon(
-                    FontAwesomeIcons.user,
+                    Icons.person,
                     color: Colors.blueAccent,
+                    size: 28,
                   ),
                 ),
                 const SizedBox(width: 8),

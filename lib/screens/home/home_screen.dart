@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
       null,
     ];
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[100],
       appBar: appBars[_selectedIndex],
       body: IndexedStack(
         index: _selectedIndex,

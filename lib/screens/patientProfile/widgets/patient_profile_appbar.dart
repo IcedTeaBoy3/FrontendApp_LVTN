@@ -15,6 +15,7 @@ class PatientProfileAppbar extends StatelessWidget
   Widget build(BuildContext context) {
     final isAuthenticated = context.read<AuthProvider>().isAuthenticated;
     return AppBar(
+      centerTitle: true,
       leading: IconButton(
         onPressed: onBackToHome,
         icon: const Icon(
@@ -22,14 +23,12 @@ class PatientProfileAppbar extends StatelessWidget
           size: 20,
         ),
       ),
-      title: Center(
-        child: const Text(
-          'Hồ sơ bệnh nhân',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+      title: const Text(
+        'Hồ sơ bệnh nhân',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
         ),
       ),
       actions: [
@@ -65,7 +64,6 @@ class PatientProfileAppbar extends StatelessWidget
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      showDragHandle: true, // <-- cái này tạo luôn thanh xám nhỏ ở ngoài
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),

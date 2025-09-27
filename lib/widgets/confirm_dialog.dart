@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ConfirmDialog {
-  static Future<void> show(
+  static Future<bool> show(
     BuildContext context, {
     required String title,
     required String content,
@@ -11,8 +11,10 @@ class ConfirmDialog {
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
   }) async {
-    return showDialog(
+    final result = await showDialog<bool>(
       context: context,
+      barrierDismissible:
+          false, // không cho đóng dialog khi bấm ra ngoài → tránh return null
       builder: (BuildContext dialogContext) {
         return Center(
           child: AlertDialog(
@@ -22,13 +24,13 @@ class ConfirmDialog {
             ),
             title: Text(
               title,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            content: Text(content, style: TextStyle(fontSize: 16)),
+            content: Text(content, style: const TextStyle(fontSize: 16)),
             actions: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(dialogContext).pop();
+                  Navigator.of(dialogContext, rootNavigator: true).pop(false);
                   if (onCancel != null) onCancel();
                 },
                 style: ElevatedButton.styleFrom(
@@ -41,7 +43,7 @@ class ConfirmDialog {
                 ),
                 child: Text(
                   cancelText,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 16,
                   ),
@@ -49,7 +51,7 @@ class ConfirmDialog {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(dialogContext).pop();
+                  Navigator.of(dialogContext, rootNavigator: true).pop(true);
                   if (onConfirm != null) onConfirm();
                 },
                 style: ElevatedButton.styleFrom(
@@ -62,7 +64,10 @@ class ConfirmDialog {
                 ),
                 child: Text(
                   confirmText,
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -70,5 +75,8 @@ class ConfirmDialog {
         );
       },
     );
+
+    // đảm bảo luôn trả về bool, không bị null
+    return result ?? false;
   }
 }
