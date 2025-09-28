@@ -25,6 +25,7 @@ class ApiClient {
         },
         onError: (DioException e, handler) async {
           // Nếu token hết hạn có thể refresh token ở đây
+          await authProvider.logout();
           return handler.next(e);
         },
       ),

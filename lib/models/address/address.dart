@@ -3,6 +3,14 @@ class Ward {
   final String name;
 
   Ward({required this.code, required this.name});
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Ward && runtimeType == other.runtimeType && code == other.code;
+  @override
+  int get hashCode => code.hashCode;
+  @override
+  String toString() => 'Ward(code: $code, name: $name)';
 
   factory Ward.fromJson(Map<String, dynamic> json) {
     return Ward(
@@ -18,6 +26,16 @@ class District {
   final List<Ward> wards;
 
   District({required this.code, required this.name, required this.wards});
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is District &&
+          runtimeType == other.runtimeType &&
+          code == other.code;
+  @override
+  int get hashCode => code.hashCode;
+  @override
+  String toString() => 'District(code: $code, name: $name)';
 
   factory District.fromJson(Map<String, dynamic> json) {
     var wardList = <Ward>[];
@@ -38,6 +56,19 @@ class Province {
   final List<District> districts;
 
   Province({required this.code, required this.name, required this.districts});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Province &&
+          runtimeType == other.runtimeType &&
+          code == other.code;
+
+  @override
+  int get hashCode => code.hashCode;
+
+  @override
+  String toString() => 'Province(code: $code, name: $name)';
 
   factory Province.fromJson(Map<String, dynamic> json) {
     var districtList = <District>[];

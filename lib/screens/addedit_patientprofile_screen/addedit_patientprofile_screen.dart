@@ -3,23 +3,29 @@ import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/widgets/custom_textfield.dart';
 import 'package:frontend_app/widgets/custom_dropdownfield.dart';
 import 'package:frontend_app/widgets/custom_datefield.dart';
-import 'package:frontend_app/services/province_service.dart';
 import 'package:frontend_app/models/address/address.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:frontend_app/models/patientprofile.dart';
 import 'package:frontend_app/models/person.dart';
-import 'package:frontend_app/providers/auth_provider.dart';
+import 'package:frontend_app/widgets/custom_flushbar.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend_app/providers/address_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:frontend_app/utils/relation_utils.dart';
+import 'package:frontend_app/utils/gender_utils.dart';
+import 'package:frontend_app/utils/date.dart';
 
-class AddPatientProfile extends StatefulWidget {
-  const AddPatientProfile({super.key});
+class AddEditPatientProfileScreen extends StatefulWidget {
+  final Patientprofile? editedPatientprofile;
+  const AddEditPatientProfileScreen({super.key, this.editedPatientprofile});
 
   @override
-  State<AddPatientProfile> createState() => _AddPatientProfileState();
+  State<AddEditPatientProfileScreen> createState() =>
+      _AddEditPatientProfileScreenState();
 }
 
-class _AddPatientProfileState extends State<AddPatientProfile> {
+class _AddEditPatientProfileScreenState
+    extends State<AddEditPatientProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
@@ -40,50 +46,66 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
     "Con",
     "Khác",
   ];
-  void _convertRelationship(String? relation) {
-    switch (relation) {
-      case "Tôi":
-        selectedRelationship = "self";
-        break;
-      case "Vợ/Chồng":
-        selectedRelationship = "spouse";
-        break;
-      case "Mẹ/Bố":
-        selectedRelationship = "parent";
-        break;
-      case "Anh/Chị/Em":
-        selectedRelationship = "sibling";
-        break;
-      case "Con":
-        selectedRelationship = "child";
-        break;
-      default:
-        selectedRelationship = "other";
+
+  Future<void> initAddress(BuildContext context, String address) async {
+    final parts = address.split(',').map((e) => e.trim()).toList();
+    final addressProvider = context.read<AddressProvider>();
+
+    _specificAddressController.text = parts[0];
+    final wardName = parts[1];
+    final districtName = parts[2];
+    final provinceName = parts[3];
+
+    // Load provinces trước (nếu chưa có)
+    if (addressProvider.provinces.isEmpty) {
+      await addressProvider.loadProvincesOnce();
     }
+
+    // --- Province ---
+    final province = addressProvider.provinces.firstWhere(
+      (p) => p.name == provinceName,
+      orElse: () => Province(code: -1, name: '', districts: []),
+    );
+    if (province.code == -1) return;
+    addressProvider.setSelectedProvince(province);
+
+    // --- District ---
+    await addressProvider.loadDistricts(province);
+    final district = addressProvider.districts.firstWhere(
+      (d) => d.name == districtName,
+      orElse: () => District(code: -1, name: '', wards: []),
+    );
+    if (district.code == -1) return;
+    addressProvider.setSelectedDistrict(district);
+
+    // --- Ward ---
+    await addressProvider.loadWards(district);
+    final ward = addressProvider.wards.firstWhere(
+      (w) => w.name == wardName,
+      orElse: () => Ward(code: -1, name: ''),
+    );
+    if (ward.code == -1) return;
+    addressProvider.setSelectedWard(ward);
   }
 
-  String _convertGender(String gender) {
-    switch (gender) {
-      case "Nam":
-        return "male";
-      case "Nữ":
-        return "female";
-      default:
-        return "other";
-    }
-  }
-
-  List<Province> provinces = [];
-  List<District> districts = [];
-  List<Ward> wards = [];
-
-  Province? selectedProvince;
-  District? selectedDistrict;
-  Ward? selectedWard;
   @override
   void initState() {
     super.initState();
-    _loadProvinces();
+    if (widget.editedPatientprofile != null) {
+      final profile = widget.editedPatientprofile!;
+      _fullNameController.text = profile.person.fullName;
+      _dobController.text = formatDate(profile.person.dateOfBirth);
+      _genderController.text = convertGenderBack(profile.person.gender);
+      _idCardController.text = profile.idCard;
+      _insuranceCodeController.text = profile.insuranceCode;
+      _phoneController.text = profile.person.phone ?? '';
+      selectedRelationship = convertRelationshipBack(profile.relation);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        initAddress(context, profile.person.address);
+      });
+    } else {
+      context.read<AddressProvider>().loadProvincesOnce();
+    }
   }
 
   @override
@@ -98,30 +120,7 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
     super.dispose();
   }
 
-  Future<void> _loadProvinces() async {
-    final data = await ProvinceService.getProvinces();
-    setState(() => provinces = data);
-  }
-
-  Future<void> _loadDistricts(int provinceId) async {
-    final data = await ProvinceService.getDistricts(provinceId);
-    setState(() {
-      districts = data;
-      wards = [];
-      selectedDistrict = null;
-      selectedWard = null;
-    });
-  }
-
-  void _loadWards(int districtId) async {
-    final data = await ProvinceService.getWards(districtId);
-    setState(() {
-      wards = data;
-      selectedWard = null;
-    });
-  }
-
-  void _handleCreateProfile() {
+  void _handelSubmit() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       // Gather all the input data
@@ -132,6 +131,10 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
       final insuranceCode = _insuranceCodeController.text;
       final phone = _phoneController.text;
       final specificAddress = _specificAddressController.text;
+      final addressProvider = context.read<AddressProvider>();
+      final selectedProvince = addressProvider.selectedProvince;
+      final selectedDistrict = addressProvider.selectedDistrict;
+      final selectedWard = addressProvider.selectedWard;
       final province = selectedProvince?.name ?? '';
       final district = selectedDistrict?.name ?? '';
       final ward = selectedWard?.name ?? '';
@@ -140,42 +143,53 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
       // Create a Patientprofile object
       final person = Person(
         fullName: fullName,
-        dateOfBirth: dateOfBirth.isNotEmpty
-            ? DateFormat('dd/MM/yyyy').parse(dateOfBirth)
-            : null,
-        gender: _convertGender(gender),
+        dateOfBirth: DateFormat('dd/MM/yyyy').parse(dateOfBirth),
+        gender: convertGender(gender),
         address: address,
         phone: phone,
       );
-      _convertRelationship(selectedRelationship);
+      selectedRelationship = convertRelationship(selectedRelationship);
       final newProfile = Patientprofile(
-        patientProfileId: '',
+        patientProfileId: "",
         relation: selectedRelationship,
         idCard: idCard,
         insuranceCode: insuranceCode,
         person: person,
-        accountId: '',
+        accountId: "",
       );
-      // Use the newProfile variable, for example:
-      final result =
-          context.read<PatientprofileProvider>().addPatientprofile(newProfile);
-      result.then((response) {
-        if (!mounted) return;
-        if (response.status == 'success') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Tạo hồ sơ thành công')),
+      if (widget.editedPatientprofile == null) {
+        context
+            .read<PatientprofileProvider>()
+            .addPatientprofile(newProfile)
+            .then((response) {
+          if (!mounted) return;
+          CustomFlushbar.show(
+            context,
+            status: response.status,
+            message: response.message,
           );
-          Navigator.pop(context, true); // Return true to indicate success
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: ${response.message}')),
-          );
-        }
-      }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $error')),
+        });
+      } else {
+        final updateProfile = Patientprofile(
+          patientProfileId: widget.editedPatientprofile!.patientProfileId,
+          relation: newProfile.relation,
+          idCard: newProfile.idCard,
+          insuranceCode: newProfile.insuranceCode,
+          person: newProfile.person,
+          accountId: widget.editedPatientprofile!.accountId,
         );
-      });
+        context
+            .read<PatientprofileProvider>()
+            .updatePatientprofile(updateProfile)
+            .then((response) {
+          if (!mounted) return;
+          CustomFlushbar.show(
+            context,
+            status: response.status,
+            message: response.message,
+          );
+        });
+      }
     }
   }
 
@@ -184,14 +198,24 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          'Thêm hồ sơ',
-          style: TextStyle(
+        title: Text(
+          widget.editedPatientprofile == null
+              ? 'Thêm hồ sơ bệnh nhân'
+              : 'Cập nhật hồ sơ bệnh nhân',
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save_as_outlined, color: Colors.white),
+            onPressed: () {
+              _handelSubmit();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -259,46 +283,51 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
                               },
                             ),
                             const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomDateField(
-                                    controller: _dobController,
-                                    label: "Ngày sinh",
-                                    hintText: "dd/mm/yyyy",
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return "Ngày sinh không được để trống";
-                                      }
-                                      // Thêm kiểm tra định dạng ngày tháng nếu cần
-                                      return null;
-                                    },
+                            CustomDateField(
+                              controller: _dobController,
+                              label: "Ngày sinh",
+                              hintText: "dd/mm/yyyy",
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Ngày sinh không được để trống";
+                                }
+                                // Thêm kiểm tra định dạng ngày tháng nếu cần
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Giới tính',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: ['Nam', 'Nữ', 'Khác'].map((gender) {
+                                return SizedBox(
+                                  width: 100,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Radio<String>(
+                                        value: gender,
+                                        groupValue: _genderController.text,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _genderController.text =
+                                                value ?? "";
+                                          });
+                                        },
+                                      ),
+                                      Text(gender),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: CustomDropdownField(
-                                    itemLabel: (value) => value,
-                                    label: "Giới tính",
-                                    hintText: "Nam/Nữ",
-                                    items: ["Nam", "Nữ"],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _genderController.text = value ?? "";
-                                      });
-                                    },
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return "Giới tính không được để trống";
-                                      }
-                                      if (value != "Nam" && value != "Nữ") {
-                                        return "Giới tính phải là 'Nam' hoặc 'Nữ'";
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                              ],
+                                );
+                              }).toList(),
                             ),
                             const SizedBox(height: 16),
                             CustomTextField(
@@ -400,75 +429,89 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
                             ),
                             const SizedBox(height: 16),
                             // Province
-                            CustomDropdownField<Province>(
-                              label: "Tỉnh/Thành phố",
-                              hintText: "Vui lòng chọn Tỉnh/Thành phố",
-                              value: selectedProvince,
-                              items: provinces,
-                              itemLabel: (p) => p.name,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    selectedProvince = value;
-                                  });
-                                  _loadDistricts(value.code);
-                                }
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return "Tỉnh/Thành phố không được để trống";
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
+                            Consumer<AddressProvider>(
+                              builder: (context, addressProvider, child) {
+                                final provinces = addressProvider.provinces;
+                                final districts = addressProvider.districts;
+                                final wards = addressProvider.wards;
+                                final selectedProvince =
+                                    addressProvider.selectedProvince;
+                                final selectedDistrict =
+                                    addressProvider.selectedDistrict;
+                                final selectedWard =
+                                    addressProvider.selectedWard;
 
-                            // District
-                            CustomDropdownField<District>(
-                              label: "Quận/Huyện",
-                              hintText: "Vui lòng chọn Quận/Huyện",
-                              value: selectedDistrict,
-                              items: districts,
-                              itemLabel: (d) => d.name,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    selectedDistrict = value;
-                                  });
-                                  _loadWards(value.code);
-                                }
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return "Quận/Huyện không được để trống";
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 16),
+                                return Column(
+                                  children: [
+                                    CustomDropdownField<Province>(
+                                      label: "Tỉnh/Thành phố",
+                                      hintText: "Vui lòng chọn Tỉnh/Thành phố",
+                                      value: selectedProvince,
+                                      items: provinces,
+                                      itemLabel: (p) => p.name,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          addressProvider
+                                              .setSelectedProvince(value);
+                                          addressProvider.loadDistricts(value);
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (value == null) {
+                                          return "Tỉnh/Thành phố không được để trống";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 16),
 
-                            // Ward
-                            CustomDropdownField<Ward>(
-                              label: "Phường/Xã",
-                              hintText: "Vui lòng chọn Phường/Xã",
-                              value: selectedWard,
-                              items: wards,
-                              itemLabel: (w) => w.name,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    selectedWard = value;
-                                  });
-                                }
-                              },
-                              validator: (value) {
-                                if (value == null) {
-                                  return "Phường/Xã không được để trống";
-                                }
-                                return null;
+                                    // District
+                                    CustomDropdownField<District>(
+                                      label: "Quận/Huyện",
+                                      hintText: "Vui lòng chọn Quận/Huyện",
+                                      value: selectedDistrict,
+                                      items: districts,
+                                      itemLabel: (d) => d.name,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          addressProvider
+                                              .setSelectedDistrict(value);
+                                          addressProvider.loadWards(value);
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (value == null) {
+                                          return "Quận/Huyện không được để trống";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 16),
+
+                                    // Ward
+                                    CustomDropdownField<Ward>(
+                                      label: "Phường/Xã",
+                                      hintText: "Vui lòng chọn Phường/Xã",
+                                      value: selectedWard,
+                                      items: wards,
+                                      itemLabel: (w) => w.name,
+                                      onChanged: (value) {
+                                        if (value != null) {
+                                          addressProvider
+                                              .setSelectedWard(value);
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (value == null) {
+                                          return "Phường/Xã không được để trống";
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
+                                );
                               },
                             ),
-                            const SizedBox(height: 16),
                             const SizedBox(height: 16),
                             CustomTextField(
                               controller: _specificAddressController,
@@ -492,13 +535,14 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
           )
         ],
       ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
+        color: Colors.white,
         padding: const EdgeInsets.all(16.0),
         child: SizedBox(
           width: double.infinity,
           height: 50,
           child: ElevatedButton(
-            onPressed: _handleCreateProfile,
+            onPressed: _handelSubmit,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryBlue,
               foregroundColor: Colors.white,
@@ -506,8 +550,10 @@ class _AddPatientProfileState extends State<AddPatientProfile> {
                 borderRadius: BorderRadius.circular(8.0),
               ),
             ),
-            child: const Text(
-              'Tạo mới hồ sơ',
+            child: Text(
+              widget.editedPatientprofile == null
+                  ? 'Thêm hồ sơ'
+                  : 'Cập nhật hồ sơ',
               style: TextStyle(fontSize: 16),
             ),
           ),

@@ -6,6 +6,7 @@ import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:frontend_app/providers/schedule_provider.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
+import 'package:frontend_app/providers/address_provider.dart';
 import 'package:frontend_app/screens/my_app.dart';
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:frontend_app/services/api_client.dart';
@@ -19,6 +20,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => authProvider),
+        ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => SpecialtyProvider()),
         ChangeNotifierProvider(create: (_) => ClinicProvider()),
         ChangeNotifierProvider(create: (_) => DoctorProvider()),

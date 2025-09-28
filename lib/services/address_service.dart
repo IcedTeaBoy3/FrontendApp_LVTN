@@ -1,7 +1,7 @@
 import 'package:frontend_app/models/address/address.dart';
 import 'package:dio/dio.dart';
 
-class ProvinceService {
+class AddressService {
   static Future<List<Province>> getProvinces() async {
     final response = await Dio().get(
       'https://provinces.open-api.vn/api/v1/?depth=2',

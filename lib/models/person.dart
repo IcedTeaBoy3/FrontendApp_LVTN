@@ -1,17 +1,17 @@
 class Person {
   final String? avatar;
-  final String? fullName;
-  final String? address;
-  final String? gender;
-  final DateTime? dateOfBirth;
+  final String fullName;
+  final String address;
+  final String gender;
+  final DateTime dateOfBirth;
   final String? phone;
 
   Person({
     this.avatar,
-    this.fullName,
-    this.address,
-    this.gender,
-    this.dateOfBirth,
+    required this.fullName,
+    required this.address,
+    required this.gender,
+    required this.dateOfBirth,
     this.phone,
   });
 
@@ -21,9 +21,7 @@ class Person {
       fullName: json['name'] ?? json['fullName'],
       address: json['address'] ?? '',
       gender: json['gender'] ?? '',
-      dateOfBirth: json['dateOfBirth'] != null
-          ? DateTime.parse(json['dateOfBirth'])
-          : null,
+      dateOfBirth: DateTime.parse(json['dateOfBirth']),
       phone: json['phone'] ?? '',
     );
   }
@@ -33,7 +31,7 @@ class Person {
       'fullName': fullName,
       'address': address,
       'gender': gender,
-      'dateOfBirth': dateOfBirth?.toIso8601String(),
+      'dateOfBirth': dateOfBirth.toIso8601String(),
       'phone': phone,
     };
   }

@@ -5,9 +5,10 @@ import 'package:frontend_app/screens/error/error_screen.dart';
 import 'package:frontend_app/screens/register/register_screen.dart';
 import 'package:frontend_app/screens/clinicDetail/clinic_detail_screen.dart';
 import 'package:frontend_app/screens/doctorDetail/doctor_detail_screen.dart';
-import 'package:frontend_app/screens/addPatientProfile/add_patient_profile.dart';
+import 'package:frontend_app/screens/addedit_patientprofile_screen/addedit_patientprofile_screen.dart';
 import 'package:frontend_app/screens/verifyOtp/verify_otp_screen.dart';
 import 'package:frontend_app/models/clinic.dart';
+import 'package:frontend_app/models/patientprofile.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -37,7 +38,12 @@ class AppRoutes {
           GoRoute(
             name: 'addPatientProfile',
             path: 'addPatientProfile',
-            builder: (context, state) => const AddPatientProfile(),
+            builder: (context, state) {
+              final editedPatientProfile = state.extra as Patientprofile?;
+              return AddEditPatientProfileScreen(
+                editedPatientprofile: editedPatientProfile,
+              );
+            },
           ),
           GoRoute(
             name: 'login',

@@ -61,6 +61,32 @@ class PatientprofileService {
     }
   }
 
+  static Future<ResponseApi<Patientprofile>> updatePatientProfile(
+      Patientprofile patientprofile) async {
+    try {
+      debugPrint('Updating patient profile: ${patientprofile.toJson()}');
+      final response = await ApiClient.dio.put(
+        '/patientprofile/update-patientprofile/${patientprofile.patientProfileId}',
+        data: patientprofile.toJson(),
+      );
+      debugPrint('response update profile ${response.data}');
+
+      return ResponseApi<Patientprofile>.fromJson(
+        response.data,
+        funtionParser: (dataJson) => Patientprofile.fromJson(dataJson),
+      );
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Cập nhật hồ sơ thất bại',
+      );
+    } catch (e) {
+      // Nếu có lỗi trong quá trình gọi API hoặc parse dữ liệu
+      throw Exception('Error: $e');
+    }
+  }
+
   static Future<ResponseApi> deletePatientProfile(String id) async {
     try {
       debugPrint('Deleting patient profile with id: $id');

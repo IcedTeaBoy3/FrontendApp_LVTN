@@ -31,6 +31,25 @@ class Patientprofile {
     return jsonList.map((json) => Patientprofile.fromJson(json)).toList();
   }
 
+  // copyWith method for updating fields
+  Patientprofile copyWith({
+    String? patientProfileId,
+    String? idCard,
+    String? insuranceCode,
+    String? relation,
+    Person? person,
+    String? accountId,
+  }) {
+    return Patientprofile(
+      patientProfileId: patientProfileId ?? this.patientProfileId,
+      idCard: idCard ?? this.idCard,
+      insuranceCode: insuranceCode ?? this.insuranceCode,
+      relation: relation ?? this.relation,
+      person: person ?? this.person,
+      accountId: accountId ?? this.accountId,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'patientProfileId': patientProfileId,

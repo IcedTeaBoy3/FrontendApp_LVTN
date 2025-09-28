@@ -55,6 +55,34 @@ class PatientprofileProvider extends ChangeNotifier {
     }
   }
 
+  Future<ResponseApi<Patientprofile>> updatePatientprofile(
+      Patientprofile profile) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final result = await PatientprofileService.updatePatientProfile(profile);
+      if (result.status == 'success' && result.data != null) {
+        final index = _patientprofiles.indexWhere(
+            (p) => p.patientProfileId == result.data!.patientProfileId);
+        if (index != -1) {
+          _patientprofiles[index] = result.data!;
+        }
+      }
+      return result;
+    } catch (e) {
+      // Handle error
+      debugPrint('Error updating patient profile: $e');
+      return ResponseApi<Patientprofile>(
+        status: 'error',
+        message: 'Error updating patient profile: $e',
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<ResponseApi> deletePatientprofile(String id) async {
     _isLoading = true;
     notifyListeners();

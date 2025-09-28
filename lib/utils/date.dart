@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 String getWeekdayName(DateTime date) {
   const weekdays = {
     1: "Thứ 2",
@@ -10,4 +12,9 @@ String getWeekdayName(DateTime date) {
   };
 
   return weekdays[date.weekday] ?? "";
+}
+
+String formatDate(DateTime date) {
+  final DateFormat formatter = DateFormat('dd/MM/yyyy');
+  return formatter.format(date);
 }

@@ -5,7 +5,6 @@ import 'package:frontend_app/models/account.dart';
 import 'package:frontend_app/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
-import 'dart:convert';
 
 class AuthProvider extends ChangeNotifier {
   static const _storage = FlutterSecureStorage();
@@ -15,16 +14,19 @@ class AuthProvider extends ChangeNotifier {
   Account? _account;
   String? _accessToken;
   String? _refreshToken;
+  bool _isLoading = false;
 
   Account? get account => _account;
   String? get accessToken => _accessToken;
   String? get refreshToken => _refreshToken;
+  bool get isLoading => _isLoading;
   bool get isAuthenticated => _account != null && _accessToken != null;
 
   Future<ResponseApi<AuthResponse>> loginWithGoogle() async {
+    _isLoading = true;
+    notifyListeners();
     try {
       final result = await AuthService.loginWithGoogle();
-      print("Login with Google result: ${result.toJson()}");
       if (result.status == 'success') {
         _account = result.data?.account;
         _accessToken = result.data?.accessToken;
@@ -32,11 +34,13 @@ class AuthProvider extends ChangeNotifier {
         // Lưu token và account vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
-        notifyListeners();
       }
       return result;
     } catch (e) {
       return ResponseApi(status: 'error', message: 'Đăng nhập Google thất bại');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -44,6 +48,8 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
+    _isLoading = true;
+    notifyListeners();
     try {
       final result = await AuthService.login(email: email, password: password);
       if (result.status == 'success') {
@@ -61,6 +67,9 @@ class AuthProvider extends ChangeNotifier {
         status: 'error',
         message: 'Đăng nhập thất bại',
       );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

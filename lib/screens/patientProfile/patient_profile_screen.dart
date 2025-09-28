@@ -167,9 +167,11 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: ListView.builder(
+                          child: ListView.separated(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 12),
                             itemCount: provider.patientprofiles.length,
                             itemBuilder: (context, index) {
                               final profile = provider.patientprofiles[index];

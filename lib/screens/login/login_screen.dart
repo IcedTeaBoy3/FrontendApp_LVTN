@@ -44,10 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
       final email = _emailController.text;
       final password = _passwordController.text;
 
-      setState(() {
-        _isLoading = true;
-      });
-
       final response = await context
           .read<AuthProvider>()
           .login(email: email, password: password);
@@ -75,12 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
           message: response.message,
           duration: 2,
         );
-      }
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
       }
     }
   }
@@ -285,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        child: _isLoading
+        child: context.watch<AuthProvider>().isLoading
             ? const SizedBox(
                 height: 24,
                 width: 24,
