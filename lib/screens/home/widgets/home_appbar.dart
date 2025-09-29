@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +52,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     Text(
-                      account?.userName?.isNotEmpty == true
+                      account?.userName.isNotEmpty == true
                           ? account!.userName
                           : (account?.email ?? 'Đăng ký/Đăng nhập'),
                       style: const TextStyle(

@@ -30,6 +30,8 @@ dependencies:
   jwt_decode: ^0.3.1
   lottie: ^2.2.0 
   another_flushbar: ^1.12.32
+  dio_cookie_manager: ^3.0.0
+  cookie_jar: ^4.0.8
   flutter_localizations:  
     sdk: flutter
 

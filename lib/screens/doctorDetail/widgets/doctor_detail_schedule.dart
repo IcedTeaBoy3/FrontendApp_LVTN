@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_app/models/slot.dart';
+import 'package:go_router/go_router.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/schedule_provider.dart';
@@ -74,6 +76,15 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
         context.read<ScheduleProvider>().fetchDoctorSchedules(
             doctorId: widget.doctorId, date: _selectedMonth);
       }
+    });
+  }
+
+  void _handleBookingAppointment(Slot slot, Schedule schedule) {
+    context.goNamed('booking', pathParameters: {
+      'doctorId': widget.doctorId,
+    }, extra: {
+      'selectedSlot': slot,
+      'selectedSchedule': schedule,
     });
   }
 
@@ -324,7 +335,14 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                             final slot = shift.slots[index];
                             final isAvailable = slot.status == 'available';
                             return ElevatedButton(
-                              onPressed: isAvailable ? () {} : null,
+                              onPressed: isAvailable
+                                  ? () {
+                                      _handleBookingAppointment(
+                                        slot,
+                                        _selectedSchedule!,
+                                      );
+                                    }
+                                  : null,
                               style: ElevatedButton.styleFrom(
                                 minimumSize: const Size(100, 40),
                                 backgroundColor: isAvailable

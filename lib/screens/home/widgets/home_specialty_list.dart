@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/specialty_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import 'package:frontend_app/widgets/specialty_card.dart';
+import 'package:frontend_app/widgets/custom_loading.dart';
 
 class HomeSpecialtyList extends StatefulWidget {
   const HomeSpecialtyList({super.key});
@@ -119,7 +119,7 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
           Consumer<SpecialtyProvider>(
             builder: (context, specialtyProvider, child) {
               if (specialtyProvider.isLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const CustomLoading();
               }
               final specialties = specialtyProvider.specialties;
               if (specialties.isEmpty) {

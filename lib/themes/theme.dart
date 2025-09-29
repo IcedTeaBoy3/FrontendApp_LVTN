@@ -52,6 +52,41 @@ class AppTheme {
       backgroundColor: Colors.blue.shade700,
       foregroundColor: Colors.white,
     ),
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: Colors.blue,
+      selectionColor: Colors.lightBlueAccent,
+      selectionHandleColor: Colors.blue,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        borderSide: const BorderSide(color: Colors.blue, width: 1.0),
+      ),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 12.0,
+        horizontal: 16.0,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        borderSide: const BorderSide(color: Colors.blue, width: 1.0),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        borderSide: const BorderSide(color: Colors.redAccent, width: 1.0),
+      ),
+      errorStyle: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.red,
+      ),
+    ),
+    scaffoldBackgroundColor: Colors.white,
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
       selectedItemColor: AppColors.primaryBlue,

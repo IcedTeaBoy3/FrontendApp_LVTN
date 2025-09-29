@@ -44,6 +44,23 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshTokenIfNeeded() async {
+    if (_refreshToken == null) return;
+    try {
+      final result = await AuthService.refreshToken(_refreshToken!);
+      if (result.status == 'success') {
+        _accessToken = result.data?.accessToken;
+        // Lưu token và user vào secure storage
+        await _storage.write(key: 'accessToken', value: _accessToken);
+        notifyListeners();
+      } else {
+        await logout();
+      }
+    } catch (e) {
+      await logout();
+    }
+  }
+
   Future<ResponseApi<AuthResponse>> login({
     required String email,
     required String password,

@@ -64,6 +64,11 @@ class CustomTextField extends StatelessWidget {
             ),
             errorMaxLines: 2,
           ),
+          cursorColor: Colors.blue,
+          cursorWidth: 2, // độ dày
+          cursorHeight: 25, // chiều cao
+          cursorRadius: Radius.circular(2), // bo góc
+          cursorErrorColor: Colors.red, // màu khi lỗi
         ),
       ],
     );

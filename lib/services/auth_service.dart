@@ -154,19 +154,42 @@ class AuthService {
     }
   }
 
-  /// 👉 Lấy thông tin account đã lưu
   static Future<Account?> getAccount() async {
     try {
       final response = await ApiClient.dio.get(
         '/auth/me',
       );
-      print("Get account response: ${response.data}");
       if (response.statusCode == 200) {
         return Account.fromJson(response.data['data']);
       }
     } catch (e) {
-      print("Error get account: $e");
       return null;
+    }
+  }
+
+  static Future<ResponseApi<AuthResponse>> refreshToken(String token) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/refresh-token',
+        options: Options(
+          extra: {"withCredentials": true}, // cho Flutter Web
+        ),
+      );
+      return ResponseApi<AuthResponse>.fromJson(
+        response.data,
+        funtionParser: (dataJson) => AuthResponse.fromJson(dataJson),
+      );
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Làm mới token thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(
+        status: 'error',
+        message: 'Làm mới token thất bại',
+      );
     }
   }
 }

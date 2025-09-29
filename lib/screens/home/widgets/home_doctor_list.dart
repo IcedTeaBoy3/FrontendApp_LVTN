@@ -3,6 +3,7 @@ import 'package:frontend_app/widgets/doctor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend_app/widgets/custom_loading.dart';
 
 class HomeDoctorList extends StatefulWidget {
   const HomeDoctorList({super.key});
@@ -76,7 +77,7 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
           ),
           Consumer<DoctorProvider>(builder: (context, doctorProvider, child) {
             if (doctorProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return const CustomLoading();
             }
             final doctors = doctorProvider.doctors;
             if (doctors.isEmpty) {
@@ -97,9 +98,9 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
                   final doctor = doctors[index];
                   return DoctorCard(
                     doctorId: doctor.doctorId,
-                    name: doctor.person.fullName as String,
+                    name: doctor.person.fullName,
                     specialtyName: doctor.primarySpecialtyName,
-                    avatar: doctor.person.avatar as String,
+                    avatar: doctor.person.avatar,
                   );
                 },
               ),

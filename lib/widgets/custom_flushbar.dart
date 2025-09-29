@@ -20,10 +20,11 @@ class CustomFlushbar {
       ),
       message: message,
       duration: duration,
-      backgroundColor: _convertColor(status) ?? backgroundColor,
+      backgroundColor: _convertColor(status),
       flushbarPosition: flushbarPosition,
       borderRadius: BorderRadius.circular(8),
       margin: const EdgeInsets.all(8),
+      isDismissible: true,
       dismissDirection: FlushbarDismissDirection.HORIZONTAL,
       boxShadows: [
         BoxShadow(

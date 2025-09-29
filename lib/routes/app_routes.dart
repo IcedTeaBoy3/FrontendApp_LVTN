@@ -9,6 +9,9 @@ import 'package:frontend_app/screens/addedit_patientprofile_screen/addedit_patie
 import 'package:frontend_app/screens/verifyOtp/verify_otp_screen.dart';
 import 'package:frontend_app/models/clinic.dart';
 import 'package:frontend_app/models/patientprofile.dart';
+import 'package:frontend_app/models/schedule.dart';
+import 'package:frontend_app/models/slot.dart';
+import 'package:frontend_app/screens/bookingAppointment/booking_appointment_screen.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -32,8 +35,25 @@ class AppRoutes {
             path: 'doctor/:doctorId',
             builder: (context, state) {
               final doctorId = state.pathParameters['doctorId']!;
+
               return DoctorDetailScreen(doctorId: doctorId);
             },
+            routes: [
+              GoRoute(
+                name: 'booking',
+                path: 'booking',
+                builder: (context, state) {
+                  final doctorId = state.pathParameters['doctorId']!;
+                  final schedule = state.extra as Schedule?;
+                  final slot = state.extra as Slot?;
+                  return BookingAppointmentScreen(
+                    doctorId: doctorId,
+                    selectedSchedule: schedule,
+                    selectedSlot: slot,
+                  );
+                },
+              )
+            ],
           ),
           GoRoute(
             name: 'addPatientProfile',

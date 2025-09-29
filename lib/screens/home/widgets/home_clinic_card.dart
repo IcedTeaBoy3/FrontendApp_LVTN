@@ -4,6 +4,7 @@ import 'package:frontend_app/providers/clinic_provider.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend_app/widgets/custom_loading.dart';
 
 class HomeClinicCard extends StatefulWidget {
   const HomeClinicCard({super.key});
@@ -64,7 +65,7 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
             Consumer<ClinicProvider>(
               builder: (context, clinicProvider, child) {
                 if (clinicProvider.isLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const CustomLoading();
                 }
                 final clinic = clinicProvider.clinic;
                 if (clinic == null) {

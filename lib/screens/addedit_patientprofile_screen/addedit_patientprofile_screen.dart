@@ -190,7 +190,42 @@ class _AddEditPatientProfileScreenState
           );
         });
       }
+    } else {
+      // Form is not valid
+      CustomFlushbar.show(
+        context,
+        status: "error",
+        message: 'Vui lòng kiểm tra lại thông tin',
+      );
     }
+  }
+
+  String? validateInsuranceCode(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Vui lòng nhập mã thẻ BHYT';
+    }
+
+    // BHYT có 15 ký tự
+    if (value.length != 15) {
+      return 'Mã thẻ BHYT phải có đúng 15 ký tự';
+    }
+
+    // 2 ký tự đầu phải là chữ
+    if (!RegExp(r'^[A-Z]{2}').hasMatch(value)) {
+      return '2 ký tự đầu phải là chữ in hoa (mã đối tượng)';
+    }
+
+    // Ký tự thứ 3 phải là số từ 1-5
+    if (!RegExp(r'^[A-Z]{2}[1-5]').hasMatch(value)) {
+      return 'Ký tự thứ 3 phải là số từ 1 đến 5 (mã quyền lợi)';
+    }
+
+    // 12 ký tự cuối phải là số
+    if (!RegExp(r'^[A-Z]{2}[1-5][0-9]{12}$').hasMatch(value)) {
+      return '12 ký tự cuối phải là số';
+    }
+
+    return null;
   }
 
   @override
@@ -291,7 +326,7 @@ class _AddEditPatientProfileScreenState
                                 if (value == null || value.isEmpty) {
                                   return "Ngày sinh không được để trống";
                                 }
-                                // Thêm kiểm tra định dạng ngày tháng nếu cần
+
                                 return null;
                               },
                             ),
@@ -322,6 +357,7 @@ class _AddEditPatientProfileScreenState
                                                 value ?? "";
                                           });
                                         },
+                                        activeColor: AppColors.primaryBlue,
                                       ),
                                       Text(gender),
                                     ],
@@ -331,12 +367,16 @@ class _AddEditPatientProfileScreenState
                             ),
                             const SizedBox(height: 16),
                             CustomTextField(
+                              keyboardType: TextInputType.number,
                               controller: _idCardController,
                               label: "Mã định danh/ CCCD",
                               hintText: "Vui lòng nhập mã định danh/ CCCD",
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return "Mã định danh/ CCCD không được để trống";
+                                }
+                                if (!RegExp(r'^[0-9]{12}$').hasMatch(value)) {
+                                  return 'CCCD phải gồm đúng 12 chữ số';
                                 }
                                 return null;
                               },
@@ -346,12 +386,7 @@ class _AddEditPatientProfileScreenState
                               controller: _insuranceCodeController,
                               label: "Mã bảo hiểm y tế",
                               hintText: "Vui lòng nhập mã bảo hiểm y tế",
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Mã bảo hiểm y tế không được để trống";
-                                }
-                                return null;
-                              },
+                              validator: validateInsuranceCode,
                             ),
                             const SizedBox(height: 16),
                             CustomTextField(
@@ -361,6 +396,10 @@ class _AddEditPatientProfileScreenState
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return "Số điện thoại không được để trống";
+                                }
+                                // Regex: bắt đầu 0, theo sau 9–10 chữ số
+                                if (!RegExp(r'^0\d{9,10}$').hasMatch(value)) {
+                                  return 'Số điện thoại không hợp lệ';
                                 }
                                 return null;
                               },
@@ -392,6 +431,8 @@ class _AddEditPatientProfileScreenState
                                             selectedRelationship = value ?? "";
                                           });
                                         },
+                                        mouseCursor: SystemMouseCursors.click,
+                                        activeColor: AppColors.primaryBlue,
                                       ),
                                       Expanded(
                                         child: Text(
@@ -431,23 +472,13 @@ class _AddEditPatientProfileScreenState
                             // Province
                             Consumer<AddressProvider>(
                               builder: (context, addressProvider, child) {
-                                final provinces = addressProvider.provinces;
-                                final districts = addressProvider.districts;
-                                final wards = addressProvider.wards;
-                                final selectedProvince =
-                                    addressProvider.selectedProvince;
-                                final selectedDistrict =
-                                    addressProvider.selectedDistrict;
-                                final selectedWard =
-                                    addressProvider.selectedWard;
-
                                 return Column(
                                   children: [
                                     CustomDropdownField<Province>(
                                       label: "Tỉnh/Thành phố",
                                       hintText: "Vui lòng chọn Tỉnh/Thành phố",
-                                      value: selectedProvince,
-                                      items: provinces,
+                                      value: addressProvider.selectedProvince,
+                                      items: addressProvider.provinces,
                                       itemLabel: (p) => p.name,
                                       onChanged: (value) {
                                         if (value != null) {
@@ -469,8 +500,8 @@ class _AddEditPatientProfileScreenState
                                     CustomDropdownField<District>(
                                       label: "Quận/Huyện",
                                       hintText: "Vui lòng chọn Quận/Huyện",
-                                      value: selectedDistrict,
-                                      items: districts,
+                                      value: addressProvider.selectedDistrict,
+                                      items: addressProvider.districts,
                                       itemLabel: (d) => d.name,
                                       onChanged: (value) {
                                         if (value != null) {
@@ -492,8 +523,8 @@ class _AddEditPatientProfileScreenState
                                     CustomDropdownField<Ward>(
                                       label: "Phường/Xã",
                                       hintText: "Vui lòng chọn Phường/Xã",
-                                      value: selectedWard,
-                                      items: wards,
+                                      value: addressProvider.selectedWard,
+                                      items: addressProvider.wards,
                                       itemLabel: (w) => w.name,
                                       onChanged: (value) {
                                         if (value != null) {

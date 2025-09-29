@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 import '../configs/api_config.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 
@@ -13,7 +15,10 @@ class ApiClient {
       },
     ),
   );
+  static final CookieJar _cookieJar = CookieJar(); // Bộ nhớ cookie
+
   static void init(AuthProvider authProvider) {
+    _dio.interceptors.add(CookieManager(_cookieJar));
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -24,8 +29,12 @@ class ApiClient {
           return handler.next(options);
         },
         onError: (DioException e, handler) async {
-          // Nếu token hết hạn có thể refresh token ở đây
-          await authProvider.logout();
+          print("Dio error: ${e.message}");
+          print("Dio error response: ${e.response?.data}");
+          print("Dio error status code: ${e.response?.statusCode}");
+          if (e.response?.statusCode == 401) {
+            await authProvider.refreshTokenIfNeeded();
+          }
           return handler.next(e);
         },
       ),
