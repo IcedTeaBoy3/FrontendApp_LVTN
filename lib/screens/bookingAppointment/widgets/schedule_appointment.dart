@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/configs/api_config.dart';
+import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:frontend_app/models/doctor.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
+import 'package:frontend_app/utils/gender_utils.dart';
+import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/screens/doctorDetail/widgets/doctor_detail_schedule.dart';
+import 'package:frontend_app/providers/appointment_provider.dart';
+import 'package:frontend_app/screens/patientProfile/widgets/card_patientprofile.dart';
+import 'package:go_router/go_router.dart';
 
 class ScheduleAppointment extends StatefulWidget {
   final String doctorId;
@@ -15,138 +21,370 @@ class ScheduleAppointment extends StatefulWidget {
 
 class _ScheduleAppointmentState extends State<ScheduleAppointment> {
   bool _isExpanded = false;
+
+  void _handleChangePatientProfile(BuildContext context) {
+    final patientProfiles =
+        context.read<PatientprofileProvider>().patientprofiles;
+    final selectedProfile =
+        context.read<AppointmentProvider>().selectedPatientProfile;
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      showDragHandle: true,
+      backgroundColor: Colors.grey[200],
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.separated(
+            itemCount: patientProfiles.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final profile = patientProfiles[index];
+              return CardPatientProfile(
+                patientprofile: profile,
+                onTap: () {
+                  context
+                      .read<AppointmentProvider>()
+                      .setSelectedPatientProfile(profile);
+                  context.pop();
+                },
+                selected: profile.patientProfileId ==
+                    selectedProfile?.patientProfileId,
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Sau khi widget khởi tạo, gán patientProfile mặc định
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appointmentProvider = context.read<AppointmentProvider>();
+      final patientProfile =
+          context.read<PatientprofileProvider>().patientprofiles[0];
+      appointmentProvider.setSelectedPatientProfile(patientProfile);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final patientProfile =
+        context.watch<AppointmentProvider>().selectedPatientProfile;
     final doctor = context.read<DoctorProvider>().findById(widget.doctorId);
-    final String avatarUrl =
-        (doctor?.person.avatar != null && doctor!.person.avatar!.isNotEmpty)
-            ? ApiConfig.backendUrl + doctor.person.avatar!
-            : 'https://via.placeholder.com/150';
+    final avatarUrl = (doctor?.person.avatar != null)
+        ? ApiConfig.backendUrl + doctor!.person.avatar!
+        : null;
     final specialties =
         doctor?.doctorSpecialties.map((ds) => ds.specialty.name) ?? [];
     final degreeName = doctor?.degree.title ?? "Chưa cập nhật";
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withAlpha(30),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: Offset(0, 3), // changes position of shadow
+    final notes = doctor?.notes ?? "Chưa cập nhật";
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
               ),
-            ],
-          ),
-          child: ListTile(
-            leading: CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.blue.shade100,
-              child: ClipOval(
-                child: Image.network(
-                  avatarUrl,
-                  fit: BoxFit.cover,
-                  width: 60,
-                  height: 60,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.person,
-                        size: 50, color: Colors.blue.shade700);
-                  },
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withAlpha(30),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3), // changes position of shadow
                 ),
-              ),
+              ],
             ),
-            title: Text(
-              'BS. ${doctor?.person.fullName ?? "Chưa cập nhật"}',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                SizedBox(height: 4),
-                Text(
-                  degreeName,
-                  style: TextStyle(fontSize: 14),
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.blue.shade100,
+                  child: ClipOval(
+                    child: avatarUrl != null
+                        ? Image.network(
+                            avatarUrl,
+                            fit: BoxFit.cover,
+                            width: 80,
+                            height: 80,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.person,
+                                  size: 50, color: Colors.blue.shade700);
+                            },
+                          )
+                        : Icon(Icons.person,
+                            size: 50, color: Colors.blue.shade700),
+                  ),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  specialties.isNotEmpty
-                      ? specialties.join(', ')
-                      : 'Chưa cập nhật chuyên khoa',
-                  style: TextStyle(fontSize: 14),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "BS. $degreeName",
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Colors.blue,
+                            ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        doctor?.person.fullName ?? "Bác sĩ chưa cập nhật",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        specialties.isNotEmpty
+                            ? "Chuyên khoa: ${specialties.join(', ')}"
+                            : "Chuyên khoa chưa cập nhật",
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Colors.grey[700],
+                            ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          // Phần màu vàng bên dưới
-        ),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.amber[100], // nền vàng nhạt
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.amber[100], // nền vàng nhạt
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            child: InkWell(
+              onTap: notes == "Chưa cập nhật"
+                  ? null
+                  : () {
+                      setState(() {
+                        _isExpanded = !_isExpanded;
+                      });
+                    },
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.warning,
+                            color: Colors.orange,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Lưu ý",
+                            style: TextStyle(
+                              color: Colors.orange[800],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Icon(
+                        _isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: Colors.orange,
+                      ),
+                    ],
+                  ),
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 200),
+                    crossFadeState: _isExpanded
+                        ? CrossFadeState.showFirst
+                        : CrossFadeState.showSecond,
+                    firstChild: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Text(
+                        notes,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    secondChild: const SizedBox.shrink(),
+                  )
+                ],
+              ),
             ),
           ),
-          child: InkWell(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          const SizedBox(
+            height: 16,
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Đặt lịch khám này cho:",
+              style: Theme.of(context).textTheme.bodyLarge,
+              textDirection: TextDirection.ltr,
+              textAlign: TextAlign.left,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withAlpha(30),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Column(
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.warning, color: Colors.orange, size: 20),
-                    const SizedBox(width: 6),
                     Text(
-                      "Lưu ý",
-                      style: TextStyle(
-                        color: Colors.orange[800],
-                        fontWeight: FontWeight.w600,
-                      ),
+                      "Họ và tên:",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    Text(
+                      patientProfile?.person.fullName ?? "Chưa có thông tin",
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                   ],
                 ),
-                Icon(
-                  _isExpanded
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: Colors.orange,
+                const SizedBox(
+                  height: 8,
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Giới tính:",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    Text(
+                      convertGenderBack(patientProfile!.person.gender),
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Ngày sinh:",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    Text(
+                      formatDate(patientProfile!.person.dateOfBirth),
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Điện thoại:",
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    Text(
+                      patientProfile.person.phone ?? "Chưa có thông tin",
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
-        ),
-        // Text mở rộng
-        AnimatedCrossFade(
-          duration: const Duration(milliseconds: 200),
-          crossFadeState: _isExpanded
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-          firstChild: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              "Bạn nên đến sớm 15 phút để làm thủ tục.\n"
-              "Mang theo giấy tờ tuỳ thân và hồ sơ y tế (nếu có).",
-              style: const TextStyle(color: Colors.black87, fontSize: 14),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(12),
+                bottomRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Xem chi tiết",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _handleChangePatientProfile(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.blue,
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                      side: BorderSide(color: Colors.blue),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                  ),
+                  child: Text(
+                    "Thay đổi",
+                  ),
+                )
+              ],
             ),
           ),
-          secondChild: const SizedBox.shrink(),
-        )
-      ],
+          const SizedBox(
+            height: 16,
+          ),
+          Text(
+            "Chọn ngày khám",
+            style: Theme.of(context).textTheme.bodyLarge,
+            textDirection: TextDirection.ltr,
+            textAlign: TextAlign.left,
+          ),
+          DoctorDetailSchedule(doctorId: widget.doctorId),
+        ],
+      ),
     );
   }
 }

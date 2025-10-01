@@ -8,6 +8,7 @@ import 'package:frontend_app/screens/patientProfile/widgets/card_patientprofile.
 import 'package:frontend_app/widgets/custom_loading.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend_app/widgets/custom_flushbar.dart';
 
 class PatientProfileScreen extends StatefulWidget {
   const PatientProfileScreen({super.key});
@@ -176,7 +177,22 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                             itemBuilder: (context, index) {
                               final profile = provider.patientprofiles[index];
                               return CardPatientProfile(
-                                  patientprofile: profile);
+                                patientprofile: profile,
+                                onTap: () => context.pushNamed(
+                                  'addPatientProfile',
+                                  extra: profile,
+                                ),
+                                onDelete: () async {
+                                  final response = await context
+                                      .read<PatientprofileProvider>()
+                                      .deletePatientprofile(
+                                          profile.patientProfileId);
+                                  CustomFlushbar.show(context,
+                                      status: response.status,
+                                      message: response.message);
+                                },
+                                dismissible: true,
+                              );
                             },
                           ),
                         ),

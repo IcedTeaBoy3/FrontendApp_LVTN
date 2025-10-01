@@ -3,6 +3,7 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import '../configs/api_config.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
   static final Dio _dio = Dio(
@@ -22,9 +23,10 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final accessToken = authProvider.accessToken;
-          if (accessToken != null) {
-            options.headers["Authorization"] = "Bearer $accessToken";
+          final storage = FlutterSecureStorage();
+          final token = await storage.read(key: 'accessToken');
+          if (token != null) {
+            options.headers["Authorization"] = "Bearer $token";
           }
           return handler.next(options);
         },

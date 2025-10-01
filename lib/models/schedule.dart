@@ -48,4 +48,8 @@ class Schedule {
       'slotDuration': slotDuration,
     };
   }
+
+  Shift getFirstShift() {
+    return shifts[0];
+  }
 }

@@ -41,4 +41,8 @@ class Shift {
       'slots': slots.map((slot) => slot.toJson()).toList(),
     };
   }
+
+  Slot getFirstSlot() {
+    return slots[0];
+  }
 }

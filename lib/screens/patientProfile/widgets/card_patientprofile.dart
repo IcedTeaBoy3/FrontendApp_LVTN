@@ -1,33 +1,90 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:frontend_app/providers/patientprofile_provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/models/patientprofile.dart';
-import 'package:frontend_app/widgets/confirm_dialog.dart';
-import 'package:frontend_app/widgets/custom_flushbar.dart';
 import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/widgets/confirm_dialog.dart';
+import 'package:frontend_app/utils/relation_utils.dart';
 
-class CardPatientProfile extends StatefulWidget {
-  final Patientprofile? patientprofile;
-  const CardPatientProfile({super.key, this.patientprofile});
+class CardPatientProfile extends StatelessWidget {
+  final Patientprofile patientprofile;
+  final bool selected;
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete; // 👈 thêm callback để xử lý delete tuỳ nơi
+  final bool dismissible; // 👈 cho phép bật/tắt vuốt xóa
 
-  @override
-  State<CardPatientProfile> createState() => _CardPatientProfileState();
-}
+  const CardPatientProfile({
+    super.key,
+    required this.patientprofile,
+    this.selected = false,
+    this.onTap,
+    this.onDelete,
+    this.dismissible = false,
+  });
 
-class _CardPatientProfileState extends State<CardPatientProfile> {
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // Chuyển đến trang chi tiết hồ sơ bệnh nhân
-        context.pushNamed('addPatientProfile', extra: widget.patientprofile);
-      },
-      child: Dismissible(
-        key: ValueKey(
-          widget.patientprofile?.patientProfileId,
-        ), // key duy nhất cho mỗi item
-        direction: DismissDirection.endToStart, // vuốt từ phải qua trái
+    Widget cardContent = Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: selected ? Border.all(color: Colors.blue, width: 1) : null,
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 30,
+            backgroundColor: Colors.blue[100],
+            child: const Icon(
+              FontAwesomeIcons.idCard,
+              size: 40,
+              color: Colors.blue,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  patientprofile.person.fullName,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Ngày sinh: ${formatDate(patientprofile.person.dateOfBirth)}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Quan hệ: ${convertRelationshipBack(patientprofile.relation)}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.chevron_right,
+            size: 30,
+            color: Colors.grey,
+          ),
+        ],
+      ),
+    );
+
+    if (dismissible && onDelete != null) {
+      return Dismissible(
+        key: ValueKey(patientprofile.patientProfileId),
+        direction: DismissDirection.endToStart,
         background: Container(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -45,65 +102,17 @@ class _CardPatientProfileState extends State<CardPatientProfile> {
           );
           return result == true;
         },
-        onDismissed: (direction) async {
-          final response = await context
-              .read<PatientprofileProvider>()
-              .deletePatientprofile(widget.patientprofile!.patientProfileId);
-          if (!mounted) return;
-          CustomFlushbar.show(
-            context,
-            status: response.status,
-            message: response.message,
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Colors.blue[100],
-                child: const Icon(
-                  Icons.person,
-                  size: 40,
-                  color: Colors.blue,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.patientprofile?.person.fullName ?? '',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Ngày sinh: ${formatDate(widget.patientprofile?.person.dateOfBirth ?? DateTime.now())}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.chevron_right,
-                size: 30,
-                color: Colors.grey,
-              ),
-            ],
-          ),
+        onDismissed: (_) => onDelete?.call(),
+        child: InkWell(
+          onTap: onTap,
+          child: cardContent,
         ),
-      ),
+      );
+    }
+
+    return InkWell(
+      onTap: onTap,
+      child: cardContent,
     );
   }
 }

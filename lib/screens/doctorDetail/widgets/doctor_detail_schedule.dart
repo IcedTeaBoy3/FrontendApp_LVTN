@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/models/slot.dart';
+import 'package:frontend_app/themes/colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/schedule_provider.dart';
+import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/utils/date.dart';
 import 'package:frontend_app/models/schedule.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend_app/widgets/custom_loading.dart';
 
 class DoctorDetailSchedule extends StatefulWidget {
   final String doctorId;
@@ -18,12 +21,22 @@ class DoctorDetailSchedule extends StatefulWidget {
 }
 
 class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
-  DateTime? _selectedMonth;
-  Schedule? _selectedSchedule;
+  void _onMonthSelected(DateTime? selectedDate) {
+    if (selectedDate == null) return;
+    final appointmentProvider = context.read<AppointmentProvider>();
+    appointmentProvider.setDate(selectedDate);
+
+    context
+        .read<ScheduleProvider>()
+        .fetchDoctorSchedules(doctorId: widget.doctorId, date: selectedDate);
+    context.read<AppointmentProvider>().setSchedule(null);
+  }
+
   void showMonthPickerDialog() {
+    final appointmentProvider = context.read<AppointmentProvider>();
     showMonthPicker(
       context: context,
-      initialDate: _selectedMonth ?? DateTime.now(),
+      initialDate: appointmentProvider.selectedDate ?? DateTime.now(),
       firstDate: DateTime(DateTime.now().year, DateTime.now().month),
       lastDate: DateTime(DateTime.now().year + 1, 12),
       monthPickerDialogSettings: const MonthPickerDialogSettings(
@@ -67,48 +80,42 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
           ),
         ),
       ),
-    ).then((selectedDate) {
-      if (selectedDate != null) {
-        setState(() {
-          _selectedMonth = selectedDate;
-          _selectedSchedule = null;
-        });
-        context.read<ScheduleProvider>().fetchDoctorSchedules(
-            doctorId: widget.doctorId, date: _selectedMonth);
-      }
-    });
+    ).then(_onMonthSelected);
   }
 
   void _handleBookingAppointment(Slot slot, Schedule schedule) {
     context.goNamed('booking', pathParameters: {
       'doctorId': widget.doctorId,
-    }, extra: {
-      'selectedSlot': slot,
-      'selectedSchedule': schedule,
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _selectedMonth = DateTime.now();
+    final now = DateTime.now();
+    final appointmentProvider = context.read<AppointmentProvider>();
+    // nếu chưa có selectedDate thì gán mặc định tháng hiện tại
+    if (appointmentProvider.selectedDate == null) {
+      appointmentProvider.setDate(now);
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ScheduleProvider>().fetchDoctorSchedules(
-          doctorId: widget.doctorId, date: _selectedMonth);
+            doctorId: widget.doctorId,
+            date: context.read<AppointmentProvider>().selectedDate,
+          );
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _selectedSchedule = null;
-    _selectedMonth = null;
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   _selectedMonth = null;
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final selectedDate = context.read<AppointmentProvider>().selectedDate;
     return Container(
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: Colors.white),
       child: Column(
         children: [
@@ -138,9 +145,9 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _selectedMonth == null
+                  selectedDate == null
                       ? "Chọn tháng"
-                      : 'Lịch tháng ${_selectedMonth?.month}/${_selectedMonth?.year}',
+                      : 'Lịch tháng ${selectedDate?.month}/${selectedDate?.year}',
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black87,
@@ -165,219 +172,249 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
             onPressed: () => showMonthPickerDialog(),
           ),
           const SizedBox(height: 12),
-          Consumer<ScheduleProvider>(
-            builder: (context, scheduleProvider, child) {
+          Consumer2<ScheduleProvider, AppointmentProvider>(
+            builder: (context, scheduleProvider, appointmentProvider, child) {
               if (scheduleProvider.isLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return const CustomLoading();
               }
               final schedules = scheduleProvider.schedules;
               if (schedules.isEmpty) {
-                return const Center(
-                  child: Text('Không có lịch khám trong tháng này.'),
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Không có lịch khám trong tháng này.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 );
               }
-              if (_selectedSchedule == null && schedules.isNotEmpty) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    _selectedSchedule = schedules.first;
-                  });
-                });
-              }
-              return SizedBox(
-                height: 160,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: schedules.length,
-                  itemBuilder: (context, index) {
-                    final schedule = schedules[index];
-                    final slotCount = schedule.availableSlotCount;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedSchedule = schedule;
-                        });
-                      },
-                      child: Container(
-                        width: 100,
-                        margin: const EdgeInsets.only(right: 12),
-                        child: Card(
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          color: _selectedSchedule?.scheduleId ==
-                                  schedule.scheduleId
-                              ? Colors.blue.shade100
-                              : Colors.white,
-                          child: Stack(
-                            children: [
-                              // Badge Hết lịch
-                              if (slotCount == 0)
-                                Positioned(
-                                  top: 6,
-                                  right: 6,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red.shade100,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Text(
-                                      'Đầy lịch',
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
+
+              return Column(
+                children: [
+                  SizedBox(
+                    height: 160,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: schedules.length,
+                      itemBuilder: (context, index) {
+                        final schedule = schedules[index];
+                        final slotCount = schedule.availableSlotCount;
+                        final isSelected =
+                            appointmentProvider.selectedSchedule?.scheduleId ==
+                                schedule.scheduleId;
+                        // Gán mặc định 1 lần khi chưa có selected
+                        if (appointmentProvider.selectedSchedule == null &&
+                            schedules.isNotEmpty) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            appointmentProvider.setSchedule(schedules.first);
+                          });
+                        }
+                        return GestureDetector(
+                          onTap: () =>
+                              appointmentProvider.setSchedule(schedule),
+                          child: Container(
+                            width: 100,
+                            margin: const EdgeInsets.only(right: 12),
+                            child: Card(
+                              elevation: 3,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              color: isSelected
+                                  ? Colors.blue.shade100
+                                  : Colors.white,
+                              child: Stack(
+                                children: [
+                                  // Badge Hết lịch
+                                  if (slotCount == 0)
+                                    Positioned(
+                                      top: 6,
+                                      right: 6,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.shade100,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: const Text(
+                                          'Đầy lịch',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
+                                    ),
+
+                                  // Nội dung chính
+                                  Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          getWeekdayName(schedule.workday),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        CircleAvatar(
+                                          radius: 22,
+                                          backgroundColor: Colors.blue.shade50,
+                                          child: Text(
+                                            '${schedule.workday.day}',
+                                            style: const TextStyle(
+                                              color: Colors.blue,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                        // Badge số khung giờ
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: slotCount > 0
+                                                ? Colors.green.shade100
+                                                : Colors.grey.shade200,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            '$slotCount slot',
+                                            style: TextStyle(
+                                              color: slotCount > 0
+                                                  ? Colors.green.shade800
+                                                  : Colors.grey.shade600,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-
-                              // Nội dung chính
-                              Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      getWeekdayName(schedule.workday),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    CircleAvatar(
-                                      radius: 22,
-                                      backgroundColor: Colors.blue.shade50,
-                                      child: Text(
-                                        '${schedule.workday.day}',
-                                        style: const TextStyle(
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                    // Badge số khung giờ
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: slotCount > 0
-                                            ? Colors.green.shade100
-                                            : Colors.grey.shade200,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        '$slotCount slot',
-                                        style: TextStyle(
-                                          color: slotCount > 0
-                                              ? Colors.green.shade800
-                                              : Colors.grey.shade600,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             },
           ),
           const SizedBox(height: 12),
-          if (_selectedSchedule != null)
-            ..._selectedSchedule!.shifts.map(
-              (shift) {
-                return SizedBox(
-                  height: 70,
-                  width: double.infinity,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+          Consumer2<ScheduleProvider, AppointmentProvider>(
+            builder: (context, scheduleProvider, appointmentProvider, child) {
+              final selectedSchedule = appointmentProvider.selectedSchedule;
+              if (selectedSchedule == null) {
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Vui lòng chọn một ngày khám để xem khung giờ trống.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                );
+              }
+              return Column(
+                children: selectedSchedule.shifts.map(
+                  (shift) {
+                    final firstSlot = shift.getFirstSlot();
+                    if (appointmentProvider.selectedSlot == null) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        appointmentProvider.setSlot(firstSlot);
+                      });
+                    }
+                    return SizedBox(
+                      height: 70,
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            shift.name.toLowerCase().contains('sáng')
-                                ? FontAwesomeIcons.sun
-                                : shift.name.toLowerCase().contains('chiều')
-                                    ? FontAwesomeIcons.cloudSun
-                                    : FontAwesomeIcons.moon,
-                            size: 16,
-                            color: shift.name.toLowerCase().contains('sáng')
-                                ? Colors.orange
-                                : shift.name.toLowerCase().contains('chiều')
-                                    ? Colors.amber
-                                    : Colors.indigo,
+                          Row(
+                            children: [
+                              Icon(
+                                shift.name.toLowerCase().contains('sáng')
+                                    ? FontAwesomeIcons.sun
+                                    : shift.name.toLowerCase().contains('chiều')
+                                        ? FontAwesomeIcons.cloudSun
+                                        : FontAwesomeIcons.moon,
+                                size: 16,
+                                color: shift.name.toLowerCase().contains('sáng')
+                                    ? Colors.orange
+                                    : shift.name.toLowerCase().contains('chiều')
+                                        ? Colors.amber
+                                        : Colors.indigo,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                shift.name,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            shift.name,
-                            style: Theme.of(context).textTheme.bodyLarge,
+                          Expanded(
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: shift.slots.length,
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(width: 8),
+                              itemBuilder: (context, index) {
+                                final slot = shift.slots[index];
+                                final isAvailable = slot.status == 'available';
+                                final isSelected =
+                                    appointmentProvider.selectedSlot == slot;
+                                return ElevatedButton(
+                                  onPressed: isAvailable
+                                      ? () => appointmentProvider.setSlot(slot)
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(100, 40),
+                                    backgroundColor: isSelected
+                                        ? AppColors.primaryBlue
+                                        : AppColors.secondaryBlue,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      side: BorderSide(),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '${DateFormat.Hm().format(slot.startTime)} - ${DateFormat.Hm().format(slot.endTime)}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: isAvailable
+                                              ? Colors.white
+                                              : Colors.grey.shade600,
+                                        ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ],
                       ),
-                      Expanded(
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: shift.slots.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(width: 8),
-                          itemBuilder: (context, index) {
-                            final slot = shift.slots[index];
-                            final isAvailable = slot.status == 'available';
-                            return ElevatedButton(
-                              onPressed: isAvailable
-                                  ? () {
-                                      _handleBookingAppointment(
-                                        slot,
-                                        _selectedSchedule!,
-                                      );
-                                    }
-                                  : null,
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(100, 40),
-                                backgroundColor: isAvailable
-                                    ? Colors.blue
-                                    : Colors.grey.shade300,
-                                foregroundColor: isAvailable
-                                    ? Colors.white
-                                    : Colors.grey.shade600,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                              ),
-                              child: Text(
-                                '${DateFormat.Hm().format(slot.startTime)} - ${DateFormat.Hm().format(slot.endTime)}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: isAvailable
-                                          ? Colors.white
-                                          : Colors.grey.shade600,
-                                    ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ).toList(),
+              );
+            },
+          ),
           const SizedBox(height: 8),
           Row(
             children: [

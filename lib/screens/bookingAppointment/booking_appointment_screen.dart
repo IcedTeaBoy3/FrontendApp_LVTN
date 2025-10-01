@@ -155,68 +155,11 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
 
             // Content: chiếm full width, không bị kéo rộng
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  // nếu nội dung cao thì cho cuộn dọc
-                  child: _contents[_currentStep],
-                ),
+              child: SingleChildScrollView(
+                // nếu nội dung cao thì cho cuộn dọc
+                child: _contents[_currentStep],
               ),
             ),
-
-            // Controls: nút Tiếp tục / Quay lại
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            //   child: Row(
-            //     children: <Widget>[
-            //       Expanded(
-            //         child: ElevatedButton(
-            //           style: ElevatedButton.styleFrom(
-            //             padding: const EdgeInsets.symmetric(vertical: 12),
-            //             backgroundColor: Colors.blue,
-            //             shape: RoundedRectangleBorder(
-            //               borderRadius: BorderRadius.circular(4.0),
-            //             ),
-            //             foregroundColor: Colors.white,
-            //           ),
-            //           onPressed: _nextStep,
-            //           child: Text(
-            //             _currentStep == _titles.length - 1
-            //                 ? 'Hoàn tất'
-            //                 : 'Tiếp tục',
-            //             style: const TextStyle(
-            //               fontSize: 16,
-            //               fontWeight: FontWeight.bold,
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //       const SizedBox(width: 8),
-            //       if (_currentStep > 0)
-            //         Expanded(
-            //           child: ElevatedButton(
-            //             onPressed: _prevStep,
-            //             style: ElevatedButton.styleFrom(
-            //               padding: const EdgeInsets.symmetric(vertical: 12),
-            //               shape: RoundedRectangleBorder(
-            //                 borderRadius: BorderRadius.circular(4.0),
-            //               ),
-            //               backgroundColor: Colors.grey[300],
-            //               foregroundColor: Colors.black87,
-            //             ),
-            //             child: const Text(
-            //               'Quay lại',
-            //               style: TextStyle(
-            //                 fontSize: 16,
-            //                 fontWeight: FontWeight.bold,
-            //                 color: Colors.black54,
-            //               ),
-            //             ),
-            //           ),
-            //         ),
-            //     ],
-            //   ),
-            // ),
           ],
         ),
         bottomNavigationBar: SafeArea(
