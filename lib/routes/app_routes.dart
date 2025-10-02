@@ -61,15 +61,20 @@ class AppRoutes {
             path: 'addPatientProfile',
             builder: (context, state) {
               final editedPatientProfile = state.extra as Patientprofile?;
+              final infoIdCard = state.uri.queryParameters['infoIdCard'];
+              print("CCCD từ scanner: $infoIdCard");
               return AddEditPatientProfileScreen(
                 editedPatientprofile: editedPatientProfile,
+                infoIdCard: infoIdCard,
               );
             },
           ),
           GoRoute(
-            path: '/scanner',
+            path: 'scanner',
             name: 'scanner',
-            builder: (context, state) => const CccdScannerScreen(),
+            builder: (context, state) {
+              return const ScanCCCDScreen();
+            },
           ),
           GoRoute(
             name: 'login',

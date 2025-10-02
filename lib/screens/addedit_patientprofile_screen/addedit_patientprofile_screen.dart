@@ -13,11 +13,16 @@ import 'package:frontend_app/providers/address_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend_app/utils/relation_utils.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
-import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/utils/date_utils.dart';
 
 class AddEditPatientProfileScreen extends StatefulWidget {
+  final String? infoIdCard;
   final Patientprofile? editedPatientprofile;
-  const AddEditPatientProfileScreen({super.key, this.editedPatientprofile});
+  const AddEditPatientProfileScreen({
+    super.key,
+    this.editedPatientprofile,
+    this.infoIdCard,
+  });
 
   @override
   State<AddEditPatientProfileScreen> createState() =>
@@ -50,11 +55,10 @@ class _AddEditPatientProfileScreenState
   Future<void> initAddress(BuildContext context, String address) async {
     final parts = address.split(',').map((e) => e.trim()).toList();
     final addressProvider = context.read<AddressProvider>();
-
     _specificAddressController.text = parts[0];
-    final wardName = parts[1];
-    final districtName = parts[2];
-    final provinceName = parts[3];
+    final wardName = parts.length > 1 ? parts[1] : '';
+    final districtName = parts.length > 2 ? parts[2] : '';
+    final provinceName = parts.length > 3 ? parts[3] : '';
 
     // Load provinces trước (nếu chưa có)
     if (addressProvider.provinces.isEmpty) {
@@ -104,7 +108,65 @@ class _AddEditPatientProfileScreenState
         initAddress(context, profile.person.address);
       });
     } else {
+      if (widget.infoIdCard != null) {
+        _parseInfoCard(widget.infoIdCard!);
+      }
       context.read<AddressProvider>().loadProvincesOnce();
+    }
+  }
+
+  void _parseInfoCard(String rawValue) {
+    final parts = rawValue.split('|');
+    if (parts.length < 7) return;
+    final idCard = parts[0];
+    final fullName = parts[2];
+    final dob = parts[3];
+    final gender = parts[4];
+    final address = parts[5];
+    // final soCCCD = parts[1];
+    // final ngayCap = parts[6];;
+
+    // Gán thẳng vào controller
+    _idCardController.text = idCard;
+    _fullNameController.text = fullName;
+    _dobController.text = formatDob(dob);
+    _genderController.text = gender;
+    parseAddress(context, address);
+  }
+
+  Future<void> parseAddress(BuildContext context, String rawAddress) async {
+    final addressProvider = context.read<AddressProvider>();
+    final parts = rawAddress.split(',').map((e) => e.trim()).toList();
+    if (addressProvider.provinces.isEmpty) {
+      await addressProvider.loadProvincesOnce();
+    }
+    // province
+    final provinceName = parts.isNotEmpty ? parts.last : '';
+    final province = addressProvider.findProvinceByName(provinceName);
+    if (province?.code == -1) return;
+    addressProvider.setSelectedProvince(province!);
+    await addressProvider.loadDistricts(province);
+
+    // cần đợi districts được load xong
+    if (addressProvider.districts.isEmpty) return;
+    final districtName = parts.length >= 2 ? parts[parts.length - 2] : '';
+    final district = addressProvider.findDistrictByName(
+        districtName, addressProvider.districts);
+    if (district?.code == -1) return;
+    addressProvider.setSelectedDistrict(district!);
+
+    await addressProvider.loadWards(district);
+    // cần đợi wards được load xong
+    if (addressProvider.wards.isEmpty) return;
+    final wardName = parts.length >= 3 ? parts[parts.length - 3] : '';
+    final ward =
+        addressProvider.findWardByName(wardName, addressProvider.wards);
+    if (ward?.code != -1) {
+      addressProvider.setSelectedWard(ward!);
+    }
+    if (parts.length > 3) {
+      final specific = parts.sublist(0, parts.length - 3).join(", ");
+      _specificAddressController.text = specific;
     }
   }
 

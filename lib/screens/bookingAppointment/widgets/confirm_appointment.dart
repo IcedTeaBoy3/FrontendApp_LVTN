@@ -3,7 +3,7 @@ import 'card_doctor_appointment.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/utils/date_utils.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
 import 'package:frontend_app/utils/currency_utils.dart';
 

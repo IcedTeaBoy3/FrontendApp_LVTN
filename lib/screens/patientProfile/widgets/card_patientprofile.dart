@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/models/patientprofile.dart';
-import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/utils/date_utils.dart';
 import 'package:frontend_app/widgets/confirm_dialog.dart';
 import 'package:frontend_app/utils/relation_utils.dart';
 

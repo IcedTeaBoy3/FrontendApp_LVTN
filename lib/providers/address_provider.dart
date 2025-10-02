@@ -93,4 +93,42 @@ class AddressProvider extends ChangeNotifier {
     _selectedWard = ward;
     notifyListeners();
   }
+
+  String normalizeName(String name) {
+    return name
+        .toLowerCase()
+        .replaceAll("tỉnh", "")
+        .replaceAll("thành phố", "")
+        .replaceAll("quận", "")
+        .replaceAll("huyện", "")
+        .replaceAll("thị xã", "")
+        .replaceAll("xã", "")
+        .replaceAll("phường", "")
+        .replaceAll("thị trấn", "")
+        .trim();
+  }
+
+  Province? findProvinceByName(String raw) {
+    final target = normalizeName(raw);
+    return provinces.firstWhere(
+      (p) => normalizeName(p.name) == target,
+      orElse: () => Province(code: -1, name: '', districts: []),
+    );
+  }
+
+  District? findDistrictByName(String raw, List<District> districts) {
+    final target = normalizeName(raw);
+    return districts.firstWhere(
+      (d) => normalizeName(d.name) == target,
+      orElse: () => District(code: -1, name: '', wards: []),
+    );
+  }
+
+  Ward? findWardByName(String raw, List<Ward> wards) {
+    final target = normalizeName(raw);
+    return wards.firstWhere(
+      (w) => normalizeName(w.name) == target,
+      orElse: () => Ward(code: -1, name: ''),
+    );
+  }
 }

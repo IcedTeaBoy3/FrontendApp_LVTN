@@ -18,3 +18,9 @@ String formatDate(DateTime date) {
   final DateFormat formatter = DateFormat('dd/MM/yyyy');
   return formatter.format(date);
 }
+
+// Format lại ngày sinh
+String formatDob(String dob) {
+  if (dob.length != 8) return dob;
+  return "${dob.substring(0, 2)}/${dob.substring(2, 4)}/${dob.substring(4, 8)}";
+}

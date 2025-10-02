@@ -6,7 +6,7 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/schedule_provider.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
-import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/utils/date_utils.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/widgets/custom_loading.dart';

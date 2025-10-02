@@ -3,7 +3,7 @@ import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
-import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/utils/date_utils.dart';
 import 'package:frontend_app/screens/doctorDetail/widgets/doctor_detail_schedule.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/screens/patientProfile/widgets/card_patientprofile.dart';

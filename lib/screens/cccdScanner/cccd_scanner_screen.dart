@@ -1,76 +1,76 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class CccdScannerPage extends StatefulWidget {
-  const CccdScannerPage({super.key});
+class ScanCCCDScreen extends StatefulWidget {
+  const ScanCCCDScreen({super.key});
 
   @override
-  State<CccdScannerPage> createState() => _CccdScannerPageState();
+  State<ScanCCCDScreen> createState() => _ScanCCCDScreenState();
 }
 
-class _CccdScannerPageState extends State<CccdScannerPage> {
-  bool _found = false;
+class _ScanCCCDScreenState extends State<ScanCCCDScreen> {
+  bool _hasPermission = false;
 
-  void _handleBarcode(String raw) async {
-    if (_found) return;
-    _found = true;
+  @override
+  void initState() {
+    super.initState();
+    _requestCameraPermission();
+  }
 
-    final parsed = _parseCccdRaw(raw);
-
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Dữ liệu phát hiện'),
-        content: Text(parsed.toString()),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Hủy')),
-          ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Xác nhận')),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      // Chuyển thẳng sang trang AddPatientProfile
-      if (mounted) {
-        context.goNamed('addPatientProfile', extra: parsed);
-      }
+  Future<void> _requestCameraPermission() async {
+    var status = await Permission.camera.request();
+    if (status.isGranted) {
+      setState(() => _hasPermission = true);
     } else {
-      _found = false;
+      openAppSettings(); // nếu bị từ chối vĩnh viễn thì mở cài đặt
     }
   }
 
-  Map<String, dynamic> _parseCccdRaw(String raw) {
-    try {
-      final obj = jsonDecode(raw);
-      if (obj is Map<String, dynamic>) return obj;
-    } catch (_) {}
+  void _onDetect(BarcodeCapture capture) {
+    final String? rawValue = capture.barcodes.first.rawValue;
+    if (rawValue != null) {
+      debugPrint("Quét được: $rawValue");
 
-    final idMatch = RegExp(r'\b\d{9,12}\b').firstMatch(raw);
-    final dobMatch =
-        RegExp(r'(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4})').firstMatch(raw);
-
-    return {
-      'raw': raw,
-      'id': idMatch?.group(0) ?? '',
-      'dob': dobMatch?.group(0) ?? '',
-    };
+      // Chuyển route
+      context.goNamed('addPatientProfile', queryParameters: {
+        'infoIdCard': rawValue,
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_hasPermission) {
+      return const Scaffold(
+        body: Center(child: Text("Cần quyền camera để quét CCCD")),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Quét mã CCCD')),
-      body: MobileScanner(
-        onDetect: (capture) {
-          final raw = capture.barcodes.first.rawValue ?? '';
-          if (raw.isNotEmpty) _handleBarcode(raw);
-        },
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          "Quét CCCD",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+      ),
+      body: Stack(
+        children: [
+          MobileScanner(onDetect: _onDetect),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.green, width: 2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

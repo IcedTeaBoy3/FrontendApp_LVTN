@@ -128,7 +128,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                 SizedBox(
                                   width: double.infinity,
                                   child: ElevatedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () => context.goNamed('scanner'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.white,
                                       foregroundColor: AppColors.secondaryBlue,
