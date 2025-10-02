@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend_app/models/schedule.dart';
 import 'package:frontend_app/models/slot.dart';
 import 'package:frontend_app/screens/bookingAppointment/widgets/schedule_appointment.dart';
+import 'package:frontend_app/screens/bookingAppointment/widgets/confirm_appointment.dart';
+import 'package:frontend_app/screens/bookingAppointment/widgets/service_appointment.dart';
 
 class BookingAppointmentScreen extends StatefulWidget {
   final String doctorId;
@@ -26,16 +28,16 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
 
   final List<String> _titles = [
     'Chọn lịch khám',
+    'Chọn dịch vụ',
     'Xác nhận',
-    'Thanh toán',
     'Nhận kết quả',
   ];
 
   List<Widget> get _contents => [
         // Thay bằng widget content thực tế của bạn nếu cần
         ScheduleAppointment(doctorId: widget.doctorId),
-        const Text('Xem lại thông tin và xác nhận lịch hẹn.'),
-        const Text('Chọn phương thức thanh toán và hoàn tất.'),
+        ServiceAppointment(doctorId: widget.doctorId),
+        ConfirmAppointment(doctorId: widget.doctorId),
         const Text('Xem kết quả khám bệnh của bạn.'),
       ];
 
@@ -128,8 +130,8 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
           ),
         ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // Header step: scroll được ngang nếu cần, không làm rộng content
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               child: SingleChildScrollView(
@@ -155,9 +157,12 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
 
             // Content: chiếm full width, không bị kéo rộng
             Expanded(
-              child: SingleChildScrollView(
-                // nếu nội dung cao thì cho cuộn dọc
-                child: _contents[_currentStep],
+              child: Container(
+                color: Colors.grey.shade200,
+                child: SingleChildScrollView(
+                  // nếu nội dung cao thì cho cuộn dọc
+                  child: _contents[_currentStep],
+                ),
               ),
             ),
           ],

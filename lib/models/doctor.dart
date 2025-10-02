@@ -4,6 +4,7 @@ import 'package:frontend_app/models/person.dart';
 import 'account.dart';
 import 'degree.dart';
 import 'doctorspecialty.dart';
+import 'doctorservice.dart';
 
 class Doctor {
   final String doctorId;
@@ -14,6 +15,7 @@ class Doctor {
   final String? notes;
   final List<DoctorSpecialty> doctorSpecialties;
   final List<DoctorWorkplace> doctorWorplaces;
+  final List<DoctorService> doctorServices;
 
   Doctor({
     required this.doctorId,
@@ -22,6 +24,7 @@ class Doctor {
     required this.degree,
     required this.doctorSpecialties,
     required this.doctorWorplaces,
+    required this.doctorServices,
     this.bio,
     this.notes,
   });
@@ -40,6 +43,9 @@ class Doctor {
           : [],
       doctorWorplaces: json['doctorWorkplaces'] != null
           ? DoctorWorkplace.doctorWorkplacesFromJson(json['doctorWorkplaces'])
+          : [],
+      doctorServices: json['doctorServices'] != null
+          ? DoctorService.doctorservicesFromJson(json['doctorServices'])
           : [],
     );
   }

@@ -21,7 +21,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch patient profiles when the screen is initialized
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<PatientprofileProvider>().fetchPatientprofiles();
     });

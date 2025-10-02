@@ -5,6 +5,7 @@ import 'package:frontend_app/models/account.dart';
 import 'package:frontend_app/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
+import 'package:frontend_app/services/api_client.dart';
 
 class AuthProvider extends ChangeNotifier {
   static const _storage = FlutterSecureStorage();
@@ -34,6 +35,7 @@ class AuthProvider extends ChangeNotifier {
         // Lưu token và account vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
+        ApiClient.init(this);
       }
       return result;
     } catch (e) {

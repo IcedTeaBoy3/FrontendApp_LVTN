@@ -8,6 +8,7 @@ import 'package:frontend_app/utils/date.dart';
 import 'package:frontend_app/screens/doctorDetail/widgets/doctor_detail_schedule.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/screens/patientProfile/widgets/card_patientprofile.dart';
+import 'package:frontend_app/screens/bookingAppointment/widgets/card_doctor_appointment.dart';
 import 'package:go_router/go_router.dart';
 
 class ScheduleAppointment extends StatefulWidget {
@@ -67,8 +68,9 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
     // Sau khi widget khởi tạo, gán patientProfile mặc định
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appointmentProvider = context.read<AppointmentProvider>();
-      final patientProfile =
-          context.read<PatientprofileProvider>().patientprofiles[0];
+      final patientProfiles = context.read<PatientprofileProvider>();
+      if (patientProfiles.patientprofiles.isEmpty) return;
+      final patientProfile = patientProfiles.patientprofiles.first;
       appointmentProvider.setSelectedPatientProfile(patientProfile);
     });
   }
@@ -77,13 +79,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
   Widget build(BuildContext context) {
     final patientProfile =
         context.watch<AppointmentProvider>().selectedPatientProfile;
-    final doctor = context.read<DoctorProvider>().findById(widget.doctorId);
-    final avatarUrl = (doctor?.person.avatar != null)
-        ? ApiConfig.backendUrl + doctor!.person.avatar!
-        : null;
-    final specialties =
-        doctor?.doctorSpecialties.map((ds) => ds.specialty.name) ?? [];
-    final degreeName = doctor?.degree.title ?? "Chưa cập nhật";
+    final doctor = context.watch<DoctorProvider>().findById(widget.doctorId);
     final notes = doctor?.notes ?? "Chưa cập nhật";
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -106,60 +102,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.blue.shade100,
-                  child: ClipOval(
-                    child: avatarUrl != null
-                        ? Image.network(
-                            avatarUrl,
-                            fit: BoxFit.cover,
-                            width: 80,
-                            height: 80,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.person,
-                                  size: 50, color: Colors.blue.shade700);
-                            },
-                          )
-                        : Icon(Icons.person,
-                            size: 50, color: Colors.blue.shade700),
-                  ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "BS. $degreeName",
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Colors.blue,
-                            ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        doctor?.person.fullName ?? "Bác sĩ chưa cập nhật",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        specialties.isNotEmpty
-                            ? "Chuyên khoa: ${specialties.join(', ')}"
-                            : "Chuyên khoa chưa cập nhật",
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Colors.grey[700],
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            child: CardDoctorAppointment(doctorId: widget.doctorId),
           ),
           Container(
             width: double.infinity,
@@ -235,8 +178,6 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
             child: Text(
               "Đặt lịch khám này cho:",
               style: Theme.of(context).textTheme.bodyLarge,
-              textDirection: TextDirection.ltr,
-              textAlign: TextAlign.left,
             ),
           ),
           Container(
@@ -332,7 +273,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: Colors.grey[300],
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(12),
                 bottomRight: Radius.circular(12),
@@ -342,7 +283,10 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => context.goNamed(
+                    'addPatientProfile',
+                    extra: patientProfile,
+                  ),
                   child: Text(
                     "Xem chi tiết",
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
@@ -376,11 +320,14 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
           const SizedBox(
             height: 16,
           ),
-          Text(
-            "Chọn ngày khám",
-            style: Theme.of(context).textTheme.bodyLarge,
-            textDirection: TextDirection.ltr,
-            textAlign: TextAlign.left,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Chọn ngày khám:",
+              style: Theme.of(context).textTheme.bodyLarge,
+              textDirection: TextDirection.ltr,
+              textAlign: TextAlign.left,
+            ),
           ),
           DoctorDetailSchedule(doctorId: widget.doctorId),
         ],

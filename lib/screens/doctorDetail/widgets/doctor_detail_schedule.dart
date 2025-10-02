@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/schedule_provider.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/utils/date.dart';
-import 'package:frontend_app/models/schedule.dart';
 import 'package:intl/intl.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/widgets/custom_loading.dart';
@@ -83,10 +82,21 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
     ).then(_onMonthSelected);
   }
 
-  void _handleBookingAppointment(Slot slot, Schedule schedule) {
-    context.goNamed('booking', pathParameters: {
-      'doctorId': widget.doctorId,
-    });
+  void _handleBookingAppointment(Slot slot) {
+    context.read<AppointmentProvider>().setSlot(slot);
+
+    final currentRoute = GoRouterState.of(context).name;
+    // hoặc: final currentLocation = GoRouter.of(context).location;
+
+    if (currentRoute != 'booking') {
+      print('Chuyển đến trang đặt lịch khám');
+      context.goNamed(
+        'booking',
+        pathParameters: {
+          'doctorId': widget.doctorId,
+        },
+      );
+    }
   }
 
   @override
@@ -95,10 +105,10 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
     final now = DateTime.now();
     final appointmentProvider = context.read<AppointmentProvider>();
     // nếu chưa có selectedDate thì gán mặc định tháng hiện tại
-    if (appointmentProvider.selectedDate == null) {
-      appointmentProvider.setDate(now);
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (appointmentProvider.selectedDate == null) {
+        appointmentProvider.setDate(now);
+      }
       context.read<ScheduleProvider>().fetchDoctorSchedules(
             doctorId: widget.doctorId,
             date: context.read<AppointmentProvider>().selectedDate,
@@ -106,17 +116,12 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
     });
   }
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  //   _selectedMonth = null;
-  // }
-
   @override
   Widget build(BuildContext context) {
     final selectedDate = context.read<AppointmentProvider>().selectedDate;
     return Container(
       decoration: BoxDecoration(color: Colors.white),
+      padding: const EdgeInsets.all(12),
       child: Column(
         children: [
           ElevatedButton(
@@ -318,13 +323,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
             builder: (context, scheduleProvider, appointmentProvider, child) {
               final selectedSchedule = appointmentProvider.selectedSchedule;
               if (selectedSchedule == null) {
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Vui lòng chọn một ngày khám để xem khung giờ trống.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                );
+                return SizedBox.shrink();
               }
               return Column(
                 children: selectedSchedule.shifts.map(
@@ -376,7 +375,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                                     appointmentProvider.selectedSlot == slot;
                                 return ElevatedButton(
                                   onPressed: isAvailable
-                                      ? () => appointmentProvider.setSlot(slot)
+                                      ? () => _handleBookingAppointment(slot)
                                       : null,
                                   style: ElevatedButton.styleFrom(
                                     minimumSize: const Size(100, 40),

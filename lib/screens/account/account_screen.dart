@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
+import 'package:frontend_app/providers/patientprofile_provider.dart';
+import 'package:frontend_app/providers/appointment_provider.dart';
+
 import 'package:frontend_app/widgets/confirm_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +20,8 @@ class AccountScreen extends StatelessWidget {
       confirmColor: Colors.red,
       onConfirm: () {
         context.read<AuthProvider>().logout();
+        context.read<PatientprofileProvider>().clear();
+        context.read<AppointmentProvider>().reset();
         context.goNamed('login');
       },
     );

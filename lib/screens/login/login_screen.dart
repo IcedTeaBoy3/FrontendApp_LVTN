@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_app/models/patientprofile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/message_dialog.dart';
+import 'package:frontend_app/providers/patientprofile_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? email;
@@ -47,8 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await context
           .read<AuthProvider>()
           .login(email: email, password: password);
-
       if (!mounted) return; // kiểm tra ngay sau await
+      context.read<PatientprofileProvider>().fetchPatientprofiles();
 
       if (response.status == 'success') {
         LottieDialog.show(
@@ -78,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> handleGoogleSignIn() async {
     final result = await context.read<AuthProvider>().loginWithGoogle();
     if (!mounted) return;
+    context.read<PatientprofileProvider>().fetchPatientprofiles();
     if (result.status == 'success') {
       LottieDialog.show(
         context,

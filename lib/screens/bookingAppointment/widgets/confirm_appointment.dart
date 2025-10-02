@@ -1,0 +1,251 @@
+import 'package:flutter/material.dart';
+import 'card_doctor_appointment.dart';
+import 'package:frontend_app/providers/appointment_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'package:frontend_app/utils/date.dart';
+import 'package:frontend_app/utils/gender_utils.dart';
+
+class ConfirmAppointment extends StatelessWidget {
+  final String doctorId;
+  const ConfirmAppointment({super.key, required this.doctorId});
+
+  @override
+  Widget build(BuildContext context) {
+    final appointmentProvider = context.watch<AppointmentProvider>();
+    final selectedSchedule = appointmentProvider.selectedSchedule;
+    final selectedSlot = appointmentProvider.selectedSlot;
+    final patientProfile = appointmentProvider.selectedPatientProfile;
+    final doctorService = appointmentProvider.selectedDoctorService;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Thông tin đăng ký'.toUpperCase(),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.only(
+            left: 12,
+            right: 12,
+            bottom: 16,
+          ),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(30),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              CardDoctorAppointment(
+                doctorId: doctorId,
+              ),
+              const Divider(
+                height: 32,
+                thickness: 1,
+                color: Colors.grey,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Ngày khám',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      'Giờ khám',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      selectedSchedule != null
+                          ? formatDate(selectedSchedule.workday)
+                          : 'Chưa chọn',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      selectedSlot != null
+                          ? '${DateFormat.Hm().format(selectedSlot.startTime)} - ${DateFormat.Hm().format(selectedSlot.endTime)}'
+                          : 'Chưa chọn',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 12),
+              //Chuyên khoa
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Chuyên khoa',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      doctorService != null
+                          ? doctorService.service.name
+                          : 'Chưa chọn',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    child: Text(
+                      "Thông tin bệnh nhân", // chữ bạn muốn
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: Colors.grey),
+                    ),
+                  ),
+                  const Expanded(
+                    child: Divider(
+                      height: 32,
+                      thickness: 1,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Họ và tên',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      patientProfile != null
+                          ? patientProfile.person.fullName
+                          : 'Chưa có',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Ngày sinh',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      patientProfile != null
+                          ? formatDate(patientProfile.person.dateOfBirth)
+                          : 'Chưa có',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              // Giới tính
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Giới tính',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      convertGenderBack(patientProfile?.person.gender ?? ''),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 8),
+              // Số điện thoại
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Số điện thoại',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      patientProfile?.person.phone ?? 'Chưa có',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            'Thông tin thanh toán'.toUpperCase(),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}

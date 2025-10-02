@@ -106,4 +106,9 @@ class PatientprofileProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void clear() {
+    _patientprofiles = [];
+    notifyListeners();
+  }
 }

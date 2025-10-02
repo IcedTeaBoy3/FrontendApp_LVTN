@@ -86,6 +86,16 @@ class AppTheme {
         color: Colors.red,
       ),
     ),
+    radioTheme: RadioThemeData(
+      fillColor: WidgetStateProperty.resolveWith<Color>(
+        (states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primaryBlue; // màu khi được chọn
+          }
+          return Colors.grey; // màu mặc định khi chưa chọn
+        },
+      ),
+    ),
     scaffoldBackgroundColor: Colors.white,
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: Colors.white,

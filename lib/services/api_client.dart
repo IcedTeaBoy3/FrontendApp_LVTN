@@ -23,10 +23,9 @@ class ApiClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final storage = FlutterSecureStorage();
-          final token = await storage.read(key: 'accessToken');
-          if (token != null) {
-            options.headers["Authorization"] = "Bearer $token";
+          if (authProvider.accessToken != null) {
+            options.headers["Authorization"] =
+                "Bearer ${authProvider.accessToken}";
           }
           return handler.next(options);
         },
@@ -36,6 +35,13 @@ class ApiClient {
           print("Dio error status code: ${e.response?.statusCode}");
           if (e.response?.statusCode == 401) {
             await authProvider.refreshTokenIfNeeded();
+            if (authProvider.accessToken != null) {
+              final retryRequest = e.requestOptions;
+              retryRequest.headers["Authorization"] =
+                  "Bearer ${authProvider.accessToken}";
+              final response = await _dio.fetch(retryRequest);
+              return handler.resolve(response);
+            }
           }
           return handler.next(e);
         },

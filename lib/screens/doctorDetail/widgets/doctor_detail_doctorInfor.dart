@@ -63,7 +63,7 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "BS.$degreeName",
+                      degreeName,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: Colors.blueAccent,
