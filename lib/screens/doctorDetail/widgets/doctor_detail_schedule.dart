@@ -152,7 +152,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                 Text(
                   selectedDate == null
                       ? "Chọn tháng"
-                      : 'Lịch tháng ${selectedDate?.month}/${selectedDate?.year}',
+                      : 'Lịch tháng ${selectedDate.month}/${selectedDate.year}',
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.black87,

@@ -30,15 +30,12 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
     'Chọn lịch khám',
     'Chọn dịch vụ',
     'Xác nhận',
-    'Nhận kết quả',
   ];
 
   List<Widget> get _contents => [
-        // Thay bằng widget content thực tế của bạn nếu cần
         ScheduleAppointment(doctorId: widget.doctorId),
         ServiceAppointment(doctorId: widget.doctorId),
         ConfirmAppointment(doctorId: widget.doctorId),
-        const Text('Xem kết quả khám bệnh của bạn.'),
       ];
 
   void _nextStep() {

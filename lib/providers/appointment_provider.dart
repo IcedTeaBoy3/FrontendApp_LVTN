@@ -10,12 +10,26 @@ class AppointmentProvider extends ChangeNotifier {
   DateTime? _selectedDate;
   DoctorService? _selectedDoctorService;
   Schedule? _selectedSchedule;
+  String? _appointmentType;
+  String? _paymentMethod;
 
   Patientprofile? get selectedPatientProfile => _selectedPatientProfile;
   Slot? get selectedSlot => _selectedSlot;
   DateTime? get selectedDate => _selectedDate;
   DoctorService? get selectedDoctorService => _selectedDoctorService;
   Schedule? get selectedSchedule => _selectedSchedule;
+  String? get appointmentType => _appointmentType;
+  String? get paymentMethod => _paymentMethod;
+
+  void setPaymentMethod(String method) {
+    _paymentMethod = method;
+    notifyListeners();
+  }
+
+  void setAppointmentType(String type) {
+    _appointmentType = type;
+    notifyListeners();
+  }
 
   void setSelectedPatientProfile(Patientprofile profile) {
     _selectedPatientProfile = profile;

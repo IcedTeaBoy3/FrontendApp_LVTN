@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_app/configs/api_config.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
@@ -243,7 +242,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     Text(
-                      formatDate(patientProfile!.person.dateOfBirth),
+                      formatDate(patientProfile.person.dateOfBirth),
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             fontWeight: FontWeight.w700,
                           ),

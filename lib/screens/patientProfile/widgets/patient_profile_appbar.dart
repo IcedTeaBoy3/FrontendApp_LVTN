@@ -121,10 +121,7 @@ class PatientProfileAppbar extends StatelessWidget
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: const Text('Quét mã CCCD để tạo hồ sơ'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  // Thêm logic để chuyển đổi bệnh nhân
-                },
+                onTap: () => context.goNamed('scanner'),
                 trailing: const FaIcon(FontAwesomeIcons.qrcode, size: 18),
               ),
             ],

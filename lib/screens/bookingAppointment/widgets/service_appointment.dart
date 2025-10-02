@@ -4,7 +4,7 @@ import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/custom_flushbar.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend_app/utils/currency_utils.dart';
 
 class ServiceAppointment extends StatefulWidget {
   final String doctorId;
@@ -15,8 +15,6 @@ class ServiceAppointment extends StatefulWidget {
 }
 
 class _ServiceAppointmentState extends State<ServiceAppointment> {
-  String? _selectedType = 'service'; // 'service' hoặc 'insurance'
-  String? _selectedServiceId;
   @override
   void initState() {
     super.initState();
@@ -26,17 +24,16 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
       final doctor = context.read<DoctorProvider>().findById(widget.doctorId)!;
       final doctorServices = doctor.doctorServices;
 
-      if (doctorServices.isNotEmpty) {
-        final defaultService = doctorServices[0];
-        appointmentProvider.setDoctorService(defaultService);
-        setState(() {
-          _selectedServiceId = defaultService.doctorServiceId;
-        });
-      } else {
-        appointmentProvider.setDoctorService(null);
-        setState(() {
-          _selectedServiceId = null;
-        });
+      // Chỉ set lần đầu khi chưa có dữ liệu
+      if (appointmentProvider.appointmentType == null) {
+        appointmentProvider.setAppointmentType('service');
+      }
+
+      if (appointmentProvider.selectedDoctorService == null) {
+        if (doctorServices.isNotEmpty) {
+          final defaultService = doctorServices[0];
+          appointmentProvider.setDoctorService(defaultService);
+        }
       }
     });
   }
@@ -51,18 +48,12 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
         message: 'Vui lòng chọn hồ sơ bệnh nhân có bảo hiểm y tế',
       );
     }
-
-    setState(() {
-      _selectedType = value;
-    });
+    context.read<AppointmentProvider>().setAppointmentType(value!);
   }
 
   void _handleSelectedService(String? value) {
-    setState(() {
-      _selectedServiceId = value;
-    });
     final doctor = context.read<DoctorProvider>().findById(widget.doctorId)!;
-    final doctorServices = doctor.doctorServices ?? [];
+    final doctorServices = doctor.doctorServices;
     final selectedService = doctorServices
         .firstWhere((service) => service.doctorServiceId == value);
     context.read<AppointmentProvider>().setDoctorService(selectedService);
@@ -105,9 +96,11 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.blue[50],
-                    border: _selectedType == 'service'
-                        ? Border.all(color: AppColors.primaryBlue, width: 1)
-                        : null,
+                    border:
+                        context.watch<AppointmentProvider>().appointmentType ==
+                                'service'
+                            ? Border.all(color: AppColors.primaryBlue, width: 1)
+                            : null,
                   ),
                   child: ListTile(
                     title: Text(
@@ -119,7 +112,8 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                     subtitle: Text('Khám dịch vụ do bạn tự chi trả'),
                     leading: Radio(
                       value: 'service',
-                      groupValue: _selectedType,
+                      groupValue:
+                          context.watch<AppointmentProvider>().appointmentType,
                       onChanged: (value) {
                         _handleSelectedType(value, context);
                       },
@@ -131,9 +125,11 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.blue[50],
-                    border: _selectedType == 'insurance'
-                        ? Border.all(color: AppColors.primaryBlue, width: 1)
-                        : null,
+                    border:
+                        context.watch<AppointmentProvider>().appointmentType ==
+                                'insurance'
+                            ? Border.all(color: AppColors.primaryBlue, width: 1)
+                            : null,
                   ),
                   child: ListTile(
                     title: Text(
@@ -146,7 +142,8 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                         Text('Khám qua bảo hiểm y tế, bảo hiểm chi trả 80%'),
                     leading: Radio(
                       value: 'insurance',
-                      groupValue: _selectedType,
+                      groupValue:
+                          context.watch<AppointmentProvider>().appointmentType,
                       onChanged: (value) {
                         _handleSelectedType(value, context);
                       },
@@ -185,20 +182,26 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
               itemCount: doctorServices.length,
               itemBuilder: (context, index) {
                 final doctorService = doctorServices[index];
-
                 return Container(
                   margin: const EdgeInsets.only(bottom: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.blue[50], // màu mặc định
-                    border: _selectedServiceId == doctorService.doctorServiceId
+                    border: context
+                                .watch<AppointmentProvider>()
+                                .selectedDoctorService!
+                                .doctorServiceId ==
+                            doctorService.doctorServiceId
                         ? Border.all(color: AppColors.primaryBlue, width: 1)
                         : null,
                   ),
                   child: ListTile(
                     leading: Radio<String>(
                       value: doctorService.doctorServiceId,
-                      groupValue: _selectedServiceId,
+                      groupValue: context
+                          .watch<AppointmentProvider>()
+                          .selectedDoctorService!
+                          .doctorServiceId,
                       onChanged: (value) {
                         _handleSelectedService(value);
                       },
@@ -217,10 +220,12 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                     trailing: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (_selectedType ==
+                        if (context
+                                .watch<AppointmentProvider>()
+                                .appointmentType ==
                             'insurance') // chỉ hiện giá gốc khi khám BHYT
                           Text(
-                            '${doctorService.price.toStringAsFixed(0)} đ',
+                            formatCurrency(doctorService.price),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -231,12 +236,18 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                                       .lineThrough, // 👈 gạch ngang
                                 ),
                           ),
-                        if (_selectedType == 'insurance')
+                        if (context
+                                .watch<AppointmentProvider>()
+                                .appointmentType ==
+                            'insurance') // chỉ hiện giá BHYT khi khám BHYT
                           const SizedBox(width: 6),
                         Text(
-                          _selectedType == 'service'
-                              ? '${doctorService.price.toStringAsFixed(0)} đ'
-                              : '${(doctorService.price * 0.2).toStringAsFixed(0)} đ',
+                          context
+                                      .watch<AppointmentProvider>()
+                                      .appointmentType ==
+                                  'service'
+                              ? formatCurrency(doctorService.price)
+                              : formatCurrency(doctorService.price * 0.2),
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     fontWeight: FontWeight.w600,
@@ -245,11 +256,6 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                         ),
                       ],
                     ),
-                    onTap: () {
-                      setState(() {
-                        _selectedServiceId = doctorService.doctorServiceId;
-                      });
-                    },
                   ),
                 );
               },

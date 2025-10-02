@@ -12,6 +12,7 @@ import 'package:frontend_app/models/patientprofile.dart';
 import 'package:frontend_app/models/schedule.dart';
 import 'package:frontend_app/models/slot.dart';
 import 'package:frontend_app/screens/bookingAppointment/booking_appointment_screen.dart';
+import 'package:frontend_app/screens/cccdScanner/cccd_scanner_screen.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -64,6 +65,11 @@ class AppRoutes {
                 editedPatientprofile: editedPatientProfile,
               );
             },
+          ),
+          GoRoute(
+            path: '/scanner',
+            name: 'scanner',
+            builder: (context, state) => const CccdScannerScreen(),
           ),
           GoRoute(
             name: 'login',

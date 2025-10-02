@@ -5,10 +5,27 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend_app/utils/date.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
+import 'package:frontend_app/utils/currency_utils.dart';
 
-class ConfirmAppointment extends StatelessWidget {
+class ConfirmAppointment extends StatefulWidget {
   final String doctorId;
   const ConfirmAppointment({super.key, required this.doctorId});
+
+  @override
+  State<ConfirmAppointment> createState() => _ConfirmAppointmentState();
+}
+
+class _ConfirmAppointmentState extends State<ConfirmAppointment> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appointmentProvider = context.read<AppointmentProvider>();
+      if (appointmentProvider.paymentMethod == null) {
+        appointmentProvider.setPaymentMethod('direct');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +34,7 @@ class ConfirmAppointment extends StatelessWidget {
     final selectedSlot = appointmentProvider.selectedSlot;
     final patientProfile = appointmentProvider.selectedPatientProfile;
     final doctorService = appointmentProvider.selectedDoctorService;
+    final appointmentType = appointmentProvider.appointmentType;
     return Column(
       children: [
         Padding(
@@ -49,7 +67,7 @@ class ConfirmAppointment extends StatelessWidget {
           child: Column(
             children: [
               CardDoctorAppointment(
-                doctorId: doctorId,
+                doctorId: widget.doctorId,
               ),
               const Divider(
                 height: 32,
@@ -117,7 +135,7 @@ class ConfirmAppointment extends StatelessWidget {
                   Expanded(
                     child: Text(
                       doctorService != null
-                          ? doctorService.service.name
+                          ? doctorService.service.specialty.name
                           : 'Chưa chọn',
                       style: Theme.of(context)
                           .textTheme
@@ -243,6 +261,164 @@ class ConfirmAppointment extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.only(
+            left: 12,
+            right: 12,
+            bottom: 16,
+          ),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(30),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Hình thức khám',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      appointmentType == 'service'
+                          ? 'Khám dịch vụ'
+                          : 'Khám bảo hiểm y tế',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Dịch vụ khám',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      doctorService != null
+                          ? doctorService.service.name
+                          : 'Chưa chọn',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Phí khám',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      doctorService != null
+                          ? formatCurrency(doctorService.price *
+                              (appointmentType == 'service' ? 1 : 0.2))
+                          : 'Chưa cập nhật',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Chọn hình thức thanh toán',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      border:
+                          context.watch<AppointmentProvider>().paymentMethod ==
+                                  'direct'
+                              ? Border.all(color: Colors.blue, width: 1)
+                              : null,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: RadioListTile<String>(
+                      value: 'direct',
+                      groupValue:
+                          context.watch<AppointmentProvider>().paymentMethod,
+                      onChanged: (value) {
+                        context
+                            .read<AppointmentProvider>()
+                            .setPaymentMethod(value!);
+                      },
+                      title: Text(
+                        'Thanh toán khi đến khám',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      border:
+                          context.watch<AppointmentProvider>().paymentMethod ==
+                                  'online'
+                              ? Border.all(color: Colors.blue, width: 1)
+                              : null,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: RadioListTile<String>(
+                      value: 'online',
+                      groupValue:
+                          context.watch<AppointmentProvider>().paymentMethod,
+                      onChanged: (value) {
+                        context
+                            .read<AppointmentProvider>()
+                            .setPaymentMethod(value!);
+                      },
+                      title: Text(
+                        'Thanh toán online',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ],
