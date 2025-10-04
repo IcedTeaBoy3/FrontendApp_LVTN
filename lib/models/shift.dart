@@ -43,6 +43,9 @@ class Shift {
   }
 
   Slot getFirstSlot() {
-    return slots[0];
+    return slots.firstWhere(
+      (slot) => slot.status == 'available',
+      orElse: () => throw Exception('Không có slot trống'),
+    );
   }
 }

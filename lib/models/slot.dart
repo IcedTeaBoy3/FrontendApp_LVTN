@@ -1,22 +1,34 @@
+import 'shift.dart';
+
 class Slot {
   final String slotId;
-  final String shift;
+  final String? shiftId;
+  final Shift? shift;
   final DateTime startTime;
   final DateTime endTime;
   final String status;
 
   Slot({
     required this.slotId,
-    required this.shift,
+    this.shift,
+    this.shiftId,
     required this.startTime,
     required this.endTime,
     required this.status,
   });
 
   factory Slot.fromJson(Map<String, dynamic> json) {
+    Shift? parsedShift;
+    String? parsedShiftId;
+    if (json['shift'] is Map<String, dynamic>) {
+      parsedShift = Shift.fromJson(json['shift']);
+    } else if (json['shift'] is String) {
+      parsedShiftId = json['shift'];
+    }
     return Slot(
       slotId: json['slotId'] ?? json['_id'],
-      shift: json['shift'] ?? '',
+      shift: parsedShift,
+      shiftId: parsedShiftId,
       startTime: DateTime.parse(json['startTime']).toLocal(),
       endTime: DateTime.parse(json['endTime']).toLocal(),
       status: json['status'],
@@ -32,7 +44,7 @@ class Slot {
       'startTime': startTime.toIso8601String(),
       'endTime': endTime.toIso8601String(),
       'status': status,
-      'shift': shift,
+      'shift': shift != null ? shift!.toJson() : shiftId,
     };
   }
 }

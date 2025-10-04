@@ -62,7 +62,7 @@ class AppointmentProvider extends ChangeNotifier {
           await AppointmentService.createAppointment(appointment, payment);
       if (result.status == 'success' && result.data != null) {
         _appointments.add(result.data!);
-        _filteredAppointments = List.from(_appointments); // <-- thêm dòng này
+        _filteredAppointments = List.from(_appointments);
       }
       return result;
     } catch (e) {

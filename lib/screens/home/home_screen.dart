@@ -19,10 +19,29 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final List<Widget> _pages = [];
+
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _pages.addAll([
+      const HomePageContent(),
+      PatientProfileScreen(), // truyền callback
+      const AccountScreen(),
+      AppointmentScreen(), // có thể dùng lại
+      AccountScreen(onBackToHome: _onItemTapped),
+    ]);
+  }
+
+  @override
+  void didUpdateWidget(HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialIndex != oldWidget.initialIndex) {
+      setState(() {
+        _selectedIndex = widget.initialIndex;
+      });
+    }
   }
 
   void _onItemTapped(int index) {
@@ -31,13 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  final List<Widget> _pages = [
-    const HomePageContent(),
-    const PatientProfileScreen(),
-    const AccountScreen(),
-    const AppointmentScreen(),
-    const AccountScreen(),
-  ];
   PreferredSizeWidget? _buildAppBar(int index) {
     switch (index) {
       case 0:

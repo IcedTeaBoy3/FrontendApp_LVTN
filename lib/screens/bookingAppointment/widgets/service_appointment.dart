@@ -5,6 +5,7 @@ import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/custom_flushbar.dart';
 import 'package:frontend_app/utils/currency_utils.dart';
+import 'package:frontend_app/widgets/dash_divider.dart';
 
 class ServiceAppointment extends StatefulWidget {
   final String doctorId;
@@ -63,17 +64,39 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
   Widget build(BuildContext context) {
     final doctor = context.read<DoctorProvider>().findById(widget.doctorId);
     final doctorServices = doctor?.doctorServices ?? [];
-    return SizedBox(
-      width: double.infinity,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withAlpha(30),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
             child: Text(
-              'Chọn hình thức khám'.toUpperCase(),
+              'Chọn hình thức khám',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
+            ),
+          ),
+
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            child: DashedDivider(
+              height: 1,
+              color: Colors.grey,
             ),
           ),
           // Thêm các widget khác để hiển thị và chọn dịch vụ
@@ -131,7 +154,7 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                   ),
                   child: ListTile(
                     title: Text(
-                      'Khám Bảo hiểm y tế',
+                      'Khám bảo hiểm y tế (BHYT)',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -151,13 +174,42 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const SizedBox(
+            height: 16,
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withAlpha(30),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
             child: Text(
-              'Chọn dịch vụ khám'.toUpperCase(),
+              'Chọn dịch vụ khám',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 1,
+                color: Colors.blue,
+              ),
+            ),
+            child: DashedDivider(
+              height: 1,
+              color: Colors.grey,
             ),
           ),
           Container(

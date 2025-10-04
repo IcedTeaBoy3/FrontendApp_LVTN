@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_app/models/appointment.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:frontend_app/utils/date_utils.dart';
+import 'package:go_router/go_router.dart';
 
 class AppointmentCard extends StatelessWidget {
   final Appointment appointment;
@@ -48,136 +49,142 @@ class AppointmentCard extends StatelessWidget {
       }
     }
 
-    return Container(
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withAlpha(30),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 4.0,
-                  horizontal: 8.0,
-                ),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(appointment.status),
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Text(
-                  _converStatus(appointment.status),
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    'STT:',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: Colors.grey[600],
-                        ),
+    return InkWell(
+      onTap: () {
+        context.goNamed('detailAppointment', extra: appointment);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withAlpha(30),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 8.0,
                   ),
-                  const SizedBox(width: 8.0),
-                  Text(
-                    appointment.appointmentNumber.toString(),
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(appointment.status),
+                    borderRadius: BorderRadius.circular(16.0),
                   ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                doctor?.person.fullName ?? '--',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge!
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-              CircleAvatar(
-                radius: 30.0,
-                backgroundImage: avatarUrl != null
-                    ? NetworkImage(avatarUrl) as ImageProvider
-                    : const AssetImage('assets/images/avatar-default-icon.png'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Giờ khám:',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Colors.grey[600],
+                  child: Text(
+                    _converStatus(appointment.status),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      'STT:',
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Colors.grey[600],
+                          ),
                     ),
-              ),
-              Text(
-                '${formatTime(slot.startTime)}-${formatTime(slot.endTime)} - ${formatDate(schedule.workday)}',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                    const SizedBox(width: 8.0),
+                    Text(
+                      appointment.appointmentNumber.toString(),
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
                     ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Chuyên khoa',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Colors.grey[600],
-                    ),
-              ),
-              Text(
-                doctorService.service?.specialty?.name ?? '--',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Bệnh nhân:',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Colors.grey[600],
-                    ),
-              ),
-              Text(
-                patient.person.fullName,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-              ),
-            ],
-          ),
-        ],
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  doctor?.person.fullName ?? '--',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge!
+                      .copyWith(fontWeight: FontWeight.bold),
+                ),
+                CircleAvatar(
+                  radius: 30.0,
+                  backgroundImage: avatarUrl != null
+                      ? NetworkImage(avatarUrl) as ImageProvider
+                      : const AssetImage(
+                          'assets/images/avatar-default-icon.png'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Giờ khám:',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                ),
+                Text(
+                  '${formatTime(slot.startTime)}-${formatTime(slot.endTime)} - ${formatDate(schedule.workday)}',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Chuyên khoa',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                ),
+                Text(
+                  doctorService.service?.specialty?.name ?? '--',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Bệnh nhân:',
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                ),
+                Text(
+                  patient.person.fullName,
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

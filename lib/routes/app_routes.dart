@@ -14,6 +14,8 @@ import 'package:frontend_app/models/patientprofile.dart';
 import 'package:frontend_app/screens/bookingAppointment/booking_appointment_screen.dart';
 import 'package:frontend_app/screens/cccdScanner/cccd_scanner_screen.dart';
 import 'package:frontend_app/screens/detailPatientProfile/detail_patientprofile_screen.dart';
+import 'package:frontend_app/screens/detailAppointment/detail_appointment_screen.dart';
+import 'package:frontend_app/models/appointment.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -23,9 +25,9 @@ class AppRoutes {
         name: 'home',
         path: '/',
         builder: (context, state) {
-          final initialIndex = state.uri.queryParameters['initialIndex'] != null
-              ? int.tryParse(state.uri.queryParameters['initialIndex']!) ?? 0
-              : 0;
+          final initialIndex =
+              int.tryParse(state.uri.queryParameters['initialIndex'] ?? '0') ??
+                  0;
           print('Initial Index: $initialIndex');
           return HomeScreen(initialIndex: initialIndex);
         },
@@ -58,6 +60,14 @@ class AppRoutes {
                 },
               )
             ],
+          ),
+          GoRoute(
+            name: 'detailAppointment',
+            path: 'detailAppointment',
+            builder: (context, state) {
+              final appointment = state.extra as Appointment;
+              return DetailAppointmentScreen(appointment: appointment);
+            },
           ),
           GoRoute(
             name: 'detailPatientProfile',

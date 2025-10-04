@@ -36,14 +36,16 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
     final doctorService = appointmentProvider.selectedDoctorService;
     final paymentType = appointmentProvider.paymentType;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(12.0),
           child: Text(
-            'Thông tin đăng ký'.toUpperCase(),
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            'Thông tin đăng ký',
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(fontWeight: FontWeight.bold),
           ),
         ),
         Container(
@@ -149,14 +151,9 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
               Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                    child: Text(
-                      "Thông tin bệnh nhân", // chữ bạn muốn
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(color: Colors.grey),
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Text("Thông tin bệnh nhân ",
+                        style: Theme.of(context).textTheme.bodyLarge),
                   ),
                   const Expanded(
                     child: Divider(
@@ -256,9 +253,9 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(12),
           child: Text(
-            'Thông tin thanh toán'.toUpperCase(),
+            'Thông tin thanh toán',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -351,26 +348,23 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
                   )
                 ],
               ),
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                    child: Text(
-                      "Hình thức thanh toán", // chữ bạn muốn
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge!
-                          .copyWith(color: Colors.grey),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Row(
+                  children: [
+                    Text(
+                      "Phương thức thanh toán ", // chữ bạn muốn
+                      style: Theme.of(context).textTheme.bodyLarge!,
                     ),
-                  ),
-                  const Expanded(
-                    child: Divider(
-                      height: 32,
-                      thickness: 1,
-                      color: Colors.grey,
+                    const Expanded(
+                      child: Divider(
+                        height: 32,
+                        thickness: 1,
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Column(
                 children: [

@@ -62,9 +62,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                   ),
                 ),
                 onPressed: () {
-                  context.goNamed('addPatientProfile', queryParameters: {
-                    'from': 'booking',
-                  });
+                  context.goNamed('addEditPatientProfile');
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

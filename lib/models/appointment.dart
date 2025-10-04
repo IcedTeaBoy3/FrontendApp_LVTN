@@ -2,6 +2,7 @@ import 'doctorservice.dart';
 import 'patientprofile.dart';
 import 'slot.dart';
 import 'schedule.dart';
+import 'payment.dart';
 
 class Appointment {
   final String appointmentId;
@@ -13,6 +14,8 @@ class Appointment {
   final String status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final Payment? payment;
+  final String? paymentId;
 
   Appointment({
     this.appointmentNumber,
@@ -24,6 +27,8 @@ class Appointment {
     required this.status,
     this.createdAt,
     this.updatedAt,
+    this.payment,
+    this.paymentId,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {

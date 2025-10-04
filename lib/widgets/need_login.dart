@@ -56,7 +56,7 @@ class _NeedLoginState extends State<NeedLogin>
             Text(
               'Tạo tài khoản hoặc đăng nhập ngay',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Colors.grey,
                   ),
             ),

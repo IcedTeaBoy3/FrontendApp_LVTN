@@ -3,6 +3,7 @@ import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/screens/appointment/widgets/appointment_card.dart';
 import 'package:frontend_app/widgets/custom_loading.dart';
 import 'package:provider/provider.dart';
+import 'package:lottie/lottie.dart';
 
 class ApppointmentList extends StatefulWidget {
   const ApppointmentList({super.key});
@@ -29,7 +30,34 @@ class _ApppointmentListState extends State<ApppointmentList> {
         if (appointmentProvider.isLoading) {
           return const CustomLoading();
         } else if (appointmentProvider.filteredAppointments.isEmpty) {
-          return const Center(child: Text('Không có lịch hẹn nào.'));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  'assets/animations/DoctorOnline.json',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+                Text(
+                  'Bạn chưa có lịch khám',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontSize: 18,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Lịch khám của bạn sẽ được hiển thị tại đây.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Colors.grey,
+                      ),
+                ),
+              ],
+            ),
+          );
         } else {
           return ListView.separated(
             itemCount: appointmentProvider.filteredAppointments.length,

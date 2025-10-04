@@ -9,7 +9,8 @@ import 'package:frontend_app/widgets/confirm_dialog.dart';
 import 'package:provider/provider.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+  final void Function(int)? onBackToHome;
+  const AccountScreen({super.key, this.onBackToHome});
   void _showLogoutDialog(BuildContext context) {
     ConfirmDialog.show(
       context,
@@ -185,7 +186,10 @@ class AccountScreen extends StatelessWidget {
                     color: Colors.black45,
                   ),
                   onTap: () {
-                    // Handle settings navigation
+                    // Gọi callback thay vì goNamed
+                    Future.delayed(const Duration(seconds: 1), () {
+                      onBackToHome!(1);
+                    });
                   },
                 ),
                 Divider(

@@ -59,10 +59,27 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
       ),
       actions: [
         IconButton(
-          icon: const FaIcon(
-            FontAwesomeIcons.filter,
-            color: Colors.white,
-            size: 20,
+          icon: Stack(
+            children: [
+              const FaIcon(
+                FontAwesomeIcons.filter,
+                color: Colors.white,
+                size: 20,
+              ),
+              if (selectedStatus != 'all' || dateController.text != '')
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
           ),
           onPressed: () {
             if (!isAuthenticated) {

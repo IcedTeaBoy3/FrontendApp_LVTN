@@ -39,6 +39,8 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
   void _nextStep() async {
     final appointmentProvider = context.read<AppointmentProvider>();
     final patientProfile = appointmentProvider.selectedPatientProfile;
+    final schedule = appointmentProvider.selectedSchedule;
+    final slot = appointmentProvider.selectedSlot;
     final paymentMethod = appointmentProvider.paymentMethod;
     if (_currentStep < _titles.length - 1) {
       if (_currentStep == 0) {
@@ -48,6 +50,24 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
             status: 'warning',
             title: 'Chưa có hồ sơ bệnh nhân',
             message: 'Vui lòng thêm hồ sơ bệnh nhân để tiếp tục đặt lịch hẹn.',
+          );
+          return;
+        }
+        if (schedule == null) {
+          CustomFlushbar.show(
+            context,
+            status: 'warning',
+            title: 'Chưa chọn ngày khám',
+            message: 'Vui lòng chọn ngày khám để tiếp tục đặt lịch hẹn.',
+          );
+          return;
+        }
+        if (slot == null) {
+          CustomFlushbar.show(
+            context,
+            status: 'warning',
+            title: 'Chưa chọn giờ khám',
+            message: 'Vui lòng chọn giờ khám.',
           );
           return;
         }
