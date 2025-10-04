@@ -107,13 +107,18 @@ class _AddEditPatientProfileScreenState
       _phoneController.text = profile.person.phone ?? '';
       selectedRelationship = convertRelationshipBack(profile.relation);
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         initAddress(context, profile.person.address);
       });
-    } else {
-      if (widget.infoIdCard != null) {
-        debugPrint("infoIdCard: ${widget.infoIdCard}");
+    } else if (widget.infoIdCard != null) {
+      // --- Case CREATE profile từ quét CCCD ---
+      debugPrint("infoIdCard: ${widget.infoIdCard}");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         _parseInfoCard(widget.infoIdCard!);
-      }
+      });
+      context.read<AddressProvider>().loadProvincesOnce();
+    } else {
       context.read<AddressProvider>().loadProvincesOnce();
     }
   }
@@ -124,7 +129,8 @@ class _AddEditPatientProfileScreenState
     final idCard = parts[0];
     final fullName = parts[2];
     final dateOfBirth = parts[3];
-    final gender = parts[4];
+    final gender = parts[4].trim();
+    debugPrint('gender: $gender');
     final address = parts[5];
     // final soCCCD = parts[1];
     // final ngayCap = parts[6];;
@@ -133,7 +139,8 @@ class _AddEditPatientProfileScreenState
     _idCardController.text = idCard;
     _fullNameController.text = fullName;
     _dobController.text = formatDob(dateOfBirth);
-    _genderController.text = gender;
+    _genderController.text = normalizeGender(gender);
+    setState(() {});
     parseAddress(context, address);
   }
 
@@ -308,7 +315,9 @@ class _AddEditPatientProfileScreenState
             if (widget.from == 'booking') {
               context.goNamed('booking');
             } else {
-              context.pop();
+              context.goNamed('home', queryParameters: {
+                'initialIndex': '2',
+              });
             }
           },
         ),
@@ -399,6 +408,9 @@ class _AddEditPatientProfileScreenState
                             const SizedBox(height: 16),
                             CustomDateField(
                               controller: _dobController,
+                              initialDate: DateTime(2000),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now(),
                               label: "Ngày sinh",
                               hintText: "dd/mm/yyyy",
                               validator: (value) {

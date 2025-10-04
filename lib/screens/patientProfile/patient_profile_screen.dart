@@ -96,8 +96,8 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                 SizedBox(
                                   width: double.infinity,
                                   child: ElevatedButton.icon(
-                                    onPressed: () =>
-                                        context.goNamed('addPatientProfile'),
+                                    onPressed: () => context
+                                        .goNamed('addEditPatientProfile'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.secondaryBlue,
                                       foregroundColor: Colors.white,
@@ -178,8 +178,8 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                               final profile = provider.patientprofiles[index];
                               return CardPatientProfile(
                                 patientprofile: profile,
-                                onTap: () => context.pushNamed(
-                                  'addPatientProfile',
+                                onTap: () => context.goNamed(
+                                  'detailPatientProfile',
                                   extra: profile,
                                 ),
                                 onDelete: () async {

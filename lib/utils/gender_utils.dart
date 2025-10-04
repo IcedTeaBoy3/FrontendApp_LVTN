@@ -19,3 +19,10 @@ String convertGenderBack(String gender) {
       return "Khác";
   }
 }
+
+String normalizeGender(String raw) {
+  raw = raw.trim().toLowerCase();
+  if (raw == "nam" || raw == "male" || raw == "m") return "Nam";
+  if (raw == "nữ" || raw == "nu" || raw == "female" || raw == "f") return "Nữ";
+  return "Khác";
+}

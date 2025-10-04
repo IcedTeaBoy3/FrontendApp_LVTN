@@ -5,14 +5,15 @@ import 'package:frontend_app/screens/error/error_screen.dart';
 import 'package:frontend_app/screens/register/register_screen.dart';
 import 'package:frontend_app/screens/clinicDetail/clinic_detail_screen.dart';
 import 'package:frontend_app/screens/doctorDetail/doctor_detail_screen.dart';
-import 'package:frontend_app/screens/addedit_patientprofile_screen/addedit_patientprofile_screen.dart';
+import 'package:frontend_app/screens/addeditpatientprofile/addedit_patientprofile_screen.dart';
 import 'package:frontend_app/screens/verifyOtp/verify_otp_screen.dart';
 import 'package:frontend_app/models/clinic.dart';
 import 'package:frontend_app/models/patientprofile.dart';
-import 'package:frontend_app/models/schedule.dart';
-import 'package:frontend_app/models/slot.dart';
+// import 'package:frontend_app/models/schedule.dart';
+// import 'package:frontend_app/models/slot.dart';
 import 'package:frontend_app/screens/bookingAppointment/booking_appointment_screen.dart';
 import 'package:frontend_app/screens/cccdScanner/cccd_scanner_screen.dart';
+import 'package:frontend_app/screens/detailPatientProfile/detail_patientprofile_screen.dart';
 
 class AppRoutes {
   static final GoRouter router = GoRouter(
@@ -59,10 +60,20 @@ class AppRoutes {
             ],
           ),
           GoRoute(
-            name: 'addPatientProfile',
-            path: 'addPatientProfile',
+            name: 'detailPatientProfile',
+            path: 'detailPatientProfile',
             builder: (context, state) {
-              final editedPatientProfile = state.extra as Patientprofile?;
+              final patientProfile = state.extra as Patientprofile;
+              return DetailPatientprofileScreen(patientProfile: patientProfile);
+            },
+          ),
+          GoRoute(
+            name: 'addEditPatientProfile',
+            path: 'addEditPatientProfile',
+            builder: (context, state) {
+              final editedPatientProfile = state.extra is Patientprofile
+                  ? state.extra as Patientprofile
+                  : null;
               final infoIdCard = state.uri.queryParameters['infoIdCard'];
               final from = state.uri.queryParameters['from'];
               return AddEditPatientProfileScreen(

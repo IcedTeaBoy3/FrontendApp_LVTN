@@ -111,7 +111,7 @@ class PatientProfileAppbar extends StatelessWidget
                 ),
                 subtitle: const Text('Tạo hồ sơ theo thông tin hành chính'),
                 onTap: () {
-                  context.goNamed('addPatientProfile');
+                  context.goNamed('addEditPatientProfile');
                 },
                 trailing: const FaIcon(FontAwesomeIcons.pen, size: 18),
               ),

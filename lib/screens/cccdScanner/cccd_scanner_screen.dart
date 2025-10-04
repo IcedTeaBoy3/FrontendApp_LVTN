@@ -12,6 +12,7 @@ class ScanCCCDScreen extends StatefulWidget {
 
 class _ScanCCCDScreenState extends State<ScanCCCDScreen> {
   bool _hasPermission = false;
+  bool _isScanning = false;
 
   @override
   void initState() {
@@ -32,12 +33,14 @@ class _ScanCCCDScreenState extends State<ScanCCCDScreen> {
     final String? rawValue = capture.barcodes.first.rawValue;
     if (rawValue != null) {
       debugPrint("Quét được: $rawValue");
-
-      // Chuyển route
-      context.goNamed('addPatientProfile', queryParameters: {
+      context.goNamed('addEditPatientProfile', queryParameters: {
         'infoIdCard': rawValue,
       });
     }
+  }
+
+  void _onSelectImage() {
+    debugPrint("Chọn ảnh từ thư viện");
   }
 
   @override
@@ -47,7 +50,6 @@ class _ScanCCCDScreenState extends State<ScanCCCDScreen> {
         body: Center(child: Text("Cần quyền camera để quét CCCD")),
       );
     }
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -58,7 +60,10 @@ class _ScanCCCDScreenState extends State<ScanCCCDScreen> {
       ),
       body: Stack(
         children: [
-          MobileScanner(onDetect: _onDetect),
+          if (_isScanning)
+            MobileScanner(onDetect: _onDetect)
+          else
+            Container(color: Colors.white),
           Align(
             alignment: Alignment.center,
             child: Container(
@@ -67,6 +72,73 @@ class _ScanCCCDScreenState extends State<ScanCCCDScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.green, width: 2),
                 borderRadius: BorderRadius.circular(12),
+              ),
+              child: _isScanning
+                  ? null
+                  : const Center(
+                      child: Icon(
+                        Icons.qr_code_2,
+                        size: 100,
+                        color: Colors.grey,
+                      ),
+                    ),
+            ),
+          ),
+          Positioned(
+            bottom: 80,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  textStyle: const TextStyle(fontSize: 16),
+                  backgroundColor: _isScanning ? Colors.grey : Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isScanning = true;
+                  });
+                },
+                child: const Text("Bắt đầu quét"),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 50,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: GestureDetector(
+                onTap: _onSelectImage,
+                child: const Text(
+                  "Hoặc chọn ảnh từ thư viện",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 16,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 150,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                color: Colors.black54,
+                child: Text(
+                  _isScanning
+                      ? "Đặt CCCD trong khung để quét"
+                      : "Nhấn nút để bắt đầu quét",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
             ),
           ),
