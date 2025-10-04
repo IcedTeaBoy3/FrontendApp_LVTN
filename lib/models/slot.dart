@@ -1,11 +1,13 @@
 class Slot {
   final String slotId;
+  final String shift;
   final DateTime startTime;
   final DateTime endTime;
   final String status;
 
   Slot({
     required this.slotId,
+    required this.shift,
     required this.startTime,
     required this.endTime,
     required this.status,
@@ -14,6 +16,7 @@ class Slot {
   factory Slot.fromJson(Map<String, dynamic> json) {
     return Slot(
       slotId: json['slotId'] ?? json['_id'],
+      shift: json['shift'] ?? '',
       startTime: DateTime.parse(json['startTime']).toLocal(),
       endTime: DateTime.parse(json['endTime']).toLocal(),
       status: json['status'],
@@ -29,6 +32,7 @@ class Slot {
       'startTime': startTime.toIso8601String(),
       'endTime': endTime.toIso8601String(),
       'status': status,
+      'shift': shift,
     };
   }
 }

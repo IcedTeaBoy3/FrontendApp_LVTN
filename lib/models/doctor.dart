@@ -8,9 +8,11 @@ import 'doctorservice.dart';
 
 class Doctor {
   final String doctorId;
-  final Account account;
+  final Account? account;
+  final String? accountId;
   final Person person;
-  final Degree degree;
+  final Degree? degree;
+  final String? degreeId;
   final String? bio;
   final String? notes;
   final List<DoctorSpecialty> doctorSpecialties;
@@ -19,9 +21,11 @@ class Doctor {
 
   Doctor({
     required this.doctorId,
-    required this.account,
+    this.account,
+    this.accountId,
     required this.person,
-    required this.degree,
+    this.degree,
+    this.degreeId,
     required this.doctorSpecialties,
     required this.doctorWorplaces,
     required this.doctorServices,
@@ -31,10 +35,26 @@ class Doctor {
 
   /// Parse từ JSON sang object
   factory Doctor.fromJson(Map<String, dynamic> json) {
+    Account? parsedAccount;
+    String? parsedAccountId;
+    if (json['account'] is Map<String, dynamic>) {
+      parsedAccount = Account.fromJson(json['account']);
+    } else if (json['account'] is String) {
+      parsedAccountId = json['account'];
+    }
+    Degree? parsedDegree;
+    String? parsedDegreeId;
+    if (json['degree'] is Map<String, dynamic>) {
+      parsedDegree = Degree.fromJson(json['degree']);
+    } else if (json['degree'] is String) {
+      parsedDegreeId = json['degree'];
+    }
     return Doctor(
       doctorId: json['doctorId'] as String,
-      account: Account.fromJson(json['account']),
-      degree: Degree.fromJson(json['degree']),
+      account: parsedAccount,
+      accountId: parsedAccountId,
+      degree: parsedDegree,
+      degreeId: parsedDegreeId,
       person: Person.fromJson(json['person']),
       bio: json['bio'] ?? '',
       notes: json['notes'] ?? '',
@@ -107,8 +127,9 @@ class Doctor {
   Map<String, dynamic> toJson() {
     return {
       'doctorId': doctorId,
-      'account': account.toJson(),
-      'degree': degree.toJson(),
+      'account': account != null ? account!.toJson() : accountId,
+      'person': person.toJson(),
+      'degree': degree != null ? degree!.toJson() : degreeId,
       'bio': bio,
       'notes': notes,
     };

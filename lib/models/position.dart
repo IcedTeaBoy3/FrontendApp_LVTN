@@ -2,11 +2,13 @@ class Position {
   final String positionId;
   final String title;
   final String? description;
+  final String status;
 
   Position({
     required this.positionId,
     required this.title,
     required this.description,
+    this.status = 'active',
   });
 
   factory Position.fromJson(Map<String, dynamic> json) {
@@ -14,6 +16,7 @@ class Position {
       positionId: json['positionId'],
       title: json['title'],
       description: json['description'],
+      status: json['status'] ?? 'active',
     );
   }
   static List<Position> positionsFromJson(List<dynamic> jsonList) {
@@ -25,6 +28,7 @@ class Position {
       'positionId': positionId,
       'title': title,
       'description': description,
+      'status': status,
     };
   }
 }

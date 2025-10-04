@@ -10,7 +10,8 @@ import 'package:frontend_app/screens/appointment/appointment_screen.dart';
 import 'package:frontend_app/screens/appointment/widgets/appointment_appbar.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int initialIndex;
+  const HomeScreen({super.key, this.initialIndex = 0});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -18,6 +19,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -32,19 +38,26 @@ class _HomeScreenState extends State<HomeScreen> {
     const AppointmentScreen(),
     const AccountScreen(),
   ];
+  PreferredSizeWidget? _buildAppBar(int index) {
+    switch (index) {
+      case 0:
+        return const HomeAppbar();
+      case 1:
+        return PatientProfileAppbar(onBackToHome: () => _onItemTapped(0));
+      case 2:
+        return null; // Account không cần appbar
+      case 3:
+        return AppointmentAppbar(onBackToHome: () => _onItemTapped(0));
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<PreferredSizeWidget?> appBars = [
-      const HomeAppbar(),
-      PatientProfileAppbar(onBackToHome: () => _onItemTapped(0)),
-      null,
-      AppointmentAppbar(onBackToHome: () => _onItemTapped(0)),
-      null,
-    ];
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: appBars[_selectedIndex],
+      appBar: _buildAppBar(_selectedIndex),
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,

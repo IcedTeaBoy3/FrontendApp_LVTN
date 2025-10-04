@@ -14,7 +14,7 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
     final avatarUrl = (doctor?.person.avatar != null)
         ? ApiConfig.backendUrl + doctor!.person.avatar!
         : null;
-    final degreeName = doctor?.degree.title ?? "Chưa cập nhật";
+    final degreeName = doctor?.degree?.title ?? "Chưa cập nhật";
     final specialties =
         doctor?.doctorSpecialties.map((ds) => ds.specialty.name) ?? [];
     return Container(

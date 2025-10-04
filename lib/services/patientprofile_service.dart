@@ -51,9 +51,10 @@ class PatientprofileService {
       );
     } on DioException catch (e) {
       // 👇 Lấy message từ server nếu có
+      print('Dio error response: ${e}');
       return ResponseApi(
         status: 'error',
-        message: e.response?.data['message'] ?? 'Đăng nhập thất bại',
+        message: e.response?.data['message'] ?? 'Tạo hồ sơ thất bại',
       );
     } catch (e) {
       // Nếu có lỗi trong quá trình gọi API hoặc parse dữ liệu

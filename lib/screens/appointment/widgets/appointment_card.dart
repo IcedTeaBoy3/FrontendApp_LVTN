@@ -1,0 +1,184 @@
+import 'package:flutter/material.dart';
+import 'package:frontend_app/models/appointment.dart';
+import 'package:frontend_app/configs/api_config.dart';
+import 'package:frontend_app/utils/date_utils.dart';
+
+class AppointmentCard extends StatelessWidget {
+  final Appointment appointment;
+  const AppointmentCard({super.key, required this.appointment});
+
+  @override
+  Widget build(BuildContext context) {
+    final doctor = appointment.doctorService.doctor;
+    final patient = appointment.patientProfile;
+    final slot = appointment.slot;
+    final schedule = appointment.schedule;
+    final doctorService = appointment.doctorService;
+    final avatarUrl = doctor?.person.avatar != null
+        ? '${ApiConfig.backendUrl}${doctor?.person.avatar}'
+        : null;
+
+    String _converStatus(String status) {
+      switch (status) {
+        case 'pending':
+          return 'Chờ xác nhận';
+        case 'confirmed':
+          return 'Đã xác nhận';
+        case 'completed':
+          return 'Đã hoàn thành';
+        case 'canceled':
+          return 'Đã hủy';
+        default:
+          return status;
+      }
+    }
+
+    Color _getStatusColor(String status) {
+      switch (status) {
+        case 'pending':
+          return Colors.orange;
+        case 'confirmed':
+          return Colors.blue;
+        case 'completed':
+          return Colors.green;
+        case 'canceled':
+          return Colors.red;
+        default:
+          return Colors.grey;
+      }
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withAlpha(30),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 4.0,
+                  horizontal: 8.0,
+                ),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(appointment.status),
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Text(
+                  _converStatus(appointment.status),
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              Row(
+                children: [
+                  Text(
+                    'STT:',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                  ),
+                  const SizedBox(width: 8.0),
+                  Text(
+                    appointment.appointmentNumber.toString(),
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                doctor?.person.fullName ?? '--',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+              CircleAvatar(
+                radius: 30.0,
+                backgroundImage: avatarUrl != null
+                    ? NetworkImage(avatarUrl) as ImageProvider
+                    : const AssetImage('assets/images/avatar-default-icon.png'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Giờ khám:',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Colors.grey[600],
+                    ),
+              ),
+              Text(
+                '${formatTime(slot.startTime)}-${formatTime(slot.endTime)} - ${formatDate(schedule.workday)}',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Chuyên khoa',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Colors.grey[600],
+                    ),
+              ),
+              Text(
+                doctorService.service?.specialty?.name ?? '--',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Bệnh nhân:',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Colors.grey[600],
+                    ),
+              ),
+              Text(
+                patient.person.fullName,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -118,7 +118,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedDate = context.read<AppointmentProvider>().selectedDate;
+    final selectedDate = context.watch<AppointmentProvider>().selectedDate;
     return Container(
       decoration: BoxDecoration(color: Colors.white),
       padding: const EdgeInsets.all(12),

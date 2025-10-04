@@ -15,7 +15,7 @@ class CardDoctorAppointment extends StatelessWidget {
         : null;
     final specialties =
         doctor?.doctorSpecialties.map((ds) => ds.specialty.name) ?? [];
-    final degreeName = doctor?.degree.title ?? "Chưa cập nhật";
+    final degreeName = doctor?.degree?.title ?? "Chưa cập nhật";
     return Row(
       children: [
         CircleAvatar(

@@ -24,3 +24,9 @@ String formatDob(String dob) {
   if (dob.length != 8) return dob;
   return "${dob.substring(0, 2)}/${dob.substring(2, 4)}/${dob.substring(4, 8)}";
 }
+
+String formatTime(DateTime? time) {
+  if (time == null) return '';
+  final DateFormat formatter = DateFormat('HH:mm');
+  return formatter.format(time);
+}

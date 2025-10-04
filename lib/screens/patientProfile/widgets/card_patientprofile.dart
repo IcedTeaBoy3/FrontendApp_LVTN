@@ -41,33 +41,29 @@ class CardPatientProfile extends StatelessWidget {
               color: Colors.blue,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   patientprofile.person.fullName,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   'Ngày sinh: ${formatDate(patientprofile.person.dateOfBirth)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Colors.grey[600],
+                      ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   'Quan hệ: ${convertRelationshipBack(patientprofile.relation)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Colors.grey[600],
+                      ),
                 ),
               ],
             ),

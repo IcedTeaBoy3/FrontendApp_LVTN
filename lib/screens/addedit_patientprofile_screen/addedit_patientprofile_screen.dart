@@ -10,18 +10,20 @@ import 'package:frontend_app/models/person.dart';
 import 'package:frontend_app/widgets/custom_flushbar.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/address_provider.dart';
-import 'package:intl/intl.dart';
 import 'package:frontend_app/utils/relation_utils.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
 import 'package:frontend_app/utils/date_utils.dart';
+import 'package:go_router/go_router.dart';
 
 class AddEditPatientProfileScreen extends StatefulWidget {
   final String? infoIdCard;
   final Patientprofile? editedPatientprofile;
+  final String? from;
   const AddEditPatientProfileScreen({
     super.key,
     this.editedPatientprofile,
     this.infoIdCard,
+    this.from,
   });
 
   @override
@@ -109,6 +111,7 @@ class _AddEditPatientProfileScreenState
       });
     } else {
       if (widget.infoIdCard != null) {
+        debugPrint("infoIdCard: ${widget.infoIdCard}");
         _parseInfoCard(widget.infoIdCard!);
       }
       context.read<AddressProvider>().loadProvincesOnce();
@@ -120,7 +123,7 @@ class _AddEditPatientProfileScreenState
     if (parts.length < 7) return;
     final idCard = parts[0];
     final fullName = parts[2];
-    final dob = parts[3];
+    final dateOfBirth = parts[3];
     final gender = parts[4];
     final address = parts[5];
     // final soCCCD = parts[1];
@@ -129,7 +132,7 @@ class _AddEditPatientProfileScreenState
     // Gán thẳng vào controller
     _idCardController.text = idCard;
     _fullNameController.text = fullName;
-    _dobController.text = formatDob(dob);
+    _dobController.text = formatDob(dateOfBirth);
     _genderController.text = gender;
     parseAddress(context, address);
   }
@@ -205,7 +208,11 @@ class _AddEditPatientProfileScreenState
       // Create a Patientprofile object
       final person = Person(
         fullName: fullName,
-        dateOfBirth: DateFormat('dd/MM/yyyy').parse(dateOfBirth),
+        dateOfBirth: DateTime.utc(
+          int.parse(dateOfBirth.split('/')[2]),
+          int.parse(dateOfBirth.split('/')[1]),
+          int.parse(dateOfBirth.split('/')[0]),
+        ),
         gender: convertGender(gender),
         address: address,
         phone: phone,
@@ -295,6 +302,16 @@ class _AddEditPatientProfileScreenState
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (widget.from == 'booking') {
+              context.goNamed('booking');
+            } else {
+              context.pop();
+            }
+          },
+        ),
         title: Text(
           widget.editedPatientprofile == null
               ? 'Thêm hồ sơ bệnh nhân'

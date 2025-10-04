@@ -30,6 +30,7 @@ class ResponseApi<T> {
       'data': data != null
           ? (dataSerializer != null ? dataSerializer(data!) : data)
           : null,
+      'statusCode': statusCode,
     };
   }
 }

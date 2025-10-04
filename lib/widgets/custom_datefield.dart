@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_app/utils/date_utils.dart';
 
 class CustomDateField extends StatefulWidget {
   final String label;
@@ -47,8 +48,7 @@ class _CustomDateFieldState extends State<CustomDateField> {
 
     if (pickedDate != null) {
       setState(() {
-        widget.controller.text =
-            "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
+        widget.controller.text = formatDate(pickedDate);
       });
     }
   }

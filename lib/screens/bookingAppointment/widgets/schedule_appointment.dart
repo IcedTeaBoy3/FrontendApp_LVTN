@@ -37,23 +37,77 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
       builder: (BuildContext context) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ListView.separated(
-            itemCount: patientProfiles.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final profile = patientProfiles[index];
-              return CardPatientProfile(
-                patientprofile: profile,
-                onTap: () {
-                  context
-                      .read<AppointmentProvider>()
-                      .setSelectedPatientProfile(profile);
-                  context.pop();
+          child: Column(
+            children: [
+              Text(
+                "Chọn hồ sơ bệnh nhân",
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              // Thêm cái nút thêm mới hồ sơ
+              const SizedBox(height: 8),
+              // Nút thêm hồ sơ mới
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent, // màu nổi bật
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16), // bo tròn
+                  ),
+                  elevation: 5, // tạo bóng
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: () {
+                  context.goNamed('addPatientProfile', queryParameters: {
+                    'from': 'booking',
+                  });
                 },
-                selected: profile.patientProfileId ==
-                    selectedProfile?.patientProfileId,
-              );
-            },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(
+                      Icons.add,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Thêm hồ sơ mới",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: patientProfiles.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    final profile = patientProfiles[index];
+                    return CardPatientProfile(
+                      patientprofile: profile,
+                      onTap: () {
+                        context
+                            .read<AppointmentProvider>()
+                            .setSelectedPatientProfile(profile);
+                        context.pop();
+                      },
+                      selected: profile.patientProfileId ==
+                          selectedProfile?.patientProfileId,
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -206,7 +260,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     Text(
-                      patientProfile?.person.fullName ?? "Chưa có thông tin",
+                      patientProfile?.person.fullName ?? "--",
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
@@ -224,7 +278,9 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     Text(
-                      convertGenderBack(patientProfile!.person.gender),
+                      patientProfile?.person.gender == null
+                          ? "--"
+                          : convertGenderBack(patientProfile!.person.gender),
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
@@ -242,7 +298,9 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     Text(
-                      formatDate(patientProfile.person.dateOfBirth),
+                      patientProfile?.person.dateOfBirth == null
+                          ? "--"
+                          : formatDate(patientProfile!.person.dateOfBirth),
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
@@ -260,7 +318,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     Text(
-                      patientProfile.person.phone ?? "Chưa có thông tin",
+                      patientProfile?.person.phone ?? "--",
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             fontWeight: FontWeight.w700,
                           ),
@@ -272,7 +330,8 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color:
+                  patientProfile == null ? Colors.amber[100] : Colors.grey[300],
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(12),
                 bottomRight: Radius.circular(12),
@@ -281,20 +340,38 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(
-                  onPressed: () => context.goNamed(
-                    'addPatientProfile',
-                    extra: patientProfile,
+                TextButton.icon(
+                  icon: Icon(
+                    patientProfile == null
+                        ? Icons.error_outline
+                        : Icons.arrow_forward_ios,
+                    color: patientProfile == null ? Colors.orange : Colors.blue,
+                    size: 18,
                   ),
-                  child: Text(
-                    "Xem chi tiết",
+                  onPressed: () {
+                    if (patientProfile != null) {
+                      context.goNamed(
+                        'addPatientProfile',
+                        extra: patientProfile,
+                        queryParameters: {'from': 'booking'},
+                      );
+                    }
+                  },
+                  label: Text(
+                    patientProfile == null ? "Chưa có hồ sơ" : "Xem chi tiết",
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: patientProfile == null
+                              ? Colors.orange
+                              : Colors.blue,
                         ),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    if (patientProfile == null) {
+                      context.goNamed('addPatientProfile');
+                    }
                     _handleChangePatientProfile(context);
                   },
                   style: ElevatedButton.styleFrom(
@@ -310,7 +387,11 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                     ),
                   ),
                   child: Text(
-                    "Thay đổi",
+                    patientProfile == null ? "Thêm hồ sơ" : "Thay đổi",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
                   ),
                 )
               ],

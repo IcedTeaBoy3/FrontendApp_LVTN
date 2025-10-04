@@ -21,7 +21,13 @@ class AppRoutes {
       GoRoute(
         name: 'home',
         path: '/',
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) {
+          final initialIndex = state.uri.queryParameters['initialIndex'] != null
+              ? int.tryParse(state.uri.queryParameters['initialIndex']!) ?? 0
+              : 0;
+          print('Initial Index: $initialIndex');
+          return HomeScreen(initialIndex: initialIndex);
+        },
         routes: [
           GoRoute(
             name: 'clinicDetail',
@@ -45,12 +51,8 @@ class AppRoutes {
                 path: 'booking',
                 builder: (context, state) {
                   final doctorId = state.pathParameters['doctorId']!;
-                  final schedule = state.extra as Schedule?;
-                  final slot = state.extra as Slot?;
                   return BookingAppointmentScreen(
                     doctorId: doctorId,
-                    selectedSchedule: schedule,
-                    selectedSlot: slot,
                   );
                 },
               )
@@ -62,10 +64,11 @@ class AppRoutes {
             builder: (context, state) {
               final editedPatientProfile = state.extra as Patientprofile?;
               final infoIdCard = state.uri.queryParameters['infoIdCard'];
-              print("CCCD từ scanner: $infoIdCard");
+              final from = state.uri.queryParameters['from'];
               return AddEditPatientProfileScreen(
                 editedPatientprofile: editedPatientProfile,
                 infoIdCard: infoIdCard,
+                from: from,
               );
             },
           ),

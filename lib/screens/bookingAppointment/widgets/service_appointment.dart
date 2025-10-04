@@ -25,8 +25,8 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
       final doctorServices = doctor.doctorServices;
 
       // Chỉ set lần đầu khi chưa có dữ liệu
-      if (appointmentProvider.appointmentType == null) {
-        appointmentProvider.setAppointmentType('service');
+      if (appointmentProvider.paymentType == null) {
+        appointmentProvider.setPaymentType('service');
       }
 
       if (appointmentProvider.selectedDoctorService == null) {
@@ -48,7 +48,7 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
         message: 'Vui lòng chọn hồ sơ bệnh nhân có bảo hiểm y tế',
       );
     }
-    context.read<AppointmentProvider>().setAppointmentType(value!);
+    context.read<AppointmentProvider>().setPaymentType(value!);
   }
 
   void _handleSelectedService(String? value) {
@@ -96,11 +96,10 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.blue[50],
-                    border:
-                        context.watch<AppointmentProvider>().appointmentType ==
-                                'service'
-                            ? Border.all(color: AppColors.primaryBlue, width: 1)
-                            : null,
+                    border: context.watch<AppointmentProvider>().paymentType ==
+                            'service'
+                        ? Border.all(color: AppColors.primaryBlue, width: 1)
+                        : null,
                   ),
                   child: ListTile(
                     title: Text(
@@ -113,7 +112,7 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                     leading: Radio(
                       value: 'service',
                       groupValue:
-                          context.watch<AppointmentProvider>().appointmentType,
+                          context.watch<AppointmentProvider>().paymentType,
                       onChanged: (value) {
                         _handleSelectedType(value, context);
                       },
@@ -125,11 +124,10 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.blue[50],
-                    border:
-                        context.watch<AppointmentProvider>().appointmentType ==
-                                'insurance'
-                            ? Border.all(color: AppColors.primaryBlue, width: 1)
-                            : null,
+                    border: context.watch<AppointmentProvider>().paymentType ==
+                            'insurance'
+                        ? Border.all(color: AppColors.primaryBlue, width: 1)
+                        : null,
                   ),
                   child: ListTile(
                     title: Text(
@@ -143,7 +141,7 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                     leading: Radio(
                       value: 'insurance',
                       groupValue:
-                          context.watch<AppointmentProvider>().appointmentType,
+                          context.watch<AppointmentProvider>().paymentType,
                       onChanged: (value) {
                         _handleSelectedType(value, context);
                       },
@@ -189,8 +187,8 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                     color: Colors.blue[50], // màu mặc định
                     border: context
                                 .watch<AppointmentProvider>()
-                                .selectedDoctorService!
-                                .doctorServiceId ==
+                                .selectedDoctorService
+                                ?.doctorServiceId ==
                             doctorService.doctorServiceId
                         ? Border.all(color: AppColors.primaryBlue, width: 1)
                         : null,
@@ -200,29 +198,27 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                       value: doctorService.doctorServiceId,
                       groupValue: context
                           .watch<AppointmentProvider>()
-                          .selectedDoctorService!
-                          .doctorServiceId,
+                          .selectedDoctorService
+                          ?.doctorServiceId,
                       onChanged: (value) {
                         _handleSelectedService(value);
                       },
                     ),
                     title: Text(
-                      doctorService.service.name,
+                      doctorService.service?.name ?? '--',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                     ),
                     subtitle: Text(
-                      doctorService.service.description ?? '',
+                      doctorService.service?.description ?? '--',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     trailing: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (context
-                                .watch<AppointmentProvider>()
-                                .appointmentType ==
+                        if (context.watch<AppointmentProvider>().paymentType ==
                             'insurance') // chỉ hiện giá gốc khi khám BHYT
                           Text(
                             formatCurrency(doctorService.price),
@@ -236,15 +232,11 @@ class _ServiceAppointmentState extends State<ServiceAppointment> {
                                       .lineThrough, // 👈 gạch ngang
                                 ),
                           ),
-                        if (context
-                                .watch<AppointmentProvider>()
-                                .appointmentType ==
+                        if (context.watch<AppointmentProvider>().paymentType ==
                             'insurance') // chỉ hiện giá BHYT khi khám BHYT
                           const SizedBox(width: 6),
                         Text(
-                          context
-                                      .watch<AppointmentProvider>()
-                                      .appointmentType ==
+                          context.watch<AppointmentProvider>().paymentType ==
                                   'service'
                               ? formatCurrency(doctorService.price)
                               : formatCurrency(doctorService.price * 0.2),

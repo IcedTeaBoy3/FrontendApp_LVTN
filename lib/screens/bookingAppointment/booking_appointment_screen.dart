@@ -1,21 +1,19 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:frontend_app/models/schedule.dart';
-import 'package:frontend_app/models/slot.dart';
 import 'package:frontend_app/screens/bookingAppointment/widgets/schedule_appointment.dart';
 import 'package:frontend_app/screens/bookingAppointment/widgets/confirm_appointment.dart';
 import 'package:frontend_app/screens/bookingAppointment/widgets/service_appointment.dart';
+import 'package:frontend_app/providers/appointment_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend_app/widgets/custom_flushbar.dart';
 
 class BookingAppointmentScreen extends StatefulWidget {
   final String doctorId;
-  Schedule? selectedSchedule;
-  Slot? selectedSlot;
 
-  BookingAppointmentScreen({
+  const BookingAppointmentScreen({
     super.key,
     required this.doctorId,
-    this.selectedSchedule,
-    this.selectedSlot,
   });
 
   @override
@@ -38,12 +36,47 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
         ConfirmAppointment(doctorId: widget.doctorId),
       ];
 
-  void _nextStep() {
+  void _nextStep() async {
+    final appointmentProvider = context.read<AppointmentProvider>();
+    final patientProfile = appointmentProvider.selectedPatientProfile;
+    final paymentMethod = appointmentProvider.paymentMethod;
     if (_currentStep < _titles.length - 1) {
+      if (_currentStep == 0) {
+        if (patientProfile == null) {
+          CustomFlushbar.show(
+            context,
+            status: 'warning',
+            title: 'Chưa có hồ sơ bệnh nhân',
+            message: 'Vui lòng thêm hồ sơ bệnh nhân để tiếp tục đặt lịch hẹn.',
+          );
+          return;
+        }
+      }
       setState(() => _currentStep += 1);
     } else {
-      // hoàn tất
-      debugPrint('Đặt lịch hẹn hoàn tất !');
+      if (paymentMethod == null) {
+        CustomFlushbar.show(
+          context,
+          status: 'warning',
+          title: 'Chưa chọn phương thức thanh toán',
+          message:
+              'Vui lòng chọn phương thức thanh toán để tiếp tục đặt lịch hẹn.',
+        );
+        return;
+      }
+      final result = await appointmentProvider.createAppointment();
+      if (!mounted) return;
+      CustomFlushbar.show(
+        context,
+        status: result.status,
+        message: result.message,
+      );
+      // đợi flushbar init xong rồi mới goNamed
+      Future.delayed(const Duration(milliseconds: 3000), () {
+        if (mounted) {
+          context.goNamed('home', queryParameters: {'initialIndex': '3'});
+        }
+      });
     }
   }
 

@@ -1,0 +1,61 @@
+import 'doctorservice.dart';
+import 'patientprofile.dart';
+import 'slot.dart';
+import 'schedule.dart';
+
+class Appointment {
+  final String appointmentId;
+  final int? appointmentNumber;
+  final Patientprofile patientProfile;
+  final DoctorService doctorService;
+  final Schedule schedule;
+  final Slot slot;
+  final String status;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
+  Appointment({
+    this.appointmentNumber,
+    required this.appointmentId,
+    required this.patientProfile,
+    required this.doctorService,
+    required this.schedule,
+    required this.slot,
+    required this.status,
+    this.createdAt,
+    this.updatedAt,
+  });
+
+  factory Appointment.fromJson(Map<String, dynamic> json) {
+    return Appointment(
+      appointmentNumber: json['appointmentNumber'] ?? '',
+      appointmentId: json['appointmentId'] ?? json['_id'] ?? '',
+      doctorService: DoctorService.fromJson(json['doctorService']),
+      patientProfile: Patientprofile.fromJson(json['patientProfile']),
+      schedule: Schedule.fromJson(json['schedule']),
+      slot: Slot.fromJson(json['slot']),
+      status: json['status'],
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt:
+          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+    );
+  }
+  static List<Appointment> appointmentsFromJson(List<dynamic> jsonList) {
+    return jsonList.map((json) => Appointment.fromJson(json)).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'appointmentId': appointmentId,
+      'appointmentNumber': appointmentNumber,
+      'doctorService': doctorService.toJson(),
+      'patientProfile': patientProfile.toJson(),
+      'schedule': schedule.toJson(),
+      'slot': slot.toJson(),
+      'status': status,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+}

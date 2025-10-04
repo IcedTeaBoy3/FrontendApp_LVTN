@@ -22,7 +22,7 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appointmentProvider = context.read<AppointmentProvider>();
       if (appointmentProvider.paymentMethod == null) {
-        appointmentProvider.setPaymentMethod('direct');
+        appointmentProvider.setPaymentMethod('cash');
       }
     });
   }
@@ -34,7 +34,7 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
     final selectedSlot = appointmentProvider.selectedSlot;
     final patientProfile = appointmentProvider.selectedPatientProfile;
     final doctorService = appointmentProvider.selectedDoctorService;
-    final appointmentType = appointmentProvider.appointmentType;
+    final paymentType = appointmentProvider.paymentType;
     return Column(
       children: [
         Padding(
@@ -135,7 +135,8 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
                   Expanded(
                     child: Text(
                       doctorService != null
-                          ? doctorService.service.specialty.name
+                          ? doctorService.service?.specialty?.name ??
+                              'Chưa cập nhật'
                           : 'Chưa chọn',
                       style: Theme.of(context)
                           .textTheme
@@ -294,7 +295,7 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
                   ),
                   Expanded(
                     child: Text(
-                      appointmentType == 'service'
+                      paymentType == 'service'
                           ? 'Khám dịch vụ'
                           : 'Khám bảo hiểm y tế',
                       style: Theme.of(context)
@@ -317,8 +318,8 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
                   Expanded(
                     child: Text(
                       doctorService != null
-                          ? doctorService.service.name
-                          : 'Chưa chọn',
+                          ? doctorService.service?.name ?? 'Chưa cập nhật'
+                          : 'Chưa cập nhật',
                       style: Theme.of(context)
                           .textTheme
                           .bodyLarge!
@@ -340,7 +341,7 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
                     child: Text(
                       doctorService != null
                           ? formatCurrency(doctorService.price *
-                              (appointmentType == 'service' ? 1 : 0.2))
+                              (paymentType == 'service' ? 1 : 0.2))
                           : 'Chưa cập nhật',
                       style: Theme.of(context)
                           .textTheme
@@ -350,15 +351,27 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
                   )
                 ],
               ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Chọn hình thức thanh toán',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                    child: Text(
+                      "Hình thức thanh toán", // chữ bạn muốn
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(color: Colors.grey),
+                    ),
+                  ),
+                  const Expanded(
+                    child: Divider(
+                      height: 32,
+                      thickness: 1,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
               Column(
                 children: [
                   Container(
@@ -366,13 +379,13 @@ class _ConfirmAppointmentState extends State<ConfirmAppointment> {
                       color: Colors.blue.shade50,
                       border:
                           context.watch<AppointmentProvider>().paymentMethod ==
-                                  'direct'
+                                  'cash'
                               ? Border.all(color: Colors.blue, width: 1)
                               : null,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: RadioListTile<String>(
-                      value: 'direct',
+                      value: 'cash',
                       groupValue:
                           context.watch<AppointmentProvider>().paymentMethod,
                       onChanged: (value) {

@@ -19,7 +19,7 @@ class DoctorWorkplace {
   factory DoctorWorkplace.fromJson(Map<String, dynamic> json) {
     return DoctorWorkplace(
       doctorWorkplaceId: json['doctorWorkplaceId'] ?? '',
-      doctorId: json['doctor'] ?? '',
+      doctorId: json['doctor'] ?? json['doctorId'] ?? '',
       workplace: Workplace.fromJson(json['workplace'] ?? {}),
       position: Position.fromJson(json['position'] ?? {}),
       isPrimary: json['isPrimary'] ?? false,

@@ -6,12 +6,14 @@ class Schedule {
   final String doctorId;
   final List<Shift> shifts;
   final int slotDuration;
+  final String status;
   Schedule({
     required this.scheduleId,
     required this.workday,
     required this.doctorId,
     required this.shifts,
     required this.slotDuration,
+    this.status = 'active',
   });
   // Đếm tổng số slot trong ngày có status = 'available'
   int get availableSlotCount {
@@ -33,6 +35,7 @@ class Schedule {
       doctorId: json['doctorId'] ?? json['doctor'],
       shifts: Shift.shiftsFromJson(json['shifts'] ?? []),
       slotDuration: json['slotDuration'] ?? 30,
+      status: json['status'] ?? 'active',
     );
   }
   static List<Schedule> schedulesFromJson(List<dynamic> jsonList) {
@@ -46,6 +49,7 @@ class Schedule {
       'doctorId': doctorId,
       'shifts': shifts.map((shift) => shift.toJson()).toList(),
       'slotDuration': slotDuration,
+      'status': status,
     };
   }
 
