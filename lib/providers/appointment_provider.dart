@@ -10,6 +10,7 @@ import 'package:frontend_app/models/responseapi.dart';
 
 class AppointmentProvider extends ChangeNotifier {
   List<Appointment> _appointments = [];
+  List<Appointment> _filteredAppointments = [];
 
   Patientprofile? _selectedPatientProfile;
   Schedule? _selectedSchedule;
@@ -23,6 +24,7 @@ class AppointmentProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   // int get total => _total;
   List<Appointment> get appointments => _appointments;
+  List<Appointment> get filteredAppointments => _filteredAppointments;
   Patientprofile? get selectedPatientProfile => _selectedPatientProfile;
   Slot? get selectedSlot => _selectedSlot;
   DateTime? get selectedDate => _selectedDate;
@@ -60,6 +62,7 @@ class AppointmentProvider extends ChangeNotifier {
           await AppointmentService.createAppointment(appointment, payment);
       if (result.status == 'success' && result.data != null) {
         _appointments.add(result.data!);
+        _filteredAppointments = List.from(_appointments); // <-- thêm dòng này
       }
       return result;
     } catch (e) {
@@ -68,6 +71,39 @@ class AppointmentProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void filterAppointments({String? status, DateTime? date}) {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      var temp = List<Appointment>.from(_appointments); // copy gốc
+
+      if (status != null && status != 'all') {
+        temp = temp.where((a) => a.status == status).toList();
+      }
+
+      if (date != null) {
+        temp = temp.where((a) {
+          final d = a.schedule.workday;
+          return d.year == date.year &&
+              d.month == date.month &&
+              d.day == date.day;
+        }).toList();
+      }
+
+      _filteredAppointments = temp;
+    } catch (e) {
+      debugPrint('Error filtering: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearFilter() {
+    _filteredAppointments = List.from(_appointments);
+    notifyListeners();
   }
 
   Future<void> fetchAppointments({int page = 1, int limit = 10}) async {
@@ -81,6 +117,7 @@ class AppointmentProvider extends ChangeNotifier {
       debugPrint('Fetched appointments provider: $response');
       if (response.status == 'success' && response.data != null) {
         _appointments = response.data!;
+        _filteredAppointments = List.from(_appointments);
       }
     } catch (e) {
       debugPrint('Error fetching appointments: $e');

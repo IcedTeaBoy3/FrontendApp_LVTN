@@ -5,6 +5,9 @@ class CustomDateField extends StatefulWidget {
   final String label;
   final String hintText;
   final TextEditingController controller;
+  final DateTime? initialDate;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
   final String? Function(String?)? validator;
 
   const CustomDateField({
@@ -12,6 +15,9 @@ class CustomDateField extends StatefulWidget {
     required this.label,
     required this.hintText,
     required this.controller,
+    this.initialDate,
+    this.firstDate,
+    this.lastDate,
     this.validator,
   });
 
@@ -23,9 +29,9 @@ class _CustomDateFieldState extends State<CustomDateField> {
   Future<void> _selectDate() async {
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime(2000),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      initialDate: widget.initialDate ?? DateTime.now(),
+      firstDate: widget.firstDate ?? DateTime(1900),
+      lastDate: widget.lastDate ?? DateTime(2100),
       locale: const Locale("vi", "VN"), // hiển thị tiếng Việt
       builder: (context, child) {
         return Theme(

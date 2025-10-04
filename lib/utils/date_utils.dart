@@ -19,6 +19,16 @@ String formatDate(DateTime date) {
   return formatter.format(date);
 }
 
+DateTime parseDate(String dateString) {
+  try {
+    final DateFormat formatter = DateFormat('dd/MM/yyyy');
+    return formatter.parse(dateString);
+  } catch (e) {
+    // Xử lý lỗi nếu định dạng không hợp lệ
+    throw FormatException("Invalid date format. Expected dd/MM/yyyy");
+  }
+}
+
 // Format lại ngày sinh
 String formatDob(String dob) {
   if (dob.length != 8) return dob;

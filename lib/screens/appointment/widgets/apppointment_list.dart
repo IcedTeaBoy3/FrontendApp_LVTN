@@ -28,14 +28,15 @@ class _ApppointmentListState extends State<ApppointmentList> {
       builder: (context, appointmentProvider, child) {
         if (appointmentProvider.isLoading) {
           return const CustomLoading();
-        } else if (appointmentProvider.appointments.isEmpty) {
+        } else if (appointmentProvider.filteredAppointments.isEmpty) {
           return const Center(child: Text('Không có lịch hẹn nào.'));
         } else {
           return ListView.separated(
-            itemCount: appointmentProvider.appointments.length,
+            itemCount: appointmentProvider.filteredAppointments.length,
             separatorBuilder: (context, index) => const SizedBox(height: 12.0),
             itemBuilder: (context, index) {
-              final appointment = appointmentProvider.appointments[index];
+              final appointment =
+                  appointmentProvider.filteredAppointments[index];
               return AppointmentCard(appointment: appointment);
             },
           );
