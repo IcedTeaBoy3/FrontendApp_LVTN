@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/configs/api_config.dart';
-import 'package:go_router/go_router.dart';
 
 class DoctorCard extends StatelessWidget {
   final String doctorId;
   final String name;
   final String specialtyName;
   final String? avatar;
-  const DoctorCard(
-      {super.key,
-      required this.doctorId,
-      required this.name,
-      required this.specialtyName,
-      this.avatar});
+  final Function()? onTap;
+  const DoctorCard({
+    super.key,
+    required this.doctorId,
+    required this.name,
+    required this.specialtyName,
+    this.avatar,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +23,7 @@ class DoctorCard extends StatelessWidget {
         : null;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        context.goNamed('doctorDetail', pathParameters: {'doctorId': doctorId});
-      },
+      onTap: onTap,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.85,
         margin: const EdgeInsets.symmetric(vertical: 8),

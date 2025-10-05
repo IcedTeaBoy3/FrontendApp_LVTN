@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/custom_loading.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeDoctorList extends StatefulWidget {
   const HomeDoctorList({super.key});
@@ -101,6 +102,13 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
                     name: doctor.person.fullName,
                     specialtyName: doctor.primarySpecialtyName,
                     avatar: doctor.person.avatar,
+                    onTap: () {
+                      context.goNamed(
+                        'doctorDetail',
+                        pathParameters: {'doctorId': doctor.doctorId},
+                        queryParameters: {'from': 'home'},
+                      );
+                    },
                   );
                 },
               ),

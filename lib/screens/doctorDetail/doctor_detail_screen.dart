@@ -14,7 +14,8 @@ import 'package:provider/provider.dart';
 
 class DoctorDetailScreen extends StatelessWidget {
   final String doctorId;
-  const DoctorDetailScreen({super.key, required this.doctorId});
+  final String? from;
+  const DoctorDetailScreen({super.key, required this.doctorId, this.from});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,16 @@ class DoctorDetailScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (from == 'search') {
+              context.goNamed('search', queryParameters: {'query': ''});
+            } else {
+              context.goNamed('home');
+            }
+          },
         ),
         actions: [
           Row(

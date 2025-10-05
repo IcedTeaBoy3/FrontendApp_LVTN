@@ -1,4 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+// 🧱 Models
+import 'package:frontend_app/models/clinic.dart';
+import 'package:frontend_app/models/appointment.dart';
+import 'package:frontend_app/models/patientprofile.dart';
+
+// 🧭 Screens
 import 'package:frontend_app/screens/login/login_screen.dart';
 import 'package:frontend_app/screens/home/home_screen.dart';
 import 'package:frontend_app/screens/error/error_screen.dart';
@@ -7,16 +15,13 @@ import 'package:frontend_app/screens/clinicDetail/clinic_detail_screen.dart';
 import 'package:frontend_app/screens/doctorDetail/doctor_detail_screen.dart';
 import 'package:frontend_app/screens/addeditpatientprofile/addedit_patientprofile_screen.dart';
 import 'package:frontend_app/screens/verifyOtp/verify_otp_screen.dart';
-import 'package:frontend_app/models/clinic.dart';
-import 'package:frontend_app/models/patientprofile.dart';
-// import 'package:frontend_app/models/schedule.dart';
-// import 'package:frontend_app/models/slot.dart';
 import 'package:frontend_app/screens/bookingAppointment/booking_appointment_screen.dart';
 import 'package:frontend_app/screens/cccdScanner/cccd_scanner_screen.dart';
 import 'package:frontend_app/screens/detailPatientProfile/detail_patientprofile_screen.dart';
 import 'package:frontend_app/screens/detailAppointment/detail_appointment_screen.dart';
-import 'package:frontend_app/models/appointment.dart';
+import 'package:frontend_app/screens/search/search_screen.dart';
 
+/// 🌐 AppRoutes quản lý toàn bộ định tuyến
 class AppRoutes {
   static final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -28,10 +33,21 @@ class AppRoutes {
           final initialIndex =
               int.tryParse(state.uri.queryParameters['initialIndex'] ?? '0') ??
                   0;
-          print('Initial Index: $initialIndex');
+          debugPrint('Initial Home Index: $initialIndex');
           return HomeScreen(initialIndex: initialIndex);
         },
         routes: [
+          // 🔍 Search
+          GoRoute(
+            name: 'search',
+            path: 'search',
+            builder: (context, state) {
+              final query = state.uri.queryParameters['query'] ?? '';
+              return SearchScreen(query: query);
+            },
+          ),
+
+          // 🏥 Clinic detail
           GoRoute(
             name: 'clinicDetail',
             path: 'clinic',
@@ -40,27 +56,30 @@ class AppRoutes {
               return ClinicDetailScreen(clinic: clinic);
             },
           ),
+
+          // 👨‍⚕️ Doctor detail
           GoRoute(
             name: 'doctorDetail',
             path: 'doctor/:doctorId',
             builder: (context, state) {
               final doctorId = state.pathParameters['doctorId']!;
-
-              return DoctorDetailScreen(doctorId: doctorId);
+              final from = state.uri.queryParameters['from'];
+              return DoctorDetailScreen(doctorId: doctorId, from: from);
             },
             routes: [
+              // 📅 Booking from doctor detail
               GoRoute(
                 name: 'booking',
                 path: 'booking',
                 builder: (context, state) {
                   final doctorId = state.pathParameters['doctorId']!;
-                  return BookingAppointmentScreen(
-                    doctorId: doctorId,
-                  );
+                  return BookingAppointmentScreen(doctorId: doctorId);
                 },
-              )
+              ),
             ],
           ),
+
+          // 🧾 Appointment detail
           GoRoute(
             name: 'detailAppointment',
             path: 'detailAppointment',
@@ -69,6 +88,8 @@ class AppRoutes {
               return DetailAppointmentScreen(appointment: appointment);
             },
           ),
+
+          // 👤 Patient profile detail
           GoRoute(
             name: 'detailPatientProfile',
             path: 'detailPatientProfile',
@@ -77,37 +98,41 @@ class AppRoutes {
               return DetailPatientprofileScreen(patientProfile: patientProfile);
             },
           ),
+
+          // ✏️ Add / Edit patient profile
           GoRoute(
             name: 'addEditPatientProfile',
             path: 'addEditPatientProfile',
             builder: (context, state) {
-              final editedPatientProfile = state.extra is Patientprofile
+              final editedProfile = state.extra is Patientprofile
                   ? state.extra as Patientprofile
                   : null;
+
               final infoIdCard = state.uri.queryParameters['infoIdCard'];
               final from = state.uri.queryParameters['from'];
+
               return AddEditPatientProfileScreen(
-                editedPatientprofile: editedPatientProfile,
+                editedPatientprofile: editedProfile,
                 infoIdCard: infoIdCard,
                 from: from,
               );
             },
           ),
+
+          // 🪪 CCCD scanner
           GoRoute(
-            path: 'scanner',
             name: 'scanner',
-            builder: (context, state) {
-              return const ScanCCCDScreen();
-            },
+            path: 'scanner',
+            builder: (context, state) => const ScanCCCDScreen(),
           ),
+
+          // 🔐 Login & Register flow
           GoRoute(
             name: 'login',
             path: 'login',
             builder: (context, state) {
               final email = state.extra as String?;
-              return LoginScreen(
-                email: email,
-              );
+              return LoginScreen(email: email);
             },
             routes: [
               GoRoute(
@@ -120,11 +145,9 @@ class AppRoutes {
                     path: 'verifyOtp',
                     builder: (context, state) {
                       final email = state.extra as String?;
-                      return VerifyOtpScreen(
-                        email: email!,
-                      );
+                      return VerifyOtpScreen(email: email!);
                     },
-                  )
+                  ),
                 ],
               ),
             ],

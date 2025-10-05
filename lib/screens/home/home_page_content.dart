@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:frontend_app/screens/home/widgets/home_search.dart';
 import 'package:frontend_app/screens/home/widgets/home_slider.dart';
 import 'package:frontend_app/screens/home/widgets/home_specialty_list.dart';
-
 import 'package:frontend_app/screens/home/widgets/home_clinic_card.dart';
 import 'package:frontend_app/screens/home/widgets/home_doctor_list.dart';
 import 'package:frontend_app/screens/home/widgets/home_service_list.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePageContent extends StatelessWidget {
   const HomePageContent({super.key});
@@ -39,8 +39,13 @@ class HomePageContent extends StatelessWidget {
               child: Column(
                 children: [
                   HomeSearch(
-                    searchText:
-                        'Tìm kiếm bác sĩ, phòng khám, chuyên khoa, dịch vụ',
+                    hintText: 'Tìm kiếm bác sĩ, chuyên khoa, dịch vụ',
+                    // initialText: context.read<DoctorProvider>().query,
+                    onSearch: (query) {
+                      context.pushNamed('search', queryParameters: {
+                        'query': query,
+                      });
+                    },
                   ),
                   const SizedBox(height: 16),
                   const HomeServiceList(),
