@@ -20,6 +20,7 @@ import 'package:frontend_app/screens/cccdScanner/cccd_scanner_screen.dart';
 import 'package:frontend_app/screens/detailPatientProfile/detail_patientprofile_screen.dart';
 import 'package:frontend_app/screens/detailAppointment/detail_appointment_screen.dart';
 import 'package:frontend_app/screens/search/search_screen.dart';
+import 'package:frontend_app/screens/bookingSuccess/booking_success_screen.dart';
 
 /// 🌐 AppRoutes quản lý toàn bộ định tuyến
 class AppRoutes {
@@ -75,6 +76,17 @@ class AppRoutes {
                   final doctorId = state.pathParameters['doctorId']!;
                   return BookingAppointmentScreen(doctorId: doctorId);
                 },
+                routes: [
+                  // ✅ Booking success
+                  GoRoute(
+                    name: 'bookingSuccess',
+                    path: 'bookingSuccess',
+                    builder: (context, state) {
+                      final appointment = state.extra as Appointment;
+                      return BookingSuccessScreen(appointment: appointment);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

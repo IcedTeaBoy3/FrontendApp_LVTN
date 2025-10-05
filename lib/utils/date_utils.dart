@@ -19,6 +19,11 @@ String formatDate(DateTime date) {
   return formatter.format(date);
 }
 
+String formatTimeHHMMSS(DateTime time) {
+  final DateFormat formatter = DateFormat('HH:mm:ss');
+  return formatter.format(time);
+}
+
 DateTime parseDate(String dateString) {
   try {
     final DateFormat formatter = DateFormat('dd/MM/yyyy');

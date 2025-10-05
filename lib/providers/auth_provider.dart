@@ -50,7 +50,6 @@ class AuthProvider extends ChangeNotifier {
       final result = await AuthService.refreshToken(_refreshToken!);
       if (result.status == 'success') {
         _accessToken = result.data?.accessToken;
-        // Lưu token và user vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         notifyListeners();
       } else {

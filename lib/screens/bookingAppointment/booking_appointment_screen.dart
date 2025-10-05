@@ -7,6 +7,8 @@ import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/custom_flushbar.dart';
+import 'package:frontend_app/models/appointment.dart';
+import 'package:frontend_app/providers/schedule_provider.dart';
 
 class BookingAppointmentScreen extends StatefulWidget {
   final String doctorId;
@@ -92,9 +94,19 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
         message: result.message,
       );
       if (result.status == 'success') {
+        final slot = result.data?.slot;
+        if (slot != null) {
+          context.read<ScheduleProvider>().disabledSlot(slot);
+        }
         Future.delayed(const Duration(milliseconds: 3000), () {
           if (mounted) {
-            context.goNamed('home', queryParameters: {'initialIndex': '3'});
+            context.goNamed(
+              'bookingSuccess',
+              pathParameters: {
+                'doctorId': widget.doctorId,
+              },
+              extra: result.data as Appointment,
+            );
           }
         });
       }

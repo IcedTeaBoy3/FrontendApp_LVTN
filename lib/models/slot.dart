@@ -6,7 +6,7 @@ class Slot {
   final Shift? shift;
   final DateTime startTime;
   final DateTime endTime;
-  final String status;
+  String status;
 
   Slot({
     required this.slotId,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/models/schedule.dart';
 import 'package:frontend_app/services/schedule_service.dart';
+import 'package:frontend_app/models/slot.dart';
 
 class ScheduleProvider with ChangeNotifier {
   List<Schedule> _schedules = [];
@@ -28,6 +29,24 @@ class ScheduleProvider with ChangeNotifier {
       debugPrint('Error fetching schedules: $e');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void disabledSlot(Slot slot) {
+    final target =
+        schedules.expand((s) => s.shifts).expand((sh) => sh.slots).firstWhere(
+              (s) => s.slotId == slot.slotId,
+              orElse: () => Slot(
+                slotId: '',
+                startTime: DateTime.now(),
+                endTime: DateTime.now(),
+                status: 'available',
+              ),
+            );
+
+    if (target.slotId.isNotEmpty) {
+      target.status = 'booked';
       notifyListeners();
     }
   }

@@ -170,11 +170,10 @@ class AuthService {
   static Future<ResponseApi<AuthResponse>> refreshToken(String token) async {
     try {
       final response = await ApiClient.dio.post(
-        '/auth/refresh-token',
-        options: Options(
-          extra: {"withCredentials": true}, // cho Flutter Web
-        ),
+        '/auth/mobile-refresh-token',
+        data: {'refreshToken': token},
       );
+      print('response refreshToken ${response.data}');
       return ResponseApi<AuthResponse>.fromJson(
         response.data,
         funtionParser: (dataJson) => AuthResponse.fromJson(dataJson),

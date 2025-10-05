@@ -27,7 +27,6 @@ class DetailAppointmentScreen extends StatelessWidget {
     final schedule = appointment.schedule;
     final slot = appointment.slot;
     final payment = appointment.payment;
-    debugPrint('payment ${payment}');
     final avatarUrl = doctor?.person.avatar != null
         ? '${ApiConfig.backendUrl}${doctor?.person.avatar}'
         : null;

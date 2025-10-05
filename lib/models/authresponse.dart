@@ -11,17 +11,11 @@ class AuthResponse {
     required this.refreshToken,
   });
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    final accessToken = json['accessToken'] as String?;
-    final refreshToken = json['refreshToken'] as String? ?? '';
-    final accountJson = json['account'] as Map<String, dynamic>?;
-    if (accessToken == null || refreshToken == null || accountJson == null) {
-      throw Exception(
-          'AuthResponse.fromJson: thiếu accessToken hoặc refreshToken hoặc account');
-    }
     return AuthResponse(
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      account: Account.fromJson(accountJson),
+      accessToken: json['accessToken'] as String?,
+      refreshToken: json['refreshToken'] as String?,
+      account:
+          json['account'] != null ? Account.fromJson(json['account']) : null,
     );
   }
 
