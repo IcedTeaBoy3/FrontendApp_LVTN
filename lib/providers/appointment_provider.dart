@@ -56,13 +56,13 @@ class AppointmentProvider extends ChangeNotifier {
             : _selectedDoctorService!.price * 0.2,
         method: _paymentMethod ?? 'cash',
         paymentType: _paymentType ?? 'service',
-        status: 'pending',
+        status: 'unpaid',
       );
       final result =
           await AppointmentService.createAppointment(appointment, payment);
       if (result.status == 'success' && result.data != null) {
         _appointments.add(result.data!);
-        _filteredAppointments = List.from(_appointments);
+        filterAppointments(); // cập nhật lại danh sách lọc
       }
       return result;
     } catch (e) {
@@ -77,7 +77,7 @@ class AppointmentProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      var temp = List<Appointment>.from(_appointments); // copy gốc
+      var temp = List<Appointment>.from(_appointments);
 
       if (status != null && status != 'all') {
         temp = temp.where((a) => a.status == status).toList();
@@ -163,12 +163,18 @@ class AppointmentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void reset() {
+  void clearSelections() {
     _selectedPatientProfile = null;
     _selectedSlot = null;
     _selectedDoctorService = null;
     _selectedSchedule = null;
     _selectedDate = null;
+    notifyListeners();
+  }
+
+  void clear() {
+    _appointments = [];
+    _filteredAppointments = [];
     notifyListeners();
   }
 }

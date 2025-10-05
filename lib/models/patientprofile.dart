@@ -2,6 +2,7 @@ import 'person.dart';
 
 class Patientprofile {
   final String patientProfileId;
+  final String patientProfileCode;
   final String idCard;
   final String insuranceCode;
   final String relation;
@@ -10,6 +11,7 @@ class Patientprofile {
 
   Patientprofile({
     required this.patientProfileId,
+    required this.patientProfileCode,
     required this.idCard,
     required this.insuranceCode,
     required this.relation,
@@ -20,6 +22,7 @@ class Patientprofile {
   factory Patientprofile.fromJson(Map<String, dynamic> json) {
     return Patientprofile(
       patientProfileId: json['patientProfileId'],
+      patientProfileCode: json['patientProfileCode'] ?? '',
       idCard: json['idCard'] ?? '',
       insuranceCode: json['insuranceCode'] ?? '',
       relation: json['relation'],
@@ -34,6 +37,7 @@ class Patientprofile {
   // copyWith method for updating fields
   Patientprofile copyWith({
     String? patientProfileId,
+    String? patientProfileCode,
     String? idCard,
     String? insuranceCode,
     String? relation,
@@ -42,6 +46,7 @@ class Patientprofile {
   }) {
     return Patientprofile(
       patientProfileId: patientProfileId ?? this.patientProfileId,
+      patientProfileCode: patientProfileCode ?? this.patientProfileCode,
       idCard: idCard ?? this.idCard,
       insuranceCode: insuranceCode ?? this.insuranceCode,
       relation: relation ?? this.relation,
@@ -53,6 +58,7 @@ class Patientprofile {
   Map<String, dynamic> toJson() {
     return {
       'patientProfileId': patientProfileId,
+      'patientProfileCode': patientProfileCode,
       'idCard': idCard,
       'insuranceCode': insuranceCode,
       'relation': relation,

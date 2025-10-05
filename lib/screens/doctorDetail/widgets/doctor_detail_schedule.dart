@@ -322,16 +322,19 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
           Consumer2<ScheduleProvider, AppointmentProvider>(
             builder: (context, scheduleProvider, appointmentProvider, child) {
               final selectedSchedule = appointmentProvider.selectedSchedule;
+              final firstAvailableSlot =
+                  selectedSchedule?.getFirstAvailableSlot();
+              final slotCount = selectedSchedule?.availableSlotCount;
               if (selectedSchedule == null) {
                 return SizedBox.shrink();
               }
               return Column(
                 children: selectedSchedule.shifts.map(
                   (shift) {
-                    final firstSlot = shift.getFirstSlot();
-                    if (appointmentProvider.selectedSlot == null) {
+                    if (appointmentProvider.selectedSlot == null &&
+                        slotCount != 0) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        appointmentProvider.setSlot(firstSlot);
+                        appointmentProvider.setSlot(firstAvailableSlot);
                       });
                     }
                     return SizedBox(

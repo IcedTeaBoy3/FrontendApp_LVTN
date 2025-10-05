@@ -41,11 +41,4 @@ class Shift {
       'slots': slots.map((slot) => slot.toJson()).toList(),
     };
   }
-
-  Slot getFirstSlot() {
-    return slots.firstWhere(
-      (slot) => slot.status == 'available',
-      orElse: () => throw Exception('Không có slot trống'),
-    );
-  }
 }

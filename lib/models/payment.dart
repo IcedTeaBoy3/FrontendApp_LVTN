@@ -2,7 +2,8 @@ import 'package:frontend_app/models/appointment.dart';
 
 class Payment {
   final String paymentId;
-  final Appointment appointment;
+  final Appointment? appointment;
+  final String? appointmentId;
   final double amount;
   final String method;
   final String paymentType;
@@ -11,7 +12,8 @@ class Payment {
 
   Payment({
     required this.paymentId,
-    required this.appointment,
+    this.appointment,
+    this.appointmentId,
     required this.paymentType,
     required this.amount,
     required this.method,
@@ -19,20 +21,29 @@ class Payment {
     this.payAt,
   });
   factory Payment.fromJson(Map<String, dynamic> json) {
+    String? parseAppointmentId;
+    Appointment? parseAppointment;
+    if (json['appointment'] is String) {
+      parseAppointmentId = json['appointment'];
+    } else if (json['appointment'] is Map<String, dynamic>) {
+      parseAppointment = Appointment.fromJson(json['appointment']);
+    }
     return Payment(
       paymentId: json['paymentId'] ?? json['_id'] ?? '',
-      appointment: Appointment.fromJson(json['appointment']),
+      appointmentId: parseAppointmentId,
+      appointment: parseAppointment,
       amount: (json['amount'] as num).toDouble(),
       method: json['method'],
       status: json['status'],
-      payAt: DateTime.parse(json['payAt']),
+      payAt: json['payAt'] != null ? DateTime.parse(json['payAt']) : null,
       paymentType: json['paymentType'],
     );
   }
   Map<String, dynamic> toJson() {
     return {
       'paymentId': paymentId,
-      'appointment': appointment.toJson(),
+      'appointment':
+          appointment != null ? appointment!.toJson() : appointmentId,
       'amount': amount,
       'method': method,
       'status': status,

@@ -227,6 +227,7 @@ class _AddEditPatientProfileScreenState
       selectedRelationship = convertRelationship(selectedRelationship);
       final newProfile = Patientprofile(
         patientProfileId: "",
+        patientProfileCode: "",
         relation: selectedRelationship,
         idCard: idCard,
         insuranceCode: insuranceCode,
@@ -248,6 +249,7 @@ class _AddEditPatientProfileScreenState
       } else {
         final updateProfile = Patientprofile(
           patientProfileId: widget.editedPatientprofile!.patientProfileId,
+          patientProfileCode: "",
           relation: newProfile.relation,
           idCard: newProfile.idCard,
           insuranceCode: newProfile.insuranceCode,

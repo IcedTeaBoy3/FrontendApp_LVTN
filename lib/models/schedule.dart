@@ -1,4 +1,5 @@
 import 'shift.dart';
+import 'slot.dart';
 
 class Schedule {
   final String scheduleId;
@@ -53,7 +54,14 @@ class Schedule {
     };
   }
 
-  Shift getFirstShift() {
-    return shifts[0];
+  Slot? getFirstAvailableSlot() {
+    for (var shift in shifts) {
+      for (var slot in shift.slots) {
+        if (slot.status == 'available') {
+          return slot;
+        }
+      }
+    }
+    return null; // không có slot nào trống
   }
 }

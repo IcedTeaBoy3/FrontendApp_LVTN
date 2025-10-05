@@ -72,7 +72,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.patientProfileId,
+                  patientProfile.patientProfileCode,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

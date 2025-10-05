@@ -91,12 +91,13 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
         status: result.status,
         message: result.message,
       );
-      // đợi flushbar init xong rồi mới goNamed
-      Future.delayed(const Duration(milliseconds: 3000), () {
-        if (mounted) {
-          context.goNamed('home', queryParameters: {'initialIndex': '3'});
-        }
-      });
+      if (result.status == 'success') {
+        Future.delayed(const Duration(milliseconds: 3000), () {
+          if (mounted) {
+            context.goNamed('home', queryParameters: {'initialIndex': '3'});
+          }
+        });
+      }
     }
   }
 

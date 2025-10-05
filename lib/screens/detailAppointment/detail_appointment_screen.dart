@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:frontend_app/models/appointment.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_app/models/patientprofile.dart';
@@ -11,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend_app/utils/currency_utils.dart';
 
 class DetailAppointmentScreen extends StatelessWidget {
   final Appointment appointment;
@@ -26,6 +26,8 @@ class DetailAppointmentScreen extends StatelessWidget {
     final service = doctorService.service;
     final schedule = appointment.schedule;
     final slot = appointment.slot;
+    final payment = appointment.payment;
+    debugPrint('payment ${payment}');
     final avatarUrl = doctor?.person.avatar != null
         ? '${ApiConfig.backendUrl}${doctor?.person.avatar}'
         : null;
@@ -130,7 +132,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     subtitle: Text(
-                      patientProfile.patientProfileId,
+                      patientProfile.patientProfileCode,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -535,7 +537,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            'Chưa cập nhật',
+                            appointment.appointmentCode ?? '',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -636,7 +638,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            'Chưa cập nhật',
+                            patient.patientProfileCode,
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -909,15 +911,42 @@ class DetailAppointmentScreen extends StatelessWidget {
                               .bodyLarge!
                               .copyWith(color: Colors.grey[600]),
                         ),
-                        Expanded(
-                          child: Text(
-                            'Chưa cập nhật',
-                            textAlign: TextAlign.right,
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
-                                    ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 8.0),
+                          decoration: BoxDecoration(
+                            color: payment != null
+                                ? (payment.status == 'paid'
+                                    ? Colors.green
+                                    : Colors.orange)
+                                : Colors.grey,
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                payment != null
+                                    ? (payment.status == 'paid'
+                                        ? Icons.check_circle
+                                        : Icons.hourglass_empty)
+                                    : Icons.help_outline,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                payment != null
+                                    ? payment.status == 'paid'
+                                        ? 'Đã thanh toán'
+                                        : 'Chưa thanh toán'
+                                    : 'Chưa cập nhật',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -935,7 +964,11 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            'Khám BHYT',
+                            payment != null
+                                ? payment.paymentType == 'service'
+                                    ? 'Khám dịch vụ'
+                                    : 'Khám BHYT'
+                                : '--',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -959,7 +992,13 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            patient.person.phone ?? '--',
+                            payment?.method == 'cash'
+                                ? 'Tiền mặt'
+                                : payment?.method == 'momo'
+                                    ? 'Momo'
+                                    : payment?.method == 'bank'
+                                        ? 'Chuyển khoản'
+                                        : '--',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -983,7 +1022,35 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '--',
+                            payment != null
+                                ? formatCurrency(payment.amount)
+                                : '--',
+                            textAlign: TextAlign.right,
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black87,
+                                    ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ngày thanh toán',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(color: Colors.grey[600]),
+                        ),
+                        Expanded(
+                          child: Text(
+                            payment?.payAt != null
+                                ? formatDate(payment!.payAt!)
+                                : '--',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(

@@ -18,14 +18,6 @@ class AppointmentService {
           'payment': payment.toJson(),
         },
       );
-      debugPrint('response create appointment ${response.data}');
-      debugPrint('new appointment ${response.data['data']}');
-      debugPrint('patientProfile ${response.data['data']['patientProfile']}');
-      debugPrint('doctorService ${response.data['data']['doctorService']}');
-      debugPrint('slot ${response.data['data']['slot']}');
-      debugPrint('schedule ${response.data['data']['schedule']}');
-      debugPrint('status ${response.data['data']['status']}');
-
       return ResponseApi<Appointment>.fromJson(
         response.data,
         funtionParser: (dataJson) => Appointment.fromJson(dataJson),

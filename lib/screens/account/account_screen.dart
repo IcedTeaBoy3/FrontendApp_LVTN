@@ -22,7 +22,8 @@ class AccountScreen extends StatelessWidget {
       onConfirm: () {
         context.read<AuthProvider>().logout();
         context.read<PatientprofileProvider>().clear();
-        context.read<AppointmentProvider>().reset();
+        context.read<AppointmentProvider>().clearSelections();
+        context.read<AppointmentProvider>().clear();
         context.goNamed('login');
       },
     );
