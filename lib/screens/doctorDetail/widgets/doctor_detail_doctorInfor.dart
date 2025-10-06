@@ -11,8 +11,9 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Doctor? doctor = context.read<DoctorProvider>().findById(doctorId);
-    final avatarUrl = (doctor?.person.avatar != null)
-        ? ApiConfig.backendUrl + doctor!.person.avatar!
+    final avatarPath = doctor?.person.avatar;
+    final avatarUrl = (avatarPath != null && avatarPath.isNotEmpty)
+        ? '${ApiConfig.backendUrl}$avatarPath'
         : null;
     final degreeName = doctor?.degree?.title ?? "Chưa cập nhật";
     final specialties =
@@ -45,16 +46,24 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
                   child: avatarUrl != null
                       ? Image.network(
                           avatarUrl,
-                          fit: BoxFit.cover,
                           width: 80,
                           height: 80,
+                          fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return Icon(Icons.person,
-                                size: 50, color: Colors.blue.shade700);
+                            return Image.asset(
+                              'assets/images/avatar-default-icon.png',
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            );
                           },
                         )
-                      : Icon(Icons.person,
-                          size: 50, color: Colors.blue.shade700),
+                      : Image.asset(
+                          'assets/images/avatar-default-icon.png',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
               const SizedBox(width: 12),

@@ -54,15 +54,24 @@ class DoctorCard extends StatelessWidget {
                 child: avatarUrl != null
                     ? Image.network(
                         avatarUrl,
-                        fit: BoxFit.cover,
                         width: 80,
                         height: 80,
+                        fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.person,
-                              size: 50, color: Colors.blue.shade700);
+                          return Image.asset(
+                            'assets/images/avatar-default-icon.png',
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          );
                         },
                       )
-                    : Icon(Icons.person, size: 50, color: Colors.blue.shade700),
+                    : Image.asset(
+                        'assets/images/avatar-default-icon.png',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(width: 16),

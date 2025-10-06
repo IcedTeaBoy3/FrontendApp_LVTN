@@ -29,7 +29,7 @@ class Service {
     }
 
     return Service(
-      serviceId: json['serviceId'] ?? '',
+      serviceId: json['serviceId'] ?? json['_id'] ?? '',
       specialty: parsedSpecialty,
       specialtyId: parsedSpecialtyId,
       name: json['name'] ?? '',

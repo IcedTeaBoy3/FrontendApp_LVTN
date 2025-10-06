@@ -18,6 +18,12 @@ class AppointmentService {
           'payment': payment.toJson(),
         },
       );
+      print('patientProfile: ${response.data['data']['patientProfile']}');
+      print('schedule: ${response.data['data']['schedule']}');
+      print('slot: ${response.data['data']['slot']}');
+      print('payment: ${response.data['data']['payment']}');
+      print('doctorservice: ${response.data['data']['doctorService']}');
+      print('appointment: ${response.data['data']}');
       return ResponseApi<Appointment>.fromJson(
         response.data,
         funtionParser: (dataJson) => Appointment.fromJson(dataJson),

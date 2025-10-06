@@ -24,10 +24,12 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     final doctorProvider = context.read<DoctorProvider>();
-    if (doctorProvider.doctors.isEmpty) {
-      doctorProvider.fetchDoctors();
-    }
-    doctorProvider.setQuery(widget.query ?? '');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (doctorProvider.doctors.isEmpty) {
+        doctorProvider.fetchDoctors();
+      }
+      doctorProvider.setQuery(widget.query ?? '');
+    });
   }
 
   void _showFilters(BuildContext context) {

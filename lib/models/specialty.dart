@@ -14,7 +14,7 @@ class Specialty {
   });
   factory Specialty.fromJson(Map<String, dynamic> json) {
     return Specialty(
-      specialtyId: json['specialtyId'] ?? '',
+      specialtyId: json['specialtyId'] ?? json['_id'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
       image: json['image'] ?? '',

@@ -1,69 +1,57 @@
-import 'package:frontend_app/models/patientprofile.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend_app/utils/gender_utils.dart';
-import 'package:go_router/go_router.dart';
-import 'package:frontend_app/utils/date_utils.dart';
+import 'package:frontend_app/models/patientprofile.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend_app/utils/date_utils.dart';
+import 'package:frontend_app/utils/gender_utils.dart';
 
-class DetailPatientprofileScreen extends StatelessWidget {
-  final Patientprofile patientProfile;
-  const DetailPatientprofileScreen({super.key, required this.patientProfile});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          'Chi tiết hồ sơ bệnh nhân',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: SingleChildScrollView(
+void handleShowDetailPatientProfile(
+    BuildContext context, Patientprofile patientProfile) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.person, color: Colors.blue),
-                    label: Text(
-                      'Thông tin cá nhân',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(color: Colors.blue, fontSize: 18),
+              SizedBox(
+                height: 40, // đảm bảo có cùng chiều cao với AppBar mini
+                child: Stack(
+                  children: [
+                    const Center(
+                      child: Text(
+                        "Thông tin bệnh nhân",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => context.goNamed(
-                      'addEditPatientProfile',
-                      extra: patientProfile,
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                        padding: EdgeInsets.zero, // bỏ padding mặc định
+                        constraints:
+                            const BoxConstraints(), // bỏ constraint thừa
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Cập nhật'),
-                  )
-                ],
+                  ],
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'thẻ căn cước công dân'.toUpperCase(),
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ],
+              const Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -84,16 +72,19 @@ class DetailPatientprofileScreen extends StatelessWidget {
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        behavior: SnackBarBehavior
-                            .floating, // nổi lên, không dính sát đáy
+                        behavior: SnackBarBehavior.floating,
                         backgroundColor: Colors.blueAccent,
                         margin: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         content: Row(
                           children: [
                             const Icon(Icons.check_circle, color: Colors.white),
@@ -313,7 +304,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.person.ethnic ?? 'Chua cập nhật',
+                  'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -335,7 +326,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
 }

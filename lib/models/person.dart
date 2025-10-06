@@ -5,6 +5,8 @@ class Person {
   final String gender;
   final DateTime dateOfBirth;
   final String? phone;
+  final String? ethnic;
+  final String? job;
 
   Person({
     this.avatar,
@@ -13,6 +15,8 @@ class Person {
     required this.gender,
     required this.dateOfBirth,
     this.phone,
+    this.ethnic,
+    this.job,
   });
 
   factory Person.fromJson(Map<String, dynamic> json) {
@@ -23,6 +27,8 @@ class Person {
       gender: json['gender'] ?? '',
       dateOfBirth: DateTime.parse(json['dateOfBirth']),
       phone: json['phone'] ?? '',
+      ethnic: json['ethnic'] ?? '',
+      job: json['job'] ?? '',
     );
   }
   Map<String, dynamic> toJson() {
@@ -33,6 +39,8 @@ class Person {
       'gender': gender,
       'dateOfBirth': dateOfBirth.toIso8601String(),
       'phone': phone,
+      'ethnic': ethnic,
+      'job': job
     };
   }
 }

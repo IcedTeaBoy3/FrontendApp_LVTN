@@ -21,7 +21,7 @@ class Patientprofile {
 
   factory Patientprofile.fromJson(Map<String, dynamic> json) {
     return Patientprofile(
-      patientProfileId: json['patientProfileId'],
+      patientProfileId: json['patientProfileId'] ?? json['_id'] ?? '',
       patientProfileCode: json['patientProfileCode'] ?? '',
       idCard: json['idCard'] ?? '',
       insuranceCode: json['insuranceCode'] ?? '',

@@ -7,9 +7,12 @@ import 'package:frontend_app/models/address/address.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:frontend_app/models/patientprofile.dart';
 import 'package:frontend_app/models/person.dart';
+import 'package:frontend_app/models/ethnic.dart';
+
 import 'package:frontend_app/widgets/custom_flushbar.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/address_provider.dart';
+import 'package:frontend_app/providers/ethnic_provider.dart';
 import 'package:frontend_app/utils/relation_utils.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
 import 'package:frontend_app/utils/date_utils.dart';
@@ -43,6 +46,7 @@ class _AddEditPatientProfileScreenState
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _specificAddressController =
       TextEditingController();
+  Ethnic? selectedEthnic = Ethnic(code: '01', name: 'Kinh');
   String selectedRelationship = "Tôi";
 
   final List<String> relationships = [
@@ -97,6 +101,10 @@ class _AddEditPatientProfileScreenState
   @override
   void initState() {
     super.initState();
+
+    final ethnicityProvider = context.read<EthnicityProvider>();
+    final addressProvider = context.read<AddressProvider>();
+
     if (widget.editedPatientprofile != null) {
       final profile = widget.editedPatientprofile!;
       _fullNameController.text = profile.person.fullName;
@@ -106,20 +114,32 @@ class _AddEditPatientProfileScreenState
       _insuranceCodeController.text = profile.insuranceCode;
       _phoneController.text = profile.person.phone ?? '';
       selectedRelationship = convertRelationshipBack(profile.relation);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      // ✅ Gán selectedEthnic sau khi provider đã load danh sách
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
+
+        // Load danh sách dân tộc nếu chưa có
+        await ethnicityProvider.loadEthnicGroups();
+
+        final ethnicValue = profile.person.ethnic;
+        final matchedEthnic = ethnicityProvider.findByCodeOrName(ethnicValue!);
+        setState(() {
+          selectedEthnic = matchedEthnic;
+        });
+        // Load địa chỉ
         initAddress(context, profile.person.address);
       });
     } else if (widget.infoIdCard != null) {
-      // --- Case CREATE profile từ quét CCCD ---
-      debugPrint("infoIdCard: ${widget.infoIdCard}");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         _parseInfoCard(widget.infoIdCard!);
       });
-      context.read<AddressProvider>().loadProvincesOnce();
+      addressProvider.loadProvincesOnce();
+      ethnicityProvider.loadEthnicGroups();
     } else {
-      context.read<AddressProvider>().loadProvincesOnce();
+      ethnicityProvider.loadEthnicGroups();
+      addressProvider.loadProvincesOnce();
     }
   }
 
@@ -223,8 +243,10 @@ class _AddEditPatientProfileScreenState
         gender: convertGender(gender),
         address: address,
         phone: phone,
+        ethnic: selectedEthnic?.name,
       );
       selectedRelationship = convertRelationship(selectedRelationship);
+
       final newProfile = Patientprofile(
         patientProfileId: "",
         patientProfileCode: "",
@@ -318,7 +340,7 @@ class _AddEditPatientProfileScreenState
               context.goNamed('booking');
             } else {
               context.goNamed('home', queryParameters: {
-                'initialIndex': '2',
+                'initialIndex': '1',
               });
             }
           },
@@ -498,7 +520,31 @@ class _AddEditPatientProfileScreenState
                               },
                             ),
                             const SizedBox(height: 16),
-                            //Radio buttons for relation
+                            Consumer<EthnicityProvider>(
+                              builder: (context, ethnicProvider, child) {
+                                return CustomDropdownField<Ethnic>(
+                                  label: "Dân tộc",
+                                  hintText: "Vui lòng chọn dân tộc",
+                                  value: selectedEthnic,
+                                  items: ethnicProvider.ethnicGroups,
+                                  itemLabel: (item) => item.name,
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedEthnic = value;
+                                      });
+                                    }
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return "Dân tộc không được để trống";
+                                    }
+                                    return null;
+                                  },
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
                             const Text(
                               'Mối quan hệ',
                               style: TextStyle(

@@ -8,6 +8,7 @@ import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:frontend_app/providers/address_provider.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
+import 'package:frontend_app/providers/ethnic_provider.dart';
 import 'package:frontend_app/screens/my_app.dart';
 import 'package:frontend_app/services/api_client.dart';
 
@@ -20,6 +21,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => EthnicityProvider()),
         ChangeNotifierProvider(create: (_) => SpecialtyProvider()),
         ChangeNotifierProvider(create: (_) => ClinicProvider()),
         ChangeNotifierProvider(create: (_) => DoctorProvider()),

@@ -15,7 +15,7 @@ class Degree {
 
   factory Degree.fromJson(Map<String, dynamic> json) {
     return Degree(
-      degreeId: json['degreeId'] ?? '',
+      degreeId: json['degreeId'] ?? json['_id'] ?? '',
       title: json['title'] ?? '',
       abbreviation: json['abbreviation'] ?? '',
       description: json['description'],

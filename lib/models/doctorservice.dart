@@ -36,7 +36,7 @@ class DoctorService {
     }
 
     return DoctorService(
-      doctorServiceId: json['doctorServiceId'] ?? '',
+      doctorServiceId: json['doctorServiceId'] ?? json['_id'] ?? '',
       doctor: parsedDoctor,
       doctorId: parsedDoctorId,
       service: parsedService,

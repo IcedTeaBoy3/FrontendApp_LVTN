@@ -50,7 +50,7 @@ class Doctor {
       parsedDegreeId = json['degree'];
     }
     return Doctor(
-      doctorId: json['doctorId'] as String,
+      doctorId: json['doctorId'] ?? json['_id'] ?? '',
       account: parsedAccount,
       accountId: parsedAccountId,
       degree: parsedDegree,
