@@ -2,13 +2,17 @@ import 'package:frontend_app/models/appointment.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_app/providers/clinic_provider.dart';
 import 'package:frontend_app/utils/date_utils.dart';
+import 'package:frontend_app/utils/status_appointment_utils.dart';
 import 'package:frontend_app/widgets/confirm_dialog.dart';
 import 'package:frontend_app/widgets/dash_divider.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:frontend_app/utils/currency_utils.dart';
 import 'package:frontend_app/widgets/modal_detail_patientprofile.dart';
+import 'package:frontend_app/utils/currency_utils.dart';
+import 'package:frontend_app/utils/status_payment_utils.dart';
+import 'package:frontend_app/utils/method_utils.dart';
+import 'package:frontend_app/utils/paymenttype_utils.dart';
 
 class DetailAppointmentScreen extends StatelessWidget {
   final Appointment appointment;
@@ -28,51 +32,6 @@ class DetailAppointmentScreen extends StatelessWidget {
     final avatarUrl = doctor?.person.avatar != null
         ? '${ApiConfig.backendUrl}${doctor?.person.avatar}'
         : null;
-    String _converStatus(String status) {
-      switch (status) {
-        case 'pending':
-          return 'Chờ xác nhận';
-        case 'confirmed':
-          return 'Đã xác nhận';
-        case 'completed':
-          return 'Đã hoàn thành';
-        case 'canceled':
-          return 'Đã hủy';
-        default:
-          return status;
-      }
-    }
-
-    Icon _getStatusIcon(String status) {
-      switch (status) {
-        case 'pending':
-          return const Icon(Icons.hourglass_empty, color: Colors.white);
-        case 'confirmed':
-          return const Icon(Icons.check_circle, color: Colors.white);
-        case 'completed':
-          return const Icon(Icons.check_circle_outline, color: Colors.white);
-        case 'canceled':
-          return const Icon(Icons.cancel, color: Colors.white);
-        default:
-          return const Icon(Icons.help_outline, color: Colors.white);
-      }
-    }
-
-    Color _getStatusColor(String status) {
-      switch (status) {
-        case 'pending':
-          return Colors.orange;
-        case 'confirmed':
-          return Colors.blue;
-        case 'completed':
-          return Colors.green;
-        case 'canceled':
-          return Colors.red;
-        default:
-          return Colors.grey;
-      }
-    }
-
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -154,14 +113,14 @@ class DetailAppointmentScreen extends StatelessWidget {
                         horizontal: 8.0,
                       ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(appointment.status),
+                        color: getStatusColorAppointment(appointment.status),
                         borderRadius: BorderRadius.circular(16.0),
                       ),
                       child: Row(
                         children: [
-                          _getStatusIcon(appointment.status),
+                          getStatusIconAppointment(appointment.status),
                           Text(
-                            _converStatus(appointment.status),
+                            converStatusAppointment(appointment.status),
                             style: const TextStyle(color: Colors.white),
                           ),
                         ],
@@ -585,32 +544,16 @@ class DetailAppointmentScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               vertical: 4.0, horizontal: 8.0),
                           decoration: BoxDecoration(
-                            color: payment != null
-                                ? (payment.status == 'paid'
-                                    ? Colors.green
-                                    : Colors.orange)
-                                : Colors.grey,
+                            color: getStatusColorPayment(payment?.status ?? ''),
                             borderRadius: BorderRadius.circular(16.0),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                payment != null
-                                    ? (payment.status == 'paid'
-                                        ? Icons.check_circle
-                                        : Icons.hourglass_empty)
-                                    : Icons.help_outline,
-                                color: Colors.white,
-                                size: 18,
-                              ),
+                              getStatusIconPayment(payment?.status ?? ''),
                               const SizedBox(width: 4),
                               Text(
-                                payment != null
-                                    ? payment.status == 'paid'
-                                        ? 'Đã thanh toán'
-                                        : 'Chưa thanh toán'
-                                    : 'Chưa cập nhật',
+                                converStatusPayment(payment?.status ?? ''),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -634,11 +577,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            payment != null
-                                ? payment.paymentType == 'service'
-                                    ? 'Khám dịch vụ'
-                                    : 'Khám BHYT'
-                                : '--',
+                            convertPaymentType(payment?.paymentType ?? ''),
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -662,13 +601,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            payment?.method == 'cash'
-                                ? 'Tiền mặt'
-                                : payment?.method == 'momo'
-                                    ? 'Momo'
-                                    : payment?.method == 'bank'
-                                        ? 'Chuyển khoản'
-                                        : '--',
+                            converMethodPayment(payment?.method ?? ''),
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_app/models/appointment.dart';
 import 'package:frontend_app/models/doctorservice.dart';
 import 'package:frontend_app/configs/api_config.dart';
 
@@ -13,7 +12,7 @@ class BookingSuccessDetaildoctor extends StatelessWidget {
     final service = doctorService.service;
     final avatarUrl = (doctor?.person.avatar != null &&
             doctor?.person.avatar!.isNotEmpty == true)
-        ? '${ApiConfig.backendUrl + doctor!.person.avatar!}'
+        ? '${ApiConfig.backendUrl}${doctor!.person.avatar!}'
         : null;
     return Container(
       padding: const EdgeInsets.all(12),

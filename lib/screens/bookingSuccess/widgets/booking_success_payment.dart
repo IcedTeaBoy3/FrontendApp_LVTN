@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:frontend_app/models/payment.dart';
 import 'package:frontend_app/utils/currency_utils.dart';
 import 'package:frontend_app/utils/date_utils.dart';
+import 'package:frontend_app/utils/method_utils.dart';
+import 'package:frontend_app/utils/paymenttype_utils.dart';
 
 class BookingSuccessPayment extends StatelessWidget {
   final Payment payment;
@@ -33,11 +35,7 @@ class BookingSuccessPayment extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  payment != null
-                      ? payment.paymentType == 'service'
-                          ? 'Khám dịch vụ'
-                          : 'Khám BHYT'
-                      : '--',
+                  convertPaymentType(payment.paymentType),
                   textAlign: TextAlign.right,
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         fontWeight: FontWeight.w600,
@@ -57,13 +55,7 @@ class BookingSuccessPayment extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  payment.method == 'cash'
-                      ? 'Tiền mặt'
-                      : payment.method == 'momo'
-                          ? 'Momo'
-                          : payment.method == 'bank'
-                              ? 'Chuyển khoản'
-                              : '--',
+                  converMethodPayment(payment.method),
                   textAlign: TextAlign.right,
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         fontWeight: FontWeight.w600,
@@ -82,7 +74,7 @@ class BookingSuccessPayment extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
               ),
               Text(
-                formatCurrency(payment?.amount ?? 0),
+                formatCurrency(payment.amount),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -98,7 +90,7 @@ class BookingSuccessPayment extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
               ),
               Text(
-                payment?.payAt != null ? formatDate(payment!.payAt!) : '--',
+                payment.payAt != null ? formatDate(payment.payAt!) : '--',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),

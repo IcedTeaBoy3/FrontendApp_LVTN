@@ -51,7 +51,7 @@ class BookingSuccessDetailPatient extends StatelessWidget {
               ),
               Text(
                 patientProfile.person.dateOfBirth != null
-                    ? formatDate(patientProfile.person.dateOfBirth!)
+                    ? formatDate(patientProfile.person.dateOfBirth)
                     : "Chưa cập nhật",
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
