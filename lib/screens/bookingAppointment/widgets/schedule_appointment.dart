@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
+import 'package:frontend_app/widgets/custom_textfield.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
@@ -9,6 +10,9 @@ import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/screens/patientProfile/widgets/card_patientprofile.dart';
 import 'package:frontend_app/screens/bookingAppointment/widgets/card_doctor_appointment.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend_app/widgets/custom_textfield.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ScheduleAppointment extends StatefulWidget {
   final String doctorId;
@@ -110,6 +114,204 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
         );
       },
     );
+  }
+
+  void _handleAddMoreInfo(BuildContext context) async {
+    final TextEditingController symptomController = TextEditingController();
+    File? selectedImage;
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      showDragHandle: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.grey[200],
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            Future<void> _pickImage() async {
+              final picker = ImagePicker();
+              final pickedFile =
+                  await picker.pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                setState(() {
+                  selectedImage = File(pickedFile.path);
+                });
+              }
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                // ✅ giúp không bị che bởi bàn phím
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Lý do thăm khám",
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 📝 Text area triệu chứng
+                    TextField(
+                      controller: symptomController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: "Ví dụ: Tôi bị sốt, ho, đau họng...",
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide:
+                              const BorderSide(color: Colors.blue, width: 1.0),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 16.0,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide:
+                              const BorderSide(color: Colors.blue, width: 1.0),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide:
+                              const BorderSide(color: Colors.grey, width: 1.0),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide:
+                              const BorderSide(color: Colors.red, width: 1.0),
+                        ),
+                        errorStyle: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        errorMaxLines: 2,
+                      ),
+                      cursorColor: Colors.blue,
+                      cursorWidth: 2, // độ dày
+                      cursorHeight: 25, // chiều cao
+                      cursorRadius: Radius.circular(2), // bo góc
+                      cursorErrorColor: Colors.red, // màu khi lỗi
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 📸 Upload ảnh
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Ảnh minh họa (nếu có)",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        width: double.infinity,
+                        height: 150,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: selectedImage == null
+                            ? const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.add_a_photo,
+                                        size: 40, color: Colors.grey),
+                                    SizedBox(height: 8),
+                                    Text("Chọn ảnh"),
+                                  ],
+                                ),
+                              )
+                            : Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.file(
+                                      selectedImage!,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedImage = null;
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.black54,
+                                        ),
+                                        padding: const EdgeInsets.all(4),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // ✅ Nút lưu
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context, {
+                            "symptom": symptomController.text.trim(),
+                            "image": selectedImage,
+                          });
+                        },
+                        child: const Text("Lưu thông tin"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    // 🟢 Sau khi đóng bottom sheet, lấy kết quả
+    if (result != null) {
+      debugPrint("Triệu chứng: ${result["symptom"]}");
+      debugPrint("Ảnh: ${result["image"]?.path}");
+      // 👉 Gán vào state, provider, hoặc gửi API
+    }
   }
 
   @override
@@ -349,9 +551,8 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                   onPressed: () {
                     if (patientProfile != null) {
                       context.goNamed(
-                        'addPatientProfile',
+                        'addEditPatientProfile',
                         extra: patientProfile,
-                        queryParameters: {'from': 'booking'},
                       );
                     }
                   },
@@ -368,7 +569,10 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                 ElevatedButton(
                   onPressed: () {
                     if (patientProfile == null) {
-                      context.goNamed('addPatientProfile');
+                      context.goNamed(
+                        'addEditPatientProfile',
+                        extra: patientProfile,
+                      );
                     }
                     _handleChangePatientProfile(context);
                   },
@@ -408,6 +612,62 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
             ),
           ),
           DoctorDetailSchedule(doctorId: widget.doctorId),
+          const SizedBox(
+            height: 16,
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Thông tin bổ sung (không bắt buộc):",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Bạn có thể cung cấp các thông tin như lý do khám, triệu chứng hiện tại, tiền sử bệnh lý, đơn thuốc,...",
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                    color: Colors.grey[600],
+                  ),
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                _handleAddMoreInfo(context);
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.blue,
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Tôi muốn cung cấp thêm thông tin ",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        fontWeight: FontWeight.bold, color: Colors.blue),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_outlined,
+                    color: Colors.blue,
+                    size: 16,
+                  )
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );

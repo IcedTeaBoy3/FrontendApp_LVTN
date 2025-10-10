@@ -2,7 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
 class CustomFlushbar {
-  static void show(
+  static Future<void> show(
     BuildContext context, {
     required String status,
     required String message,
@@ -11,7 +11,7 @@ class CustomFlushbar {
     Color backgroundColor = Colors.black,
     FlushbarPosition flushbarPosition = FlushbarPosition.TOP,
   }) {
-    Flushbar(
+    return Flushbar(
       title: _convertMessage(status),
       icon: Icon(
         _convertIcon(status),

@@ -33,6 +33,7 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final account = authProvider.account;
+    final avatarUrl = account?.avatar;
     final isAuthenticated = authProvider.isAuthenticated;
     return Column(
       children: [
@@ -53,12 +54,12 @@ class AccountScreen extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 45,
-                        backgroundColor: Colors.grey.shade200,
-                        child: const Icon(
-                          Icons.person,
-                          color: Colors.grey,
-                          size: 50,
-                        ),
+                        backgroundColor: Colors.lightBlue,
+                        backgroundImage:
+                            avatarUrl != null && avatarUrl.isNotEmpty
+                                ? NetworkImage(avatarUrl) as ImageProvider
+                                : AssetImage(
+                                    'assets/images/avatar-default-icon.png'),
                       ),
                       const SizedBox(height: 12),
                       Text(

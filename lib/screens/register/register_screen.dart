@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/services/auth_service.dart';
+import 'package:frontend_app/widgets/custom_flushbar.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -32,28 +33,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         confirmPassword: _confirmPasswordController.text,
       );
-      if (!mounted) return;
-      if (response.status == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response.message),
-            backgroundColor: Colors.green,
-          ),
-        );
-        context.pop();
-
-        context.goNamed('verifyOtp', extra: _emailController.text);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response.message),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
       setState(() {
         _isLoading = false;
       });
+      if (!mounted) return;
+      await CustomFlushbar.show(
+        context,
+        status: response.status,
+        message: response.message,
+      );
+      if (response.status == 'success') {
+        if (!mounted) return;
+        context.goNamed('verifyOtp', extra: _emailController.text);
+      }
     }
   }
 

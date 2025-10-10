@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frontend_app/services/auth_service.dart';
 import 'package:lottie/lottie.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend_app/widgets/custom_flushbar.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
   final String email;
@@ -34,27 +35,20 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         email: widget.email,
         otp: otp,
       );
+      setState(() {
+        _isLoading = false;
+      });
       if (!mounted) return;
+      await CustomFlushbar.show(
+        context,
+        status: result.status,
+        message: result.message,
+      );
       if (result.status == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.message),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (!mounted) return;
         context.goNamed('login', extra: widget.email);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result.message),
-            backgroundColor: Colors.red,
-          ),
-        );
       }
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _handleResendOtp() async {
