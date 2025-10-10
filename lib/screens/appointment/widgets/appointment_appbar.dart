@@ -21,21 +21,6 @@ class AppointmentAppbar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _AppointmentAppbarState extends State<AppointmentAppbar> {
-  final dateController = TextEditingController();
-  String? selectedStatus;
-  @override
-  void dispose() {
-    dateController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    dateController.text = '';
-    selectedStatus ??= 'all';
-  }
-
   @override
   Widget build(BuildContext context) {
     final isAuthenticated = context.read<AuthProvider>().isAuthenticated;
@@ -66,7 +51,7 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                 color: Colors.white,
                 size: 20,
               ),
-              if (selectedStatus != 'all' || dateController.text != '')
+              if (context.watch<AppointmentProvider>().isFilters())
                 Positioned(
                   right: 0,
                   top: 0,
@@ -167,7 +152,10 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: selectedStatus == 'all'
+                          color: context
+                                      .read<AppointmentProvider>()
+                                      .filterStatus ==
+                                  'all'
                               ? AppColors.primaryBlue
                               : Colors.transparent),
                     ),
@@ -175,11 +163,13 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       title: const Text('Tất cả'),
                       trailing: Radio<String>(
                         value: 'all',
-                        groupValue: selectedStatus,
+                        groupValue:
+                            context.read<AppointmentProvider>().filterStatus,
                         onChanged: (val) {
-                          setState(() => selectedStatus = val); // update AppBar
-                          setStateSheet(() =>
-                              selectedStatus = val); // update bottom sheet
+                          context
+                              .read<AppointmentProvider>()
+                              .setFilterStatus(val!);
+                          setStateSheet(() {});
                         },
                       ),
                       onTap: () {},
@@ -193,7 +183,10 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: selectedStatus == 'pending'
+                          color: context
+                                      .read<AppointmentProvider>()
+                                      .filterStatus ==
+                                  'pending'
                               ? AppColors.primaryBlue
                               : Colors.transparent),
                     ),
@@ -201,10 +194,13 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       title: const Text('Chờ xác nhận'),
                       trailing: Radio<String>(
                         value: 'pending',
-                        groupValue: selectedStatus,
+                        groupValue:
+                            context.read<AppointmentProvider>().filterStatus,
                         onChanged: (val) {
-                          setState(() => selectedStatus = val);
-                          setStateSheet(() => selectedStatus = val);
+                          context
+                              .read<AppointmentProvider>()
+                              .setFilterStatus(val!);
+                          setStateSheet(() {});
                         },
                       ),
                     ),
@@ -217,7 +213,10 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: selectedStatus == 'confirmed'
+                          color: context
+                                      .read<AppointmentProvider>()
+                                      .filterStatus ==
+                                  'confirmed'
                               ? AppColors.primaryBlue
                               : Colors.transparent),
                     ),
@@ -225,10 +224,13 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       title: const Text('Đã xác nhận'),
                       trailing: Radio<String>(
                         value: 'confirmed',
-                        groupValue: selectedStatus,
+                        groupValue:
+                            context.read<AppointmentProvider>().filterStatus,
                         onChanged: (val) {
-                          setState(() => selectedStatus = val);
-                          setStateSheet(() => selectedStatus = val);
+                          context
+                              .read<AppointmentProvider>()
+                              .setFilterStatus(val!);
+                          setStateSheet(() {});
                         },
                       ),
                     ),
@@ -241,7 +243,10 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: selectedStatus == 'completed'
+                          color: context
+                                      .read<AppointmentProvider>()
+                                      .filterStatus ==
+                                  'completed'
                               ? AppColors.primaryBlue
                               : Colors.transparent),
                     ),
@@ -249,10 +254,13 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       title: const Text('Hoàn thành'),
                       trailing: Radio<String>(
                         value: 'completed',
-                        groupValue: selectedStatus,
+                        groupValue:
+                            context.read<AppointmentProvider>().filterStatus,
                         onChanged: (val) {
-                          setState(() => selectedStatus = val);
-                          setStateSheet(() => selectedStatus = val);
+                          context
+                              .read<AppointmentProvider>()
+                              .setFilterStatus(val!);
+                          setStateSheet(() {});
                         },
                       ),
                     ),
@@ -265,18 +273,24 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: selectedStatus == 'canceled'
+                          color: context
+                                      .read<AppointmentProvider>()
+                                      .filterStatus ==
+                                  'canceled'
                               ? AppColors.primaryBlue
                               : Colors.transparent),
                     ),
                     child: ListTile(
                       title: const Text('Đã huỷ'),
                       trailing: Radio<String>(
-                        value: 'canceled',
-                        groupValue: selectedStatus,
+                        value: 'cancelled',
+                        groupValue:
+                            context.read<AppointmentProvider>().filterStatus,
                         onChanged: (val) {
-                          setState(() => selectedStatus = val);
-                          setStateSheet(() => selectedStatus = val);
+                          context
+                              .read<AppointmentProvider>()
+                              .setFilterStatus(val!);
+                          setStateSheet(() {});
                         },
                       ),
                     ),
@@ -289,7 +303,17 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                     firstDate:
                         DateTime.now().subtract(const Duration(days: 365)),
                     lastDate: DateTime.now().add(const Duration(days: 365)),
-                    controller: dateController,
+                    controller: TextEditingController(
+                      text: context.read<AppointmentProvider>().filterDate !=
+                              null
+                          ? formatDate(
+                              context.read<AppointmentProvider>().filterDate!)
+                          : '',
+                    ),
+                    onDateSelected: (date) {
+                      context.read<AppointmentProvider>().setFilterDate(date);
+                      setStateSheet(() {});
+                    },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Vui lòng chọn ngày';
@@ -307,14 +331,9 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                             color: Colors.grey,
                           ),
                           onPressed: () {
-                            setState(() {
-                              selectedStatus = 'all';
-                            });
-                            setStateSheet(() {
-                              selectedStatus = 'all';
-                            });
-                            dateController.text = '';
-                            context.read<AppointmentProvider>().clearFilter();
+                            context.read<AppointmentProvider>().resetFilters();
+                            setStateSheet(() {});
+                            context.pop();
                           },
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -341,13 +360,8 @@ class _AppointmentAppbarState extends State<AppointmentAppbar> {
                           onPressed: () {
                             context
                                 .read<AppointmentProvider>()
-                                .filterAppointments(
-                                  status: selectedStatus,
-                                  date: dateController.text.isNotEmpty
-                                      ? parseDate(dateController.text)
-                                      : null,
-                                );
-                            Navigator.of(context).pop();
+                                .filterAppointments();
+                            context.pop();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryBlue,

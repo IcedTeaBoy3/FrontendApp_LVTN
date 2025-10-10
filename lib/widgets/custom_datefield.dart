@@ -4,17 +4,19 @@ import 'package:frontend_app/utils/date_utils.dart';
 class CustomDateField extends StatefulWidget {
   final String label;
   final String hintText;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final DateTime? initialDate;
   final DateTime? firstDate;
   final DateTime? lastDate;
   final String? Function(String?)? validator;
+  final void Function(DateTime)? onDateSelected;
 
   const CustomDateField({
     super.key,
     required this.label,
     required this.hintText,
-    required this.controller,
+    this.controller,
+    this.onDateSelected,
     this.initialDate,
     this.firstDate,
     this.lastDate,
@@ -54,8 +56,10 @@ class _CustomDateFieldState extends State<CustomDateField> {
 
     if (pickedDate != null) {
       setState(() {
-        widget.controller.text = formatDate(pickedDate);
+        widget.controller?.text = formatDate(pickedDate);
       });
+      // 👉 Gọi callback để truyền ngày về Provider
+      widget.onDateSelected?.call(pickedDate);
     }
   }
 

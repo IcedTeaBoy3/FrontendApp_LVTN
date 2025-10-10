@@ -11,6 +11,8 @@ import 'package:frontend_app/models/responseapi.dart';
 class AppointmentProvider extends ChangeNotifier {
   List<Appointment> _appointments = [];
   List<Appointment> _filteredAppointments = [];
+  DateTime? _filterDate;
+  String _filterStatus = 'all';
 
   Patientprofile? _selectedPatientProfile;
   Schedule? _selectedSchedule;
@@ -25,6 +27,9 @@ class AppointmentProvider extends ChangeNotifier {
   // int get total => _total;
   List<Appointment> get appointments => _appointments;
   List<Appointment> get filteredAppointments => _filteredAppointments;
+  DateTime? get filterDate => _filterDate;
+  String get filterStatus => _filterStatus;
+
   Patientprofile? get selectedPatientProfile => _selectedPatientProfile;
   Slot? get selectedSlot => _selectedSlot;
   DateTime? get selectedDate => _selectedDate;
@@ -97,39 +102,6 @@ class AppointmentProvider extends ChangeNotifier {
     }
   }
 
-  void filterAppointments({String? status, DateTime? date}) {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      var temp = List<Appointment>.from(_appointments);
-
-      if (status != null && status != 'all') {
-        temp = temp.where((a) => a.status == status).toList();
-      }
-
-      if (date != null) {
-        temp = temp.where((a) {
-          final d = a.schedule.workday;
-          return d.year == date.year &&
-              d.month == date.month &&
-              d.day == date.day;
-        }).toList();
-      }
-
-      _filteredAppointments = temp;
-    } catch (e) {
-      debugPrint('Error filtering: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  void clearFilter() {
-    _filteredAppointments = List.from(_appointments);
-    notifyListeners();
-  }
-
   Future<void> fetchAppointments({int page = 1, int limit = 10}) async {
     _isLoading = true;
     notifyListeners();
@@ -175,6 +147,56 @@ class AppointmentProvider extends ChangeNotifier {
         return;
       }
     }
+  }
+
+  void filterAppointments() {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      var temp = List<Appointment>.from(_appointments);
+
+      if (_filterStatus != null && _filterStatus != 'all') {
+        temp = temp.where((a) => a.status == _filterStatus).toList();
+      }
+
+      if (_filterDate != null) {
+        temp = temp.where((a) {
+          final d = a.schedule.workday;
+          return d.year == _filterDate?.year &&
+              d.month == _filterDate?.month &&
+              d.day == _filterDate?.day;
+        }).toList();
+      }
+
+      _filteredAppointments = temp;
+    } catch (e) {
+      debugPrint('Error filtering: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void setFilterStatus(String status) {
+    _filterStatus = status;
+    notifyListeners();
+  }
+
+  void setFilterDate(DateTime? date) {
+    _filterDate = date;
+    notifyListeners();
+  }
+
+  void resetFilters() {
+    _filterDate = null;
+    _filterStatus = 'all';
+    _filteredAppointments = List.from(_appointments);
+    notifyListeners();
+  }
+
+  bool isFilters() {
+    return _filterDate != null ||
+        (_filterStatus != 'all' && _filterStatus.isNotEmpty);
   }
 
   void setPaymentMethod(String method) {
