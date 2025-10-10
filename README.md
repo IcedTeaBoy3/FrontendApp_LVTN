@@ -1,16 +1,28 @@
-# frontend_app
+## 📁 Project Structure
 
-A new Flutter project.
+│
+├── assets/                   # Chứa các tài nguyên tĩnh như hình ảnh, biểu tượng, dữ liệu JSON,...
 
-## Getting Started
+├── lib/
 
-This project is a starting point for a Flutter application.
+│   ├── configs/               # Chứa các tệp cấu hình hệ thống (API base URL, keys, routes,…)
 
-A few resources to get you started if this is your first Flutter project:
+│   ├── models/                # Định nghĩa các lớp mô hình dữ liệu (User, Doctor, Appointment, Service,…)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+│   ├── providers/             # Quản lý trạng thái ứng dụng sử dụng Provider
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+│   ├── routes/                # Định nghĩa và quản lý điều hướng (Routing) giữa các màn hình
+
+│   ├── screens/               # Các màn hình chính của ứng dụng (Trang chủ, Đặt lịch, Hồ sơ, Chatbot,…)
+
+│   ├── services/              # Xử lý giao tiếp với backend thông qua API (Node.js/Express)
+
+│   ├── themes/                # Cấu hình giao diện chung: màu sắc, font chữ, kích thước, phong cách hiển thị
+
+│   ├── utils/                 # Các hàm tiện ích dùng chung (định dạng ngày giờ, xử lý chuỗi, chuyển đổi dữ liệu,…)
+
+│   ├── widgets/               # Các widget tái sử dụng (nút, thẻ thông tin, dialog, toast,…)
+
+│   └── main.dart              # Điểm khởi đầu của ứng dụng (khởi tạo Provider, MaterialApp, và routes chính)
+
+└── pubspec.yaml               # Tệp cấu hình quản lý package, asset và thông tin dự án
