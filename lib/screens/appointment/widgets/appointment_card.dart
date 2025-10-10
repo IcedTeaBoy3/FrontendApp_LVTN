@@ -3,6 +3,7 @@ import 'package:frontend_app/models/appointment.dart';
 import 'package:frontend_app/configs/api_config.dart';
 import 'package:frontend_app/utils/date_utils.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend_app/utils/status_appointment_utils.dart';
 
 class AppointmentCard extends StatelessWidget {
   final Appointment appointment;
@@ -18,36 +19,6 @@ class AppointmentCard extends StatelessWidget {
     final avatarUrl = doctor?.person.avatar != null
         ? '${ApiConfig.backendUrl}${doctor?.person.avatar}'
         : null;
-
-    String _converStatus(String status) {
-      switch (status) {
-        case 'pending':
-          return 'Chờ xác nhận';
-        case 'confirmed':
-          return 'Đã xác nhận';
-        case 'completed':
-          return 'Đã hoàn thành';
-        case 'canceled':
-          return 'Đã hủy';
-        default:
-          return status;
-      }
-    }
-
-    Color _getStatusColor(String status) {
-      switch (status) {
-        case 'pending':
-          return Colors.orange;
-        case 'confirmed':
-          return Colors.blue;
-        case 'completed':
-          return Colors.green;
-        case 'canceled':
-          return Colors.red;
-        default:
-          return Colors.grey;
-      }
-    }
 
     return InkWell(
       onTap: () {
@@ -78,11 +49,11 @@ class AppointmentCard extends StatelessWidget {
                     horizontal: 8.0,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(appointment.status),
+                    color: getStatusColorAppointment(appointment.status),
                     borderRadius: BorderRadius.circular(16.0),
                   ),
                   child: Text(
-                    _converStatus(appointment.status),
+                    converStatusAppointment(appointment.status),
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),

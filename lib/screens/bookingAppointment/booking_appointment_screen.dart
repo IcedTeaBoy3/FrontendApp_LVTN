@@ -88,27 +88,21 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
       }
       final result = await appointmentProvider.createAppointment();
       if (!mounted) return;
-      CustomFlushbar.show(
+      await CustomFlushbar.show(
         context,
         status: result.status,
         message: result.message,
       );
       if (result.status == 'success') {
-        final slot = result.data?.slot;
-        if (slot != null) {
-          context.read<ScheduleProvider>().disabledSlot(slot);
-        }
-        Future.delayed(const Duration(milliseconds: 3000), () {
-          if (mounted) {
-            context.goNamed(
-              'bookingSuccess',
-              pathParameters: {
-                'doctorId': widget.doctorId,
-              },
-              extra: result.data as Appointment,
-            );
-          }
-        });
+        if (!mounted) return;
+        context.read<AppointmentProvider>().disableSlot(result.data!.slot);
+        context.goNamed(
+          'bookingSuccess',
+          pathParameters: {
+            'doctorId': widget.doctorId,
+          },
+          extra: result.data as Appointment,
+        );
       }
     }
   }

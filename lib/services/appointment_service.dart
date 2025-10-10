@@ -9,8 +9,6 @@ class AppointmentService {
   static Future<ResponseApi<Appointment>> createAppointment(
       Appointment appointment, Payment payment) async {
     try {
-      debugPrint('Creating appointment: ${appointment.toJson()}');
-      debugPrint('Creating payment: ${payment.toJson()}');
       final response = await ApiClient.dio.post(
         '/appointment/create-appointment',
         data: {
@@ -18,12 +16,6 @@ class AppointmentService {
           'payment': payment.toJson(),
         },
       );
-      print('patientProfile: ${response.data['data']['patientProfile']}');
-      print('schedule: ${response.data['data']['schedule']}');
-      print('slot: ${response.data['data']['slot']}');
-      print('payment: ${response.data['data']['payment']}');
-      print('doctorservice: ${response.data['data']['doctorService']}');
-      print('appointment: ${response.data['data']}');
       return ResponseApi<Appointment>.fromJson(
         response.data,
         funtionParser: (dataJson) => Appointment.fromJson(dataJson),
@@ -34,6 +26,31 @@ class AppointmentService {
       return ResponseApi(
         status: 'error',
         message: e.response?.data['message'] ?? 'Tạo hồ sơ thất bại',
+      );
+    } catch (e) {
+      // Nếu có lỗi trong quá trình gọi API hoặc parse dữ liệu
+      throw Exception('Error: $e');
+    }
+  }
+
+  static Future<ResponseApi<Appointment>> cancelAppointment(
+      String appointmentId) async {
+    try {
+      final response = await ApiClient.dio.put(
+        '/appointment/cancel-appointment/$appointmentId',
+        data: {},
+      );
+      debugPrint('Response data: ${response.data}');
+      return ResponseApi<Appointment>.fromJson(
+        response.data,
+        funtionParser: (dataJson) => Appointment.fromJson(dataJson),
+      );
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      print('Dio error response: ${e}');
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Hủy lịch khám thất bại',
       );
     } catch (e) {
       // Nếu có lỗi trong quá trình gọi API hoặc parse dữ liệu

@@ -8,7 +8,7 @@ String converStatusAppointment(String status) {
       return 'Đã xác nhận';
     case 'completed':
       return 'Đã hoàn thành';
-    case 'canceled':
+    case 'cancelled':
       return 'Đã hủy';
     default:
       return status;
@@ -23,7 +23,7 @@ Icon getStatusIconAppointment(String status) {
       return const Icon(Icons.check_circle, color: Colors.white);
     case 'completed':
       return const Icon(Icons.check_circle_outline, color: Colors.white);
-    case 'canceled':
+    case 'cancelled':
       return const Icon(Icons.cancel, color: Colors.white);
     default:
       return const Icon(Icons.help_outline, color: Colors.white);
@@ -38,7 +38,7 @@ Color getStatusColorAppointment(String status) {
       return Colors.blue;
     case 'completed':
       return Colors.green;
-    case 'canceled':
+    case 'cancelled':
       return Colors.red;
     default:
       return Colors.grey;

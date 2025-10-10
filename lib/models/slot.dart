@@ -38,6 +38,24 @@ class Slot {
     return jsonList.map((json) => Slot.fromJson(json)).toList();
   }
 
+  Slot copyWith({
+    String? slotId,
+    Shift? shift,
+    String? shiftId,
+    DateTime? startTime,
+    DateTime? endTime,
+    String? status,
+  }) {
+    return Slot(
+      slotId: slotId ?? this.slotId,
+      shift: shift ?? this.shift,
+      shiftId: shiftId ?? this.shiftId,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      status: status ?? this.status,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'slotId': slotId,

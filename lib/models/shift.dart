@@ -15,6 +15,22 @@ class Shift {
     required this.slots,
   });
 
+  Shift copyWith({
+    String? shiftId,
+    String? name,
+    DateTime? startTime,
+    DateTime? endTime,
+    List<Slot>? slots,
+  }) {
+    return Shift(
+      shiftId: shiftId ?? this.shiftId,
+      name: name ?? this.name,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      slots: slots ?? this.slots,
+    );
+  }
+
   factory Shift.fromJson(Map<String, dynamic> json) {
     return Shift(
       shiftId: json['shiftId'] ?? json['_id'],

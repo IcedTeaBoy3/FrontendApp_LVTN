@@ -16,6 +16,24 @@ class Schedule {
     required this.slotDuration,
     this.status = 'active',
   });
+  Schedule copyWith({
+    String? scheduleId,
+    DateTime? workday,
+    String? doctorId,
+    List<Shift>? shifts,
+    int? slotDuration,
+    String? status,
+  }) {
+    return Schedule(
+      scheduleId: scheduleId ?? this.scheduleId,
+      workday: workday ?? this.workday,
+      doctorId: doctorId ?? this.doctorId,
+      shifts: shifts ?? this.shifts,
+      slotDuration: slotDuration ?? this.slotDuration,
+      status: status ?? this.status,
+    );
+  }
+
   // Đếm tổng số slot trong ngày có status = 'available'
   int get availableSlotCount {
     int count = 0;

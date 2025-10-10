@@ -192,6 +192,15 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                   ),
                 );
               }
+              // --- Set default selected schedule 1 lần (sau frame) ---
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (appointmentProvider.selectedSchedule == null &&
+                    schedules.isNotEmpty) {
+                  appointmentProvider.setSchedule(schedules.first);
+                }
+              });
+
+              final selectedSchedule = appointmentProvider.selectedSchedule;
 
               return Column(
                 children: [
@@ -206,13 +215,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                         final isSelected =
                             appointmentProvider.selectedSchedule?.scheduleId ==
                                 schedule.scheduleId;
-                        // Gán mặc định 1 lần khi chưa có selected
-                        if (appointmentProvider.selectedSchedule == null &&
-                            schedules.isNotEmpty) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            appointmentProvider.setSchedule(schedules.first);
-                          });
-                        }
+
                         return GestureDetector(
                           onTap: () =>
                               appointmentProvider.setSchedule(schedule),
@@ -314,109 +317,228 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
                       },
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  if (selectedSchedule != null) ...[
+                    Consumer<AppointmentProvider>(
+                      builder: (context, appointmentProvider, child) {
+                        final selectedSchedule =
+                            appointmentProvider.selectedSchedule;
+                        final firstAvailableSlot =
+                            selectedSchedule?.getFirstAvailableSlot();
+                        final slotCount = selectedSchedule?.availableSlotCount;
+                        if (selectedSchedule == null) {
+                          return SizedBox.shrink();
+                        }
+                        return Column(
+                          children: selectedSchedule.shifts.map(
+                            (shift) {
+                              if (appointmentProvider.selectedSlot == null &&
+                                  slotCount != 0) {
+                                WidgetsBinding.instance
+                                    .addPostFrameCallback((_) {
+                                  appointmentProvider
+                                      .setSlot(firstAvailableSlot);
+                                });
+                              }
+                              return SizedBox(
+                                height: 70,
+                                width: double.infinity,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          shift.name
+                                                  .toLowerCase()
+                                                  .contains('sáng')
+                                              ? FontAwesomeIcons.sun
+                                              : shift.name
+                                                      .toLowerCase()
+                                                      .contains('chiều')
+                                                  ? FontAwesomeIcons.cloudSun
+                                                  : FontAwesomeIcons.moon,
+                                          size: 16,
+                                          color: shift.name
+                                                  .toLowerCase()
+                                                  .contains('sáng')
+                                              ? Colors.orange
+                                              : shift.name
+                                                      .toLowerCase()
+                                                      .contains('chiều')
+                                                  ? Colors.amber
+                                                  : Colors.indigo,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          shift.name,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge,
+                                        ),
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: shift.slots.length,
+                                        separatorBuilder: (context, index) =>
+                                            const SizedBox(width: 8),
+                                        itemBuilder: (context, index) {
+                                          final slot = shift.slots[index];
+                                          final isAvailable =
+                                              slot.status == 'available';
+                                          final isSelected = appointmentProvider
+                                                  .selectedSlot ==
+                                              slot;
+                                          return ElevatedButton(
+                                            onPressed: isAvailable
+                                                ? () =>
+                                                    _handleBookingAppointment(
+                                                        slot)
+                                                : null,
+                                            style: ElevatedButton.styleFrom(
+                                              minimumSize: const Size(100, 40),
+                                              backgroundColor: isSelected
+                                                  ? AppColors.primaryBlue
+                                                  : AppColors.secondaryBlue,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                side: BorderSide(),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              '${DateFormat.Hm().format(slot.startTime)} - ${DateFormat.Hm().format(slot.endTime)}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium!
+                                                  .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: isAvailable
+                                                        ? Colors.white
+                                                        : Colors.grey.shade600,
+                                                  ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ).toList(),
+                        );
+                      },
+                    ),
+                  ]
                 ],
               );
             },
           ),
-          const SizedBox(height: 12),
-          Consumer2<ScheduleProvider, AppointmentProvider>(
-            builder: (context, scheduleProvider, appointmentProvider, child) {
-              final selectedSchedule = appointmentProvider.selectedSchedule;
-              final firstAvailableSlot =
-                  selectedSchedule?.getFirstAvailableSlot();
-              final slotCount = selectedSchedule?.availableSlotCount;
-              if (selectedSchedule == null) {
-                return SizedBox.shrink();
-              }
-              return Column(
-                children: selectedSchedule.shifts.map(
-                  (shift) {
-                    if (appointmentProvider.selectedSlot == null &&
-                        slotCount != 0) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        appointmentProvider.setSlot(firstAvailableSlot);
-                      });
-                    }
-                    return SizedBox(
-                      height: 70,
-                      width: double.infinity,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                shift.name.toLowerCase().contains('sáng')
-                                    ? FontAwesomeIcons.sun
-                                    : shift.name.toLowerCase().contains('chiều')
-                                        ? FontAwesomeIcons.cloudSun
-                                        : FontAwesomeIcons.moon,
-                                size: 16,
-                                color: shift.name.toLowerCase().contains('sáng')
-                                    ? Colors.orange
-                                    : shift.name.toLowerCase().contains('chiều')
-                                        ? Colors.amber
-                                        : Colors.indigo,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                shift.name,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
-                          Expanded(
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: shift.slots.length,
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(width: 8),
-                              itemBuilder: (context, index) {
-                                final slot = shift.slots[index];
-                                final isAvailable = slot.status == 'available';
-                                final isSelected =
-                                    appointmentProvider.selectedSlot == slot;
-                                return ElevatedButton(
-                                  onPressed: isAvailable
-                                      ? () => _handleBookingAppointment(slot)
-                                      : null,
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(100, 40),
-                                    backgroundColor: isSelected
-                                        ? AppColors.primaryBlue
-                                        : AppColors.secondaryBlue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                      side: BorderSide(),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    '${DateFormat.Hm().format(slot.startTime)} - ${DateFormat.Hm().format(slot.endTime)}',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium!
-                                        .copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: isAvailable
-                                              ? Colors.white
-                                              : Colors.grey.shade600,
-                                        ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ).toList(),
-              );
-            },
-          ),
+          // Consumer2<ScheduleProvider, AppointmentProvider>(
+          //   builder: (context, scheduleProvider, appointmentProvider, child) {
+          //     final selectedSchedule = appointmentProvider.selectedSchedule;
+          //     final firstAvailableSlot =
+          //         selectedSchedule?.getFirstAvailableSlot();
+          //     final slotCount = selectedSchedule?.availableSlotCount;
+          //     if (selectedSchedule == null) {
+          //       return SizedBox.shrink();
+          //     }
+          //     return Column(
+          //       children: selectedSchedule.shifts.map(
+          //         (shift) {
+          //           if (appointmentProvider.selectedSlot == null &&
+          //               slotCount != 0) {
+          //             WidgetsBinding.instance.addPostFrameCallback((_) {
+          //               appointmentProvider.setSlot(firstAvailableSlot);
+          //             });
+          //           }
+          //           return SizedBox(
+          //             height: 70,
+          //             width: double.infinity,
+          //             child: Column(
+          //               crossAxisAlignment: CrossAxisAlignment.start,
+          //               children: [
+          //                 Row(
+          //                   children: [
+          //                     Icon(
+          //                       shift.name.toLowerCase().contains('sáng')
+          //                           ? FontAwesomeIcons.sun
+          //                           : shift.name.toLowerCase().contains('chiều')
+          //                               ? FontAwesomeIcons.cloudSun
+          //                               : FontAwesomeIcons.moon,
+          //                       size: 16,
+          //                       color: shift.name.toLowerCase().contains('sáng')
+          //                           ? Colors.orange
+          //                           : shift.name.toLowerCase().contains('chiều')
+          //                               ? Colors.amber
+          //                               : Colors.indigo,
+          //                     ),
+          //                     const SizedBox(width: 8),
+          //                     Text(
+          //                       shift.name,
+          //                       style: Theme.of(context).textTheme.bodyLarge,
+          //                     ),
+          //                   ],
+          //                 ),
+          //                 Expanded(
+          //                   child: ListView.separated(
+          //                     scrollDirection: Axis.horizontal,
+          //                     itemCount: shift.slots.length,
+          //                     separatorBuilder: (context, index) =>
+          //                         const SizedBox(width: 8),
+          //                     itemBuilder: (context, index) {
+          //                       final slot = shift.slots[index];
+          //                       final isAvailable = slot.status == 'available';
+          //                       final isSelected =
+          //                           appointmentProvider.selectedSlot == slot;
+          //                       return ElevatedButton(
+          //                         onPressed: isAvailable
+          //                             ? () => _handleBookingAppointment(slot)
+          //                             : null,
+          //                         style: ElevatedButton.styleFrom(
+          //                           minimumSize: const Size(100, 40),
+          //                           backgroundColor: isSelected
+          //                               ? AppColors.primaryBlue
+          //                               : AppColors.secondaryBlue,
+          //                           shape: RoundedRectangleBorder(
+          //                             borderRadius: BorderRadius.circular(8),
+          //                             side: BorderSide(),
+          //                           ),
+          //                           padding: const EdgeInsets.symmetric(
+          //                             horizontal: 8,
+          //                           ),
+          //                         ),
+          //                         child: Text(
+          //                           '${DateFormat.Hm().format(slot.startTime)} - ${DateFormat.Hm().format(slot.endTime)}',
+          //                           style: Theme.of(context)
+          //                               .textTheme
+          //                               .bodyMedium!
+          //                               .copyWith(
+          //                                 fontWeight: FontWeight.bold,
+          //                                 color: isAvailable
+          //                                     ? Colors.white
+          //                                     : Colors.grey.shade600,
+          //                               ),
+          //                         ),
+          //                       );
+          //                     },
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           );
+          //         },
+          //       ).toList(),
+          //     );
+          //   },
+          // ),
           const SizedBox(height: 8),
           Row(
             children: [

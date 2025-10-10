@@ -73,6 +73,30 @@ class AppointmentProvider extends ChangeNotifier {
     }
   }
 
+  Future<ResponseApi<Appointment>> cancelAppointment(
+    String appointmentId,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final result = await AppointmentService.cancelAppointment(appointmentId);
+      if (result.status == 'success' && result.data != null) {
+        final index =
+            _appointments.indexWhere((a) => a.appointmentId == appointmentId);
+        if (index != -1) {
+          _appointments[index] = result.data!;
+          filterAppointments(); // cập nhật lại danh sách lọc
+        }
+      }
+      return result;
+    } catch (e) {
+      throw Exception('Error cancelling appointment: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   void filterAppointments({String? status, DateTime? date}) {
     _isLoading = true;
     notifyListeners();
@@ -124,6 +148,32 @@ class AppointmentProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  void disableSlot(Slot slot) {
+    if (_selectedSchedule == null) return;
+
+    for (var shift in _selectedSchedule!.shifts) {
+      final index = shift.slots.indexWhere((s) => s.slotId == slot.slotId);
+      if (index != -1) {
+        shift.slots[index] = slot.copyWith(status: 'booked');
+        notifyListeners();
+        return;
+      }
+    }
+  }
+
+  void enableSlot(Slot slot) {
+    if (_selectedSchedule == null) return;
+
+    for (var shift in _selectedSchedule!.shifts) {
+      final index = shift.slots.indexWhere((s) => s.slotId == slot.slotId);
+      if (index != -1) {
+        shift.slots[index] = shift.slots[index].copyWith(status: 'available');
+        notifyListeners();
+        return;
+      }
     }
   }
 

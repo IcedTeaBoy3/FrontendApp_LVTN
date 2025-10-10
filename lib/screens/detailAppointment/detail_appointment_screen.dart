@@ -1,5 +1,8 @@
-import 'package:frontend_app/models/appointment.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend_app/providers/appointment_provider.dart';
+import 'package:frontend_app/providers/schedule_provider.dart';
+import 'package:frontend_app/widgets/custom_flushbar.dart';
+import 'package:frontend_app/models/appointment.dart';
 import 'package:frontend_app/providers/clinic_provider.dart';
 import 'package:frontend_app/utils/date_utils.dart';
 import 'package:frontend_app/utils/status_appointment_utils.dart';
@@ -682,8 +685,23 @@ class DetailAppointmentScreen extends StatelessWidget {
               cancelText: 'Không',
               confirmText: 'Huỷ',
               confirmColor: Colors.red,
-              onConfirm: () {
-                // Handle cancellation logic here
+              onConfirm: () async {
+                final result = await context
+                    .read<AppointmentProvider>()
+                    .cancelAppointment(appointment.appointmentId);
+                if (!context.mounted) return;
+                await CustomFlushbar.show(
+                  context,
+                  status: result.status,
+                  message: result.message,
+                );
+                if (result.status == 'success') {
+                  if (!context.mounted) return;
+                  context
+                      .read<AppointmentProvider>()
+                      .enableSlot(appointment.slot);
+                  context.pop();
+                }
               },
             );
           },
