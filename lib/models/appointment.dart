@@ -77,4 +77,34 @@ class Appointment {
       'updatedAt': updatedAt?.toIso8601String(),
     };
   }
+
+  Appointment copyWith({
+    String? appointmentId,
+    String? appointmentCode,
+    int? appointmentNumber,
+    Patientprofile? patientProfile,
+    DoctorService? doctorService,
+    Schedule? schedule,
+    Slot? slot,
+    String? status,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Payment? payment,
+    String? paymentId,
+  }) {
+    return Appointment(
+      appointmentId: appointmentId ?? this.appointmentId,
+      appointmentCode: appointmentCode ?? this.appointmentCode,
+      appointmentNumber: appointmentNumber ?? this.appointmentNumber,
+      patientProfile: patientProfile ?? this.patientProfile,
+      doctorService: doctorService ?? this.doctorService,
+      schedule: schedule ?? this.schedule,
+      slot: slot ?? this.slot,
+      status: status ?? this.status,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      payment: payment ?? this.payment,
+      paymentId: paymentId ?? this.paymentId,
+    );
+  }
 }

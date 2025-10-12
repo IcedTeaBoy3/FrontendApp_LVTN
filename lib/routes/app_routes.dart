@@ -21,6 +21,7 @@ import 'package:frontend_app/screens/detailPatientProfile/detail_patientprofile_
 import 'package:frontend_app/screens/detailAppointment/detail_appointment_screen.dart';
 import 'package:frontend_app/screens/search/search_screen.dart';
 import 'package:frontend_app/screens/bookingSuccess/booking_success_screen.dart';
+import 'package:frontend_app/screens/paymentQrCode/paymentQrCode.dart';
 
 /// 🌐 AppRoutes quản lý toàn bộ định tuyến
 class AppRoutes {
@@ -84,6 +85,17 @@ class AppRoutes {
                     builder: (context, state) {
                       final appointment = state.extra as Appointment;
                       return BookingSuccessScreen(appointment: appointment);
+                    },
+                  ),
+                  // 💳 Payment QR Code
+                  GoRoute(
+                    name: 'paymentQRCode',
+                    path: 'paymentQRCode',
+                    builder: (context, state) {
+                      final appointment = state.extra as Appointment;
+                      return PaymentQRCode(
+                        appointment: appointment,
+                      );
                     },
                   ),
                 ],

@@ -26,6 +26,7 @@ class LottieDialog {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+          backgroundColor: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -55,6 +56,7 @@ class LottieDialog {
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 16),
                 ),
+                const SizedBox(height: 8),
               ],
             ),
           ),

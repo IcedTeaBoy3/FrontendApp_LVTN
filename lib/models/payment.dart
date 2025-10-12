@@ -51,4 +51,26 @@ class Payment {
       'paymentType': paymentType,
     };
   }
+
+  Payment copyWith({
+    String? paymentId,
+    Appointment? appointment,
+    String? appointmentId,
+    double? amount,
+    String? method,
+    String? paymentType,
+    String? status,
+    DateTime? payAt,
+  }) {
+    return Payment(
+      paymentId: paymentId ?? this.paymentId,
+      appointment: appointment ?? this.appointment,
+      appointmentId: appointmentId ?? this.appointmentId,
+      amount: amount ?? this.amount,
+      method: method ?? this.method,
+      paymentType: paymentType ?? this.paymentType,
+      status: status ?? this.status,
+      payAt: payAt ?? this.payAt,
+    );
+  }
 }

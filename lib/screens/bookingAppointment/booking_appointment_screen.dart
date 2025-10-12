@@ -41,6 +41,7 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
   void _nextStep() async {
     final appointmentProvider = context.read<AppointmentProvider>();
     final patientProfile = appointmentProvider.selectedPatientProfile;
+    final doctorService = appointmentProvider.selectedDoctorService;
     final schedule = appointmentProvider.selectedSchedule;
     final slot = appointmentProvider.selectedSlot;
     final paymentMethod = appointmentProvider.paymentMethod;
@@ -86,6 +87,15 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
         );
         return;
       }
+      if (doctorService == null) {
+        CustomFlushbar.show(
+          context,
+          status: 'warning',
+          title: 'Chưa chọn dịch vụ khám',
+          message: 'Vui lòng chọn dịch vụ khám để tiếp tục đặt lịch hẹn.',
+        );
+        return;
+      }
       final result = await appointmentProvider.createAppointment();
       if (!mounted) return;
       await CustomFlushbar.show(
@@ -94,15 +104,27 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
         message: result.message,
       );
       if (result.status == 'success') {
-        if (!mounted) return;
+        // di chuyển đến thanh toán
         context.read<AppointmentProvider>().disableSlot(result.data!.slot);
-        context.goNamed(
-          'bookingSuccess',
-          pathParameters: {
-            'doctorId': widget.doctorId,
-          },
-          extra: result.data as Appointment,
-        );
+        if (paymentMethod == 'online') {
+          if (!mounted) return;
+          context.goNamed(
+            'paymentQRCode',
+            pathParameters: {
+              'doctorId': widget.doctorId,
+            },
+            extra: result.data as Appointment,
+          );
+        } else {
+          if (!mounted) return;
+          context.goNamed(
+            'bookingSuccess',
+            pathParameters: {
+              'doctorId': widget.doctorId,
+            },
+            extra: result.data as Appointment,
+          );
+        }
       }
     }
   }

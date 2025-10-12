@@ -16,10 +16,11 @@ class AppointmentCard extends StatelessWidget {
     final slot = appointment.slot;
     final schedule = appointment.schedule;
     final doctorService = appointment.doctorService;
-    final avatarUrl = doctor?.person.avatar != null
-        ? '${ApiConfig.backendUrl}${doctor?.person.avatar}'
+    final avatarUrl = (doctor != null &&
+            doctor.person.avatar != null &&
+            doctor.person.avatar!.isNotEmpty)
+        ? ApiConfig.backendUrl + doctor.person.avatar!
         : null;
-
     return InkWell(
       onTap: () {
         context.goNamed('detailAppointment', extra: appointment);
@@ -90,11 +91,31 @@ class AppointmentCard extends StatelessWidget {
                 ),
                 CircleAvatar(
                   radius: 30.0,
-                  backgroundImage: avatarUrl != null
-                      ? NetworkImage(avatarUrl) as ImageProvider
-                      : const AssetImage(
-                          'assets/images/avatar-default-icon.png'),
-                ),
+                  backgroundColor: Colors.blue.shade100,
+                  child: ClipOval(
+                    child: avatarUrl != null
+                        ? Image.network(
+                            avatarUrl,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                'assets/images/avatar-default-icon.png',
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              );
+                            },
+                          )
+                        : Image.asset(
+                            'assets/images/avatar-default-icon.png',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                )
               ],
             ),
             const SizedBox(height: 8.0),

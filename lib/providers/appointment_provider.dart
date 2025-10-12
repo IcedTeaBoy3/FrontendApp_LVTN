@@ -66,7 +66,7 @@ class AppointmentProvider extends ChangeNotifier {
       final result =
           await AppointmentService.createAppointment(appointment, payment);
       if (result.status == 'success' && result.data != null) {
-        _appointments.add(result.data!);
+        _appointments.insert(0, result.data!); // thêm vào đầu danh sách
         filterAppointments(); // cập nhật lại danh sách lọc
       }
       return result;
@@ -147,6 +147,25 @@ class AppointmentProvider extends ChangeNotifier {
         return;
       }
     }
+  }
+
+  Appointment updatePaymentStatus(String appointmentId, String status) {
+    final index =
+        _appointments.indexWhere((a) => a.appointmentId == appointmentId);
+    if (index != -1) {
+      final appointment = _appointments[index];
+      if (appointment.payment != null) {
+        final updatedPayment = appointment.payment!.copyWith(
+          status: status,
+          payAt: DateTime.now(),
+        );
+        _appointments[index] = appointment.copyWith(payment: updatedPayment);
+        filterAppointments();
+        notifyListeners();
+      }
+      return _appointments[index];
+    }
+    throw Exception('Appointment not found');
   }
 
   void filterAppointments() {

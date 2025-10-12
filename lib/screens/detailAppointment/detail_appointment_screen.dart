@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
-import 'package:frontend_app/providers/schedule_provider.dart';
 import 'package:frontend_app/widgets/custom_flushbar.dart';
 import 'package:frontend_app/models/appointment.dart';
 import 'package:frontend_app/providers/clinic_provider.dart';
@@ -406,10 +405,30 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         CircleAvatar(
                           radius: 30.0,
-                          backgroundImage: avatarUrl != null
-                              ? NetworkImage(avatarUrl) as ImageProvider
-                              : const AssetImage(
-                                  'assets/images/avatar-default-icon.png'),
+                          backgroundColor: Colors.blue.shade100,
+                          child: ClipOval(
+                            child: avatarUrl != null
+                                ? Image.network(
+                                    avatarUrl,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Image.asset(
+                                        'assets/images/avatar-default-icon.png',
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                                    'assets/images/avatar-default-icon.png',
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
                         ),
                       ],
                     ),
