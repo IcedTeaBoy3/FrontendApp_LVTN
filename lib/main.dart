@@ -9,6 +9,7 @@ import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:frontend_app/providers/address_provider.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/providers/ethnic_provider.dart';
+import 'package:frontend_app/providers/notification_provider.dart';
 import 'package:frontend_app/screens/my_app.dart';
 import 'package:frontend_app/services/api_client.dart';
 
@@ -27,7 +28,14 @@ void main() async {
         ChangeNotifierProvider(create: (_) => DoctorProvider()),
         ChangeNotifierProvider(create: (_) => ScheduleProvider()),
         ChangeNotifierProvider(create: (_) => PatientprofileProvider()),
-        ChangeNotifierProvider(create: (_) => AppointmentProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProxyProvider<NotificationProvider, AppointmentProvider>(
+          create: (context) => AppointmentProvider(
+            Provider.of<NotificationProvider>(context, listen: false),
+          ),
+          update: (context, notificationProvider, appointmentProvider) =>
+              AppointmentProvider(notificationProvider),
+        ),
       ],
       child: const MyApp(),
     ),

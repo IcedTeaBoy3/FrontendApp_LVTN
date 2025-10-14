@@ -5,18 +5,25 @@ import 'package:frontend_app/models/schedule.dart';
 import 'package:frontend_app/models/slot.dart';
 import 'package:frontend_app/models/doctorservice.dart';
 import 'package:frontend_app/models/appointment.dart';
+import 'package:frontend_app/models/notification.dart';
 import 'package:frontend_app/services/appointment_service.dart';
 import 'package:frontend_app/models/responseapi.dart';
 import 'package:frontend_app/services/websocket_service.dart';
+import 'package:frontend_app/providers/notification_provider.dart';
+import 'package:provider/provider.dart';
 
 class AppointmentProvider extends ChangeNotifier {
   final WebSocketService _socketService = WebSocketService();
-  AppointmentProvider() {
-    _socketService.on('appointment_confirmed', (data) {
-      debugPrint('Received appointment_confirmed: $data');
-      final appointmentId = data['appointmentId'];
-      final newStatus = data['status'];
+  final NotificationProvider _notificationProvider;
+  AppointmentProvider(this._notificationProvider) {
+    // Lắng nghe sự kiện cập nhật trạng thái từ WebSocket
+    _socketService.socket?.on('appointment_status_updated', (data) {
+      final appointmentId = data['appointmentId'] as String;
+      final newStatus = data['status'] as String;
+      final notification = NotificationModel.fromJson(data['notification']);
+      debugPrint('🔔 Appointment status updated: $appointmentId -> $newStatus');
       _updateAppointmentStatus(appointmentId, newStatus);
+      _notificationProvider.addNotification(notification);
     });
   }
   List<Appointment> _appointments = [];
@@ -182,6 +189,7 @@ class AppointmentProvider extends ChangeNotifier {
     final index = _appointments.indexWhere((a) => a.appointmentId == id);
     if (index != -1) {
       _appointments[index] = _appointments[index].copyWith(status: newStatus);
+      notifyListeners();
       filterAppointments();
     }
   }

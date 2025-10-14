@@ -39,6 +39,7 @@ class AuthProvider extends ChangeNotifier {
         // Kết nối WebSocket
         _socketService.connect(
           accountId: _account!.accountId,
+          role: _account!.role,
         );
       }
       return result;
@@ -84,6 +85,7 @@ class AuthProvider extends ChangeNotifier {
         // Kết nối WebSocket
         _socketService.connect(
           accountId: _account!.accountId,
+          role: _account!.role,
         );
       }
       return result;
@@ -130,6 +132,7 @@ class AuthProvider extends ChangeNotifier {
         if (_account != null) {
           _socketService.connect(
             accountId: _account!.accountId,
+            role: _account!.role,
           );
         }
       } else {
