@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_app/models/patientprofile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend_app/themes/colors.dart';

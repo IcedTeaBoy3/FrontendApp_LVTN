@@ -5,9 +5,11 @@ import 'package:frontend_app/models/account.dart';
 import 'package:frontend_app/services/auth_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
+import 'package:frontend_app/services/websocket_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   static const _storage = FlutterSecureStorage();
+  final WebSocketService _socketService = WebSocketService();
   AuthProvider() {
     _loadFromStorage();
   }
@@ -34,6 +36,10 @@ class AuthProvider extends ChangeNotifier {
         // Lưu token và account vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
+        // Kết nối WebSocket
+        _socketService.connect(
+          accountId: _account!.accountId,
+        );
       }
       return result;
     } catch (e) {
@@ -75,6 +81,10 @@ class AuthProvider extends ChangeNotifier {
         // Lưu token và user vào secure storage
         await _storage.write(key: 'accessToken', value: _accessToken);
         await _storage.write(key: 'refreshToken', value: _refreshToken);
+        // Kết nối WebSocket
+        _socketService.connect(
+          accountId: _account!.accountId,
+        );
       }
       return result;
     } catch (e) {
@@ -116,6 +126,12 @@ class AuthProvider extends ChangeNotifier {
       bool isExpired = Jwt.isExpired(_accessToken!);
       if (!isExpired) {
         _account = await AuthService.getAccount();
+        // 🔥 Kết nối lại socket khi app mở lại
+        if (_account != null) {
+          _socketService.connect(
+            accountId: _account!.accountId,
+          );
+        }
       } else {
         _accessToken = null;
         await _storage.delete(key: 'accessToken');
@@ -132,6 +148,7 @@ class AuthProvider extends ChangeNotifier {
     _refreshToken = null;
     await _storage.delete(key: 'accessToken');
     await _storage.delete(key: 'refreshToken');
+    _socketService.disconnect();
     notifyListeners();
   }
 }

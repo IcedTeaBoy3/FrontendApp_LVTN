@@ -7,8 +7,18 @@ import 'package:frontend_app/models/doctorservice.dart';
 import 'package:frontend_app/models/appointment.dart';
 import 'package:frontend_app/services/appointment_service.dart';
 import 'package:frontend_app/models/responseapi.dart';
+import 'package:frontend_app/services/websocket_service.dart';
 
 class AppointmentProvider extends ChangeNotifier {
+  final WebSocketService _socketService = WebSocketService();
+  AppointmentProvider() {
+    _socketService.on('appointment_confirmed', (data) {
+      debugPrint('Received appointment_confirmed: $data');
+      final appointmentId = data['appointmentId'];
+      final newStatus = data['status'];
+      _updateAppointmentStatus(appointmentId, newStatus);
+    });
+  }
   List<Appointment> _appointments = [];
   List<Appointment> _filteredAppointments = [];
   DateTime? _filterDate;
@@ -166,6 +176,14 @@ class AppointmentProvider extends ChangeNotifier {
       return _appointments[index];
     }
     throw Exception('Appointment not found');
+  }
+
+  void _updateAppointmentStatus(String id, String newStatus) {
+    final index = _appointments.indexWhere((a) => a.appointmentId == id);
+    if (index != -1) {
+      _appointments[index] = _appointments[index].copyWith(status: newStatus);
+      filterAppointments();
+    }
   }
 
   void filterAppointments() {
