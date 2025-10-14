@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'api_client.dart';
 import 'package:frontend_app/models/account.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -189,6 +191,38 @@ class AuthService {
         status: 'error',
         message: 'Làm mới token thất bại',
       );
+    }
+  }
+
+  static Future<ResponseApi<Account>> updateAccount({
+    required String accountId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    try {
+      final formData = FormData.fromMap(updatedData);
+      final response = await ApiClient.dio.put(
+        '/account/update-account/$accountId',
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+      debugPrint('Response data: ${response.data}');
+      return ResponseApi<Account>.fromJson(
+        response.data,
+        funtionParser: (dataJson) => Account.fromJson(dataJson),
+      );
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Cập nhật thông tin thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(
+          status: 'error', message: 'Cập nhật thông tin thất bại');
     }
   }
 }

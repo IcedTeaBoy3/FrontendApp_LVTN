@@ -22,6 +22,7 @@ import 'package:frontend_app/screens/detailAppointment/detail_appointment_screen
 import 'package:frontend_app/screens/search/search_screen.dart';
 import 'package:frontend_app/screens/bookingSuccess/booking_success_screen.dart';
 import 'package:frontend_app/screens/paymentQrCode/paymentQrCode.dart';
+import 'package:frontend_app/screens/accountInfo/account_info_screen.dart';
 
 /// 🌐 AppRoutes quản lý toàn bộ định tuyến
 class AppRoutes {
@@ -175,6 +176,13 @@ class AppRoutes {
                 ],
               ),
             ],
+          ),
+
+          // 👤 Account Info
+          GoRoute(
+            name: 'accountInfo',
+            path: 'accountInfo',
+            builder: (context, state) => const AccountInfoScreen(),
           ),
         ],
       ),

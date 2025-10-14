@@ -25,6 +25,7 @@ class DoctorDetailScreen extends StatelessWidget {
           ? Colors.grey.shade200
           : Colors.grey.shade800,
       appBar: AppBar(
+        centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [

@@ -88,6 +88,27 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<ResponseApi<Account>> updateAccount({
+    required String accountId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final result = await AuthService.updateAccount(
+          accountId: accountId, updatedData: updatedData);
+      if (result.status == 'success') {
+        _account = result.data;
+      }
+      return result;
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Cập nhật thất bại');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> _loadFromStorage() async {
     _accessToken = await _storage.read(key: 'accessToken');
     print('Token loaded from storage: $_accessToken');

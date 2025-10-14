@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
 import 'package:frontend_app/providers/appointment_provider.dart';
-
 import 'package:frontend_app/widgets/confirm_dialog.dart';
-import 'package:provider/provider.dart';
+import 'package:frontend_app/configs/api_config.dart';
 
 class AccountScreen extends StatelessWidget {
   final void Function(int)? onBackToHome;
@@ -29,11 +29,21 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
+  ImageProvider _getAvatarImage(account) {
+    // 2️⃣ Nếu chưa chọn ảnh mới, nhưng đã có avatar trong account
+    if (account?.avatar != null && account!.avatar.isNotEmpty) {
+      return account.avatar.startsWith('http')
+          ? NetworkImage(account.avatar)
+          : NetworkImage('${ApiConfig.backendUrl}${account.avatar}');
+    }
+    // 3️⃣ Trả về ảnh mặc định
+    return const AssetImage('assets/images/avatar-default-icon.png');
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final account = authProvider.account;
-    final avatarUrl = account?.avatar;
     final isAuthenticated = authProvider.isAuthenticated;
     return Column(
       children: [
@@ -54,12 +64,8 @@ class AccountScreen extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 45,
-                        backgroundColor: Colors.lightBlue,
-                        backgroundImage:
-                            avatarUrl != null && avatarUrl.isNotEmpty
-                                ? NetworkImage(avatarUrl) as ImageProvider
-                                : AssetImage(
-                                    'assets/images/avatar-default-icon.png'),
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage: _getAvatarImage(account),
                       ),
                       const SizedBox(height: 12),
                       Text(
@@ -192,6 +198,28 @@ class AccountScreen extends StatelessWidget {
                     Future.delayed(const Duration(seconds: 1), () {
                       onBackToHome!(1);
                     });
+                  },
+                ),
+                Divider(
+                  indent: 12,
+                  endIndent: 12,
+                  color: Colors.grey[200],
+                  thickness: 1,
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.person,
+                    color: AppColors.primaryBlue,
+                  ),
+                  title: Text('Thông tin tài khoản'),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Colors.black45,
+                  ),
+                  onTap: () {
+                    // Gọi callback thay vì goNamed
+                    context.goNamed('accountInfo');
                   },
                 ),
                 Divider(

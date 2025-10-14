@@ -36,10 +36,13 @@ class Appointment {
   factory Appointment.fromJson(Map<String, dynamic> json) {
     String? parsePaymentId;
     Payment? parsePayment;
-    if (json['payment'] is String) {
-      parsePaymentId = json['payment'];
-    } else if (json['payment'] is Map<String, dynamic>) {
-      parsePayment = Payment.fromJson(json['payment']);
+    final paymentData = json['payment'];
+    if (paymentData != null) {
+      if (paymentData is String) {
+        parsePaymentId = paymentData;
+      } else if (paymentData is Map<String, dynamic>) {
+        parsePayment = Payment.fromJson(paymentData);
+      }
     }
 
     return Appointment(
