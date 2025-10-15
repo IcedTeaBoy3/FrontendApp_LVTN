@@ -38,10 +38,32 @@ class NotificationService {
     }
   }
 
+  static Future<ResponseApi> markAsRead(String notificationId) async {
+    try {
+      final response = await ApiClient.dio
+          .put('/notification/mark-as-read/$notificationId', data: {});
+      debugPrint('Response data: ${response.data}');
+      return ResponseApi.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
   static Future<ResponseApi> deleteAllNotifications() async {
     try {
       final response =
           await ApiClient.dio.delete('/notification/clear-all-notifications');
+      debugPrint('Response data: ${response.data}');
+      return ResponseApi.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  static Future<ResponseApi> deleteNotification(String notificationId) async {
+    try {
+      final response = await ApiClient.dio
+          .delete('/notification/delete-notification/$notificationId');
       debugPrint('Response data: ${response.data}');
       return ResponseApi.fromJson(response.data);
     } catch (e) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend_app/models/notification.dart';
 import 'package:frontend_app/utils/date_utils.dart';
 import 'package:go_router/go_router.dart';
+import 'notification_bottom_sheet.dart';
 
 class NotificationCard extends StatelessWidget {
   final NotificationModel notification;
@@ -46,7 +47,18 @@ class NotificationCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Icon(Icons.more_vert, color: Colors.grey.shade600),
+                IconButton(
+                  icon: Icon(
+                    Icons.more_vert,
+                    color: Colors.grey.shade600,
+                  ),
+                  onPressed: () {
+                    showNotificationBottomSheet(
+                      context,
+                      notificationId: notification.notificationId,
+                    );
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 8),

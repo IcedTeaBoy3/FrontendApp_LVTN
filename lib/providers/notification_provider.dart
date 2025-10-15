@@ -50,6 +50,28 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
+  void markAsRead(String notificationId) async {
+    final response = await NotificationService.markAsRead(notificationId);
+    if (response.status == 'success') {
+      int index = _notifications
+          .indexWhere((noti) => noti.notificationId == notificationId);
+      if (index != -1) {
+        _notifications[index] = _notifications[index].copyWith(isRead: true);
+        notifyListeners();
+      }
+    }
+  }
+
+  void deleteNotification(String notificationId) async {
+    final response =
+        await NotificationService.deleteNotification(notificationId);
+    if (response.status == 'success') {
+      _notifications
+          .removeWhere((noti) => noti.notificationId == notificationId);
+      notifyListeners();
+    }
+  }
+
   void deleteAllNotifications() async {
     final response = await NotificationService.deleteAllNotifications();
     if (response.status == 'success') {
