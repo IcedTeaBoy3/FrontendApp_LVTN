@@ -304,7 +304,7 @@ void handleShowDetailPatientProfile(
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  'Chua cập nhật',
+                  patientProfile.person.ethnic ?? 'Chưa cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

@@ -4,40 +4,45 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class ServiceItem extends StatelessWidget {
   final IconData icon;
   final String title;
+  final Function()? onTap;
 
   const ServiceItem({
     super.key,
     required this.icon,
     required this.title,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        FaIcon(
-          icon,
-          size: 20,
-          color: Colors.blue,
-        ),
-        const SizedBox(height: 6),
-        Flexible(
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            softWrap: true, // Cho phép xuống dòng
-            overflow: TextOverflow.visible, // Không cắt chữ
-            style: Theme.of(context).brightness == Brightness.dark
-                ? Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    )
-                : Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FaIcon(
+            icon,
+            size: 20,
+            color: Colors.blue,
           ),
-        ),
-      ],
+          const SizedBox(height: 6),
+          Flexible(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              softWrap: true, // Cho phép xuống dòng
+              overflow: TextOverflow.visible, // Không cắt chữ
+              style: Theme.of(context).brightness == Brightness.dark
+                  ? Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      )
+                  : Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

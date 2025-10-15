@@ -7,9 +7,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend_app/themes/colors.dart';
 import 'package:frontend_app/widgets/custom_dropdownfield.dart';
-import 'package:frontend_app/models/specialty.dart';
 import 'package:frontend_app/models/service.dart';
 import 'package:frontend_app/models/degree.dart';
+import 'package:frontend_app/providers/specialty_provider.dart';
+import 'package:lottie/lottie.dart';
 
 class SearchScreen extends StatefulWidget {
   final String? query;
@@ -29,20 +30,12 @@ class _SearchScreenState extends State<SearchScreen> {
         doctorProvider.fetchDoctors();
       }
       doctorProvider.setQuery(widget.query ?? '');
+      debugPrint('Initial query: ${widget.query}');
     });
   }
 
   void _showFilters(BuildContext context) {
-    final doctorSpecialties = context
-        .read<DoctorProvider>()
-        .doctors
-        .expand((doc) => doc.doctorSpecialties.map((ds) => ds.specialty))
-        .fold<Map<String, Specialty>>({}, (map, specialty) {
-          map[specialty.specialtyId] = specialty;
-          return map;
-        })
-        .values
-        .toList();
+    final specialties = context.read<SpecialtyProvider>().specialties;
 
     final services = context
         .read<DoctorProvider>()
@@ -119,7 +112,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ? null
                     : context.watch<DoctorProvider>().selectedSpecialty,
                 itemLabel: (item) => item,
-                items: doctorSpecialties.map((e) => e.name).toList(),
+                items: specialties.map((e) => e.name).toList(),
                 onChanged: (value) {
                   // Xử lý khi chọn trạng thái
                   context.read<DoctorProvider>().setSelectedSpecialty(value);
@@ -224,7 +217,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filterDoctors = context.watch<DoctorProvider>().filteredDoctors;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -245,7 +237,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   color: Colors.white,
                   size: 20,
                 ),
-                if (context.read<DoctorProvider>().isFilter() == true)
+                if (context.watch<DoctorProvider>().isFilter() == true)
                   Positioned(
                     right: 0,
                     top: 0,
@@ -283,25 +275,56 @@ class _SearchScreenState extends State<SearchScreen> {
                   'Kết quả tìm kiếm cho: "${context.read<DoctorProvider>().query}"',
                 ),
               ),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filterDoctors.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 4),
-              itemBuilder: (context, index) {
-                final doctor = filterDoctors[index];
-                return DoctorCard(
-                  doctorId: doctor.doctorId,
-                  name: doctor.person.fullName,
-                  specialtyName: doctor.primarySpecialtyName,
-                  avatar: doctor.person.avatar,
-                  onTap: () {
-                    context.goNamed(
-                      'doctorDetail',
-                      pathParameters: {'doctorId': doctor.doctorId},
-                      queryParameters: {'from': 'search'},
-                    );
-                  },
+            Consumer<DoctorProvider>(
+              builder: (context, doctorProvider, child) {
+                final filterDoctors = doctorProvider.filteredDoctors;
+                if (filterDoctors.isEmpty) {
+                  return Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Lottie.asset(
+                          'assets/animations/NotFound.json',
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Không tìm thấy kết quả phù hợp.',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return Expanded(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: filterDoctors.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 4),
+                    itemBuilder: (context, index) {
+                      final doctor = filterDoctors[index];
+                      return DoctorCard(
+                        doctorId: doctor.doctorId,
+                        name: doctor.person.fullName,
+                        specialtyName: doctor.primarySpecialtyName,
+                        avatar: doctor.person.avatar,
+                        onTap: () {
+                          context.goNamed(
+                            'doctorDetail',
+                            pathParameters: {'doctorId': doctor.doctorId},
+                            queryParameters: {'from': 'search'},
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             )

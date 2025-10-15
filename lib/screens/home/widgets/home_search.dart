@@ -21,12 +21,26 @@ class _HomeSearchState extends State<HomeSearch> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        TextEditingController(text: context.read<DoctorProvider>().query);
+    _controller = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final doctorProvider = context.watch<DoctorProvider>();
+    final newText = doctorProvider.query;
+    // Cập nhật controller khi query trong provider thay đổi
+    if (_controller.text != newText) {
+      _controller.value = TextEditingValue(
+        text: newText,
+        selection: TextSelection.collapsed(offset: newText.length),
+      );
+    }
   }
 
   void _handleSearch() {
     final query = _controller.text.trim();
+    context.read<DoctorProvider>().setQuery(query); // Cập nhật Provider
     widget.onSearch?.call(query);
   }
 
@@ -69,7 +83,7 @@ class _HomeSearchState extends State<HomeSearch> {
         ),
       ),
       textInputAction: TextInputAction.search, // Cho phép nhấn Enter để search
-      onSubmitted: (value) => _handleSearch(), // Khi nhấn Enter
+      onSubmitted: (_) => _handleSearch(), // Khi nhấn Enter
     );
   }
 }

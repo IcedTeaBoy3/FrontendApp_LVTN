@@ -26,17 +26,12 @@ class DoctorDetailScreen extends StatelessWidget {
           : Colors.grey.shade800,
       appBar: AppBar(
         centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              'Chi tiết bác sĩ',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        title: Text(
+          'Chi tiết bác sĩ',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

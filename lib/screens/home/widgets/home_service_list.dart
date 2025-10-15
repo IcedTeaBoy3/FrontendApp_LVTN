@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend_app/providers/clinic_provider.dart';
+import 'package:frontend_app/widgets/modal_list_specialties.dart';
 import 'package:frontend_app/widgets/service_item.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class HomeServiceList extends StatelessWidget {
   const HomeServiceList({super.key});
@@ -33,19 +37,31 @@ class HomeServiceList extends StatelessWidget {
           mainAxisSpacing: 12,
           crossAxisSpacing: 12,
           children: [
-            const ServiceItem(
+            ServiceItem(
               icon: FontAwesomeIcons.hospital,
               title: "Phòng khám",
+              onTap: () {
+                context.goNamed(
+                  'clinicDetail',
+                  extra: context.read<ClinicProvider>().clinic,
+                );
+              },
             ),
-            const ServiceItem(
+            ServiceItem(
               icon: FontAwesomeIcons.userDoctor,
               title: "Bác sĩ",
+              onTap: () {
+                context.goNamed('search', queryParameters: {'query': ''});
+              },
             ),
-            const ServiceItem(
+            ServiceItem(
               icon: FontAwesomeIcons.stethoscope,
               title: "Chuyên khoa",
+              onTap: () {
+                openSpecialtySheet(context);
+              },
             ),
-            const ServiceItem(
+            ServiceItem(
               icon: FontAwesomeIcons.briefcaseMedical,
               title: "Dịch vụ",
             ),
@@ -56,10 +72,6 @@ class HomeServiceList extends StatelessWidget {
             const ServiceItem(
               icon: FontAwesomeIcons.calendarCheck,
               title: "Đặt lịch hẹn",
-            ),
-            const ServiceItem(
-              icon: FontAwesomeIcons.fileMedical,
-              title: "Hồ sơ y tế",
             ),
             const ServiceItem(
               icon: FontAwesomeIcons.heartPulse,

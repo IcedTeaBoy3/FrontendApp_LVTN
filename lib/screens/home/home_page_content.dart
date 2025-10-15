@@ -40,7 +40,6 @@ class HomePageContent extends StatelessWidget {
                 children: [
                   HomeSearch(
                     hintText: 'Tìm kiếm bác sĩ, chuyên khoa, dịch vụ',
-                    // initialText: context.read<DoctorProvider>().query,
                     onSearch: (query) {
                       context.pushNamed('search', queryParameters: {
                         'query': query,
