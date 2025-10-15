@@ -28,13 +28,19 @@ void main() async {
         ChangeNotifierProvider(create: (_) => DoctorProvider()),
         ChangeNotifierProvider(create: (_) => ScheduleProvider()),
         ChangeNotifierProvider(create: (_) => PatientprofileProvider()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider<NotificationProvider>(
+          create: (_) => NotificationProvider(),
+        ),
         ChangeNotifierProxyProvider<NotificationProvider, AppointmentProvider>(
           create: (context) => AppointmentProvider(
             Provider.of<NotificationProvider>(context, listen: false),
           ),
-          update: (context, notificationProvider, appointmentProvider) =>
-              AppointmentProvider(notificationProvider),
+          update: (context, notificationProvider, appointmentProvider) {
+            // Chỉ cập nhật notificationProvider chứ không tạo instance mới
+            appointmentProvider!
+                .updateNotificationProvider(notificationProvider);
+            return appointmentProvider;
+          },
         ),
       ],
       child: const MyApp(),

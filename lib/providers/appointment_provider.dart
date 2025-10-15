@@ -10,22 +10,38 @@ import 'package:frontend_app/services/appointment_service.dart';
 import 'package:frontend_app/models/responseapi.dart';
 import 'package:frontend_app/services/websocket_service.dart';
 import 'package:frontend_app/providers/notification_provider.dart';
-import 'package:provider/provider.dart';
 
 class AppointmentProvider extends ChangeNotifier {
   final WebSocketService _socketService = WebSocketService();
-  final NotificationProvider _notificationProvider;
+  late NotificationProvider _notificationProvider;
+  bool _socketListenerRegistered = false; // ⚡ chỉ 1 lần
+
   AppointmentProvider(this._notificationProvider) {
-    // Lắng nghe sự kiện cập nhật trạng thái từ WebSocket
-    _socketService.socket?.on('appointment_status_updated', (data) {
-      final appointmentId = data['appointmentId'] as String;
-      final newStatus = data['status'] as String;
-      final notification = NotificationModel.fromJson(data['notification']);
-      debugPrint('🔔 Appointment status updated: $appointmentId -> $newStatus');
-      _updateAppointmentStatus(appointmentId, newStatus);
-      _notificationProvider.addNotification(notification);
-    });
+    _initSocket();
   }
+  void updateNotificationProvider(NotificationProvider provider) {
+    _notificationProvider = provider;
+  }
+
+  void _initSocket() {
+    if (!_socketListenerRegistered) {
+      _socketService.on('appointment_status_updated', (data) {
+        debugPrint('Received appointment_status_updated: $data');
+        final appointmentId = data['appointmentId'];
+        final status = data['status'];
+        final notificationData = data['notification'];
+        if (appointmentId != null) {
+          _updateAppointmentStatus(appointmentId, status);
+        }
+        if (notificationData != null) {
+          final noti = NotificationModel.fromJson(notificationData);
+          _notificationProvider.addNotification(noti);
+        }
+      });
+    }
+    _socketListenerRegistered = true;
+  }
+
   List<Appointment> _appointments = [];
   List<Appointment> _filteredAppointments = [];
   DateTime? _filterDate;
@@ -188,9 +204,18 @@ class AppointmentProvider extends ChangeNotifier {
   void _updateAppointmentStatus(String id, String newStatus) {
     final index = _appointments.indexWhere((a) => a.appointmentId == id);
     if (index != -1) {
-      _appointments[index] = _appointments[index].copyWith(status: newStatus);
+      final updatedAppointment =
+          _appointments[index].copyWith(status: newStatus);
+      _appointments[index] = updatedAppointment;
+
+      // Cập nhật _filteredAppointments tương ứng
+      final filteredIndex =
+          _filteredAppointments.indexWhere((a) => a.appointmentId == id);
+      if (filteredIndex != -1) {
+        _filteredAppointments[filteredIndex] = updatedAppointment;
+      }
+
       notifyListeners();
-      filterAppointments();
     }
   }
 

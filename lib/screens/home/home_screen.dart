@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/screens/home/widgets/home_navbar.dart';
 import 'package:frontend_app/screens/home/widgets/home_appbar.dart';
-
 import 'package:frontend_app/screens/home/home_page_content.dart';
 import 'package:frontend_app/screens/patientProfile/patient_profile_screen.dart';
 import 'package:frontend_app/screens/account/account_screen.dart';

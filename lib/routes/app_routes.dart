@@ -23,6 +23,7 @@ import 'package:frontend_app/screens/search/search_screen.dart';
 import 'package:frontend_app/screens/bookingSuccess/booking_success_screen.dart';
 import 'package:frontend_app/screens/paymentQrCode/paymentQrCode.dart';
 import 'package:frontend_app/screens/accountInfo/account_info_screen.dart';
+import 'package:frontend_app/screens/notification/notification_screen.dart';
 
 /// 🌐 AppRoutes quản lý toàn bộ định tuyến
 class AppRoutes {
@@ -183,6 +184,11 @@ class AppRoutes {
             name: 'accountInfo',
             path: 'accountInfo',
             builder: (context, state) => const AccountInfoScreen(),
+          ),
+          GoRoute(
+            name: 'notification',
+            path: 'notification',
+            builder: (context, state) => const NotificationScreen(),
           ),
         ],
       ),

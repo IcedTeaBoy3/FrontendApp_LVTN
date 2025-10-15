@@ -4,6 +4,7 @@ import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/confirm_dialog.dart';
 import 'package:frontend_app/themes/colors.dart';
+import 'package:frontend_app/providers/notification_provider.dart';
 
 class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppbar({super.key});
@@ -78,7 +79,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
               onPressed: () {
                 if (isAuthenticated) {
-                  context.goNamed('notifications');
+                  context.goNamed('notification');
                 } else {
                   ConfirmDialog.show(
                     context,
@@ -95,29 +96,33 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
                 }
               },
             ),
-            Positioned(
-              right: 11,
-              top: 11,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                constraints: const BoxConstraints(
-                  minWidth: 14,
-                  minHeight: 14,
-                ),
-                child: const Text(
-                  '3', // Số lượng thông báo chưa đọc
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 8,
+            if (context.watch<NotificationProvider>().countUnread() > 0)
+              Positioned(
+                right: 11,
+                top: 11,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(6),
                   ),
-                  textAlign: TextAlign.center,
+                  constraints: const BoxConstraints(
+                    minWidth: 14,
+                    minHeight: 14,
+                  ),
+                  child: Text(
+                    context
+                        .watch<NotificationProvider>()
+                        .countUnread()
+                        .toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
           ],
         )
       ],

@@ -4,7 +4,6 @@ import 'package:frontend_app/screens/appointment/widgets/appointment_card.dart';
 import 'package:frontend_app/widgets/custom_loading.dart';
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
-import 'package:frontend_app/services/websocket_service.dart';
 
 class ApppointmentList extends StatefulWidget {
   const ApppointmentList({super.key});

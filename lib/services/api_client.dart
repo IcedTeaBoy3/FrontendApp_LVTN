@@ -30,8 +30,7 @@ class ApiClient {
           final data = e.response?.data;
 
           // 🟢 Check token hết hạn
-          if (data is Map<String, dynamic> &&
-              data['message']?.toString().toLowerCase() == 'jwt expired') {
+          if (data['message']?.toString().toLowerCase() == 'jwt expired') {
             await authProvider.refreshTokenIfNeeded();
             if (authProvider.accessToken != null) {
               try {

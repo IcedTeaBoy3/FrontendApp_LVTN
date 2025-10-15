@@ -6,6 +6,7 @@ import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/message_dialog.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
+import 'package:frontend_app/providers/notification_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? email;
@@ -50,6 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
           .login(email: email, password: password);
       if (!mounted) return; // kiểm tra ngay sau await
       context.read<PatientprofileProvider>().fetchPatientprofiles();
+      context
+          .read<NotificationProvider>()
+          .fetchNotification(page: 1, limit: 100);
 
       if (response.status == 'success') {
         LottieDialog.show(
@@ -80,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final result = await context.read<AuthProvider>().loginWithGoogle();
     if (!mounted) return;
     context.read<PatientprofileProvider>().fetchPatientprofiles();
+    context.read<NotificationProvider>().fetchNotification(page: 1, limit: 100);
     if (result.status == 'success') {
       LottieDialog.show(
         context,
