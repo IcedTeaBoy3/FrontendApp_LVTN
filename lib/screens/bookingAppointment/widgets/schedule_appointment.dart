@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/providers/patientprofile_provider.dart';
-import 'package:frontend_app/widgets/custom_textfield.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/providers/doctor_provider.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
@@ -10,7 +9,6 @@ import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/screens/patientProfile/widgets/card_patientprofile.dart';
 import 'package:frontend_app/screens/bookingAppointment/widgets/card_doctor_appointment.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend_app/widgets/custom_textfield.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -117,8 +115,13 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
   }
 
   void _handleAddMoreInfo(BuildContext context) async {
-    final TextEditingController symptomController = TextEditingController();
-    File? selectedImage;
+    final appointmentProvider = context.read<AppointmentProvider>();
+
+    // 🟢 Lấy giá trị hiện tại từ Provider
+    final TextEditingController symptomController =
+        TextEditingController(text: appointmentProvider.symptoms ?? '');
+    File? selectedImage = appointmentProvider.symptomsImage;
+
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -146,20 +149,24 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                 left: 16,
                 right: 16,
                 top: 16,
-                // ✅ giúp không bị che bởi bàn phím
                 bottom: MediaQuery.of(context).viewInsets.bottom + 16,
               ),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      "Lý do thăm khám",
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Lý do thăm khám",
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
                     // 📝 Text area triệu chứng
                     TextField(
@@ -174,58 +181,29 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                           borderSide:
                               const BorderSide(color: Colors.blue, width: 1.0),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 12.0,
-                          horizontal: 16.0,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide:
-                              const BorderSide(color: Colors.blue, width: 1.0),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide:
-                              const BorderSide(color: Colors.grey, width: 1.0),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                          borderSide:
-                              const BorderSide(color: Colors.red, width: 1.0),
-                        ),
-                        errorStyle: const TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        errorMaxLines: 2,
                       ),
-                      cursorColor: Colors.blue,
-                      cursorWidth: 2, // độ dày
-                      cursorHeight: 25, // chiều cao
-                      cursorRadius: Radius.circular(2), // bo góc
-                      cursorErrorColor: Colors.red, // màu khi lỗi
                     ),
 
                     const SizedBox(height: 16),
 
-                    // 📸 Upload ảnh
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Ảnh minh họa (nếu có)",
+                        "Ảnh triệu chứng (nếu có)",
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium!
-                            .copyWith(fontWeight: FontWeight.w600),
+                            .copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(height: 8),
+
+                    // 📸 Upload ảnh
                     GestureDetector(
                       onTap: _pickImage,
                       child: Container(
                         width: double.infinity,
-                        height: 150,
+                        height: 300,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -294,7 +272,24 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                             "image": selectedImage,
                           });
                         },
-                        child: const Text("Lưu thông tin"),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: const Text(
+                          "Lưu thông tin",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -306,11 +301,12 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
       },
     );
 
-    // 🟢 Sau khi đóng bottom sheet, lấy kết quả
+    // 🟢 Sau khi đóng bottom sheet, lưu lại vào Provider
     if (result != null) {
-      debugPrint("Triệu chứng: ${result["symptom"]}");
-      debugPrint("Ảnh: ${result["image"]?.path}");
-      // 👉 Gán vào state, provider, hoặc gửi API
+      final symptom = result["symptom"] as String?;
+      final image = result["image"] as File?;
+      appointmentProvider.setSymptoms(symptom ?? "");
+      appointmentProvider.setSymptomsImage(image);
     }
   }
 

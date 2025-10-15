@@ -3,18 +3,31 @@ import 'api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_app/models/responseapi.dart';
 import 'package:frontend_app/models/payment.dart';
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:path/path.dart' as path;
+import 'dart:convert';
 
 class AppointmentService {
   static Future<ResponseApi<Appointment>> createAppointment(
-      Appointment appointment, Payment payment) async {
+      Appointment appointment, Payment payment,
+      {File? symptomsImage}) async {
     try {
+      final formData = FormData.fromMap({
+        'appointment': jsonEncode(appointment.toJson()),
+        'payment': jsonEncode(payment.toJson()),
+        if (symptomsImage != null)
+          'symptomsImage': await MultipartFile.fromFile(
+            symptomsImage.path,
+            filename: path.basename(symptomsImage.path),
+          ),
+      });
       final response = await ApiClient.dio.post(
         '/appointment/create-appointment',
-        data: {
-          'appointment': appointment.toJson(),
-          'payment': payment.toJson(),
-        },
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
       );
       return ResponseApi<Appointment>.fromJson(
         response.data,

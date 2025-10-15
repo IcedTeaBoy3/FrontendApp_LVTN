@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend_app/widgets/custom_flushbar.dart';
 import 'package:frontend_app/models/appointment.dart';
-import 'package:frontend_app/providers/schedule_provider.dart';
 
 class BookingAppointmentScreen extends StatefulWidget {
   final String doctorId;

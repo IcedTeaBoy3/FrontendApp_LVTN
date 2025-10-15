@@ -17,6 +17,8 @@ class Appointment {
   final DateTime? updatedAt;
   final Payment? payment;
   final String? paymentId;
+  final String? symptoms;
+  final String? symptomImage;
 
   Appointment({
     this.appointmentNumber,
@@ -31,6 +33,8 @@ class Appointment {
     this.updatedAt,
     this.payment,
     this.paymentId,
+    this.symptoms,
+    this.symptomImage,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -60,6 +64,8 @@ class Appointment {
           json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       updatedAt:
           json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      symptoms: json['symptoms'] ?? '',
+      symptomImage: json['symptomImage'] ?? '',
     );
   }
   static List<Appointment> appointmentsFromJson(List<dynamic> jsonList) {
@@ -78,6 +84,8 @@ class Appointment {
       'status': status,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'symptoms': symptoms,
+      'symptomImage': symptomImage,
     };
   }
 
@@ -94,6 +102,8 @@ class Appointment {
     DateTime? updatedAt,
     Payment? payment,
     String? paymentId,
+    String? symptoms,
+    String? symptomImage,
   }) {
     return Appointment(
       appointmentId: appointmentId ?? this.appointmentId,
@@ -108,6 +118,8 @@ class Appointment {
       updatedAt: updatedAt ?? this.updatedAt,
       payment: payment ?? this.payment,
       paymentId: paymentId ?? this.paymentId,
+      symptoms: symptoms ?? this.symptoms,
+      symptomImage: symptomImage ?? this.symptomImage,
     );
   }
 }

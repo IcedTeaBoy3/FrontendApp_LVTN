@@ -10,6 +10,7 @@ import 'package:frontend_app/services/appointment_service.dart';
 import 'package:frontend_app/models/responseapi.dart';
 import 'package:frontend_app/services/websocket_service.dart';
 import 'package:frontend_app/providers/notification_provider.dart';
+import 'dart:io';
 
 class AppointmentProvider extends ChangeNotifier {
   final WebSocketService _socketService = WebSocketService();
@@ -54,6 +55,8 @@ class AppointmentProvider extends ChangeNotifier {
   String? _paymentMethod;
   Slot? _selectedSlot;
   DateTime? _selectedDate;
+  String? _symptoms;
+  File? _symptomsImage;
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
@@ -70,6 +73,8 @@ class AppointmentProvider extends ChangeNotifier {
   Schedule? get selectedSchedule => _selectedSchedule;
   String? get paymentType => _paymentType;
   String? get paymentMethod => _paymentMethod;
+  String? get symptoms => _symptoms;
+  File? get symptomsImage => _symptomsImage;
 
   Future<ResponseApi<Appointment>> createAppointment() async {
     _isLoading = true;
@@ -83,6 +88,7 @@ class AppointmentProvider extends ChangeNotifier {
         schedule: _selectedSchedule!,
         slot: _selectedSlot!,
         status: 'pending',
+        symptoms: _symptoms,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -96,8 +102,11 @@ class AppointmentProvider extends ChangeNotifier {
         paymentType: _paymentType ?? 'service',
         status: 'unpaid',
       );
-      final result =
-          await AppointmentService.createAppointment(appointment, payment);
+      final result = await AppointmentService.createAppointment(
+        appointment,
+        payment,
+        symptomsImage: _symptomsImage,
+      );
       if (result.status == 'success' && result.data != null) {
         _appointments.insert(0, result.data!); // thêm vào đầu danh sách
         filterAppointments(); // cập nhật lại danh sách lọc
@@ -276,6 +285,16 @@ class AppointmentProvider extends ChangeNotifier {
 
   void setPaymentType(String type) {
     _paymentType = type;
+    notifyListeners();
+  }
+
+  void setSymptoms(String symptoms) {
+    _symptoms = symptoms;
+    notifyListeners();
+  }
+
+  void setSymptomsImage(File? image) {
+    _symptomsImage = image;
     notifyListeners();
   }
 
