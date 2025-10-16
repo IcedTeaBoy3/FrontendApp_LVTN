@@ -26,7 +26,13 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       title: InkWell(
-        onTap: () => context.goNamed('login'),
+        onTap: () {
+          if (!isAuthenticated) {
+            context.goNamed('login');
+          } else {
+            context.goNamed('accountInfo');
+          }
+        },
         child: Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
             final account = authProvider.account;

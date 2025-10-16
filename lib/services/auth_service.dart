@@ -206,6 +206,30 @@ class AuthService {
     }
   }
 
+  static Future<ResponseApi> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await ApiClient.dio.put(
+        '/auth/change-password',
+        data: {
+          'currentPassword': currentPassword,
+          'newPassword': newPassword,
+        },
+      );
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Đổi mật khẩu thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Đổi mật khẩu thất bại');
+    }
+  }
+
   static Future<Account?> getAccount() async {
     try {
       final response = await ApiClient.dio.get(
