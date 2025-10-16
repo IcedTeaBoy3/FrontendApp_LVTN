@@ -64,7 +64,9 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
                 ],
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.goNamed('search', queryParameters: {'query': ''});
+                },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: const [

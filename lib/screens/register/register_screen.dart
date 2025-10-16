@@ -44,7 +44,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       if (response.status == 'success') {
         if (!mounted) return;
-        context.goNamed('verifyOtp', extra: _emailController.text);
+        context.goNamed(
+          'verifyOtp',
+          extra: _emailController.text,
+          queryParameters: {'type': 'register'},
+        );
       }
     }
   }
@@ -299,6 +303,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (value == null || value.isEmpty || value.length < 6) {
           return '* Mật khẩu phải có ít nhất 6 ký tự';
         }
+        // Biểu thức kiểm tra độ mạnh của mật khẩu
+        final regex = RegExp(
+          r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$',
+        );
+        if (!regex.hasMatch(value)) {
+          return '* Mật khẩu phải gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt';
+        }
         if (value != _confirmPasswordController.text) {
           return '* Mật khẩu không khớp';
         }
@@ -315,7 +326,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: _isPasswordVisible ? Colors.blue : Colors.grey,
+            color: _isPasswordVisible ? Colors.black87 : Colors.grey,
           ),
           onPressed: () {
             setState(() {
@@ -392,6 +403,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+            color: _isPasswordVisible ? Colors.black87 : Colors.grey,
           ),
           onPressed: () {
             setState(() {

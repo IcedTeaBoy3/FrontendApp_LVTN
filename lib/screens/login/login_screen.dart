@@ -56,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
           .fetchNotification(page: 1, limit: 100);
 
       if (response.status == 'success') {
+        if (!mounted) return;
         LottieDialog.show(
           context,
           animationPath: "assets/animations/Success.json",
@@ -63,9 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
           message: response.message,
           duration: 2,
           onClosed: () {
-            if (mounted) {
-              context.goNamed('home');
-            }
+            context.goNamed('home');
           },
         );
       } else {
@@ -188,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: _isPasswordVisible ? Colors.blue : Colors.grey,
+            color: _isPasswordVisible ? Colors.black87 : Colors.grey,
           ),
           onPressed: () {
             setState(() {
@@ -443,7 +442,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               alignment: Alignment.centerRight,
                               child: TextButton(
                                 onPressed: () {
-                                  // Handle forgot password action
+                                  context.goNamed('forgotPassword');
                                 },
                                 child: const Text(
                                   'Quên mật khẩu?',

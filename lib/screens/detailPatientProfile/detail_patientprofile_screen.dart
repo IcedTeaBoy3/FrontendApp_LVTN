@@ -1,13 +1,28 @@
 import 'package:frontend_app/models/patientprofile.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend_app/providers/ethnic_provider.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:frontend_app/utils/date_utils.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-class DetailPatientprofileScreen extends StatelessWidget {
+class DetailPatientprofileScreen extends StatefulWidget {
   final Patientprofile patientProfile;
   const DetailPatientprofileScreen({super.key, required this.patientProfile});
+
+  @override
+  State<DetailPatientprofileScreen> createState() =>
+      _DetailPatientprofileScreenState();
+}
+
+class _DetailPatientprofileScreenState
+    extends State<DetailPatientprofileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<EthnicityProvider>().loadEthnicGroups();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +61,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => context.goNamed(
                       'addEditPatientProfile',
-                      extra: patientProfile,
+                      extra: widget.patientProfile,
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -72,7 +87,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.patientProfileCode,
+                  widget.patientProfile.patientProfileCode,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -80,7 +95,8 @@ class DetailPatientprofileScreen extends StatelessWidget {
                 trailing: IconButton(
                   onPressed: () {
                     Clipboard.setData(
-                      ClipboardData(text: patientProfile.patientProfileId),
+                      ClipboardData(
+                          text: widget.patientProfile.patientProfileId),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -130,7 +146,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.insuranceCode ?? 'Chưa cập nhật',
+                  widget.patientProfile.insuranceCode ?? 'Chưa cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -138,7 +154,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                 trailing: IconButton(
                   onPressed: () {
                     Clipboard.setData(
-                      ClipboardData(text: patientProfile.insuranceCode),
+                      ClipboardData(text: widget.patientProfile.insuranceCode),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -188,7 +204,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.idCard ?? 'Chua cập nhật',
+                  widget.patientProfile.idCard ?? 'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -196,7 +212,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                 trailing: IconButton(
                   onPressed: () {
                     Clipboard.setData(
-                      ClipboardData(text: patientProfile.idCard),
+                      ClipboardData(text: widget.patientProfile.idCard),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -246,7 +262,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.person.fullName ?? 'Chua cập nhật',
+                  widget.patientProfile.person.fullName ?? 'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -259,7 +275,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.person.phone ?? 'Chua cập nhật',
+                  widget.patientProfile.person.phone ?? 'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -272,7 +288,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  formatDate(patientProfile.person.dateOfBirth) ??
+                  formatDate(widget.patientProfile.person.dateOfBirth) ??
                       'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
@@ -286,7 +302,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  convertGenderBack(patientProfile.person.gender) ??
+                  convertGenderBack(widget.patientProfile.person.gender) ??
                       'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
@@ -300,7 +316,7 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.person.address ?? 'Chua cập nhật',
+                  widget.patientProfile.person.address ?? 'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -313,7 +329,13 @@ class DetailPatientprofileScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.person.ethnic ?? 'Chua cập nhật',
+                  context
+                          .read<EthnicityProvider>()
+                          .findByCodeOrName(
+                              widget.patientProfile.person.ethnic ??
+                                  '') // tìm dân tộc theo code hoặc name
+                          ?.name ??
+                      'Chua cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

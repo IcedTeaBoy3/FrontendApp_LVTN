@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/models/patientprofile.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend_app/providers/ethnic_provider.dart';
 import 'package:frontend_app/utils/date_utils.dart';
 import 'package:frontend_app/utils/gender_utils.dart';
+import 'package:provider/provider.dart';
 
 void handleShowDetailPatientProfile(
-    BuildContext context, Patientprofile patientProfile) {
+  BuildContext context,
+  Patientprofile patientProfile,
+) {
+  context.read<EthnicityProvider>().loadEthnicGroups();
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -304,7 +309,11 @@ void handleShowDetailPatientProfile(
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 subtitle: Text(
-                  patientProfile.person.ethnic ?? 'Chưa cập nhật',
+                  context
+                          .watch<EthnicityProvider>()
+                          .findByCodeOrName(patientProfile.person.ethnic ?? '')
+                          ?.name ??
+                      'Chưa cập nhật',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

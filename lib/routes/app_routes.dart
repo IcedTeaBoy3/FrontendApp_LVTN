@@ -24,6 +24,8 @@ import 'package:frontend_app/screens/bookingSuccess/booking_success_screen.dart'
 import 'package:frontend_app/screens/paymentQrCode/paymentQrCode.dart';
 import 'package:frontend_app/screens/accountInfo/account_info_screen.dart';
 import 'package:frontend_app/screens/notification/notification_screen.dart';
+import 'package:frontend_app/screens/forgotPassword/forgot_password_screen.dart';
+import 'package:frontend_app/screens/resetPassword/reset_password_screen.dart';
 
 /// 🌐 AppRoutes quản lý toàn bộ định tuyến
 class AppRoutes {
@@ -165,16 +167,29 @@ class AppRoutes {
                 name: 'register',
                 path: 'register',
                 builder: (context, state) => const RegisterScreen(),
-                routes: [
-                  GoRoute(
-                    name: 'verifyOtp',
-                    path: 'verifyOtp',
-                    builder: (context, state) {
-                      final email = state.extra as String?;
-                      return VerifyOtpScreen(email: email!);
-                    },
-                  ),
-                ],
+              ),
+              GoRoute(
+                name: 'forgotPassword',
+                path: 'forgotPassword',
+                builder: (context, state) => const ForgotPasswordScreen(),
+              ),
+              GoRoute(
+                name: 'resetPassword',
+                path: 'resetPassword',
+                builder: (context, state) {
+                  final email = state.extra as String?;
+                  return ResetPasswordScreen(email: email!);
+                },
+              ),
+              // ✅ Dùng chung cho cả 2 loại OTP
+              GoRoute(
+                name: 'verifyOtp',
+                path: 'verifyOtp',
+                builder: (context, state) {
+                  final email = state.extra as String?;
+                  final type = state.uri.queryParameters['type'] ?? 'register';
+                  return VerifyOtpScreen(email: email!, type: type);
+                },
               ),
             ],
           ),

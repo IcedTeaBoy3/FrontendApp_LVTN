@@ -113,6 +113,7 @@ class AuthService {
   static Future<ResponseApi> verifyOtp({
     required String email,
     required String otp,
+    required String type, // "register" hoặc "forgotPassword"
   }) async {
     try {
       final response = await ApiClient.dio.post(
@@ -120,6 +121,7 @@ class AuthService {
         data: {
           'email': email,
           'otp': otp,
+          'type': type,
         },
       );
       return ResponseApi.fromJson(response.data);
@@ -136,12 +138,14 @@ class AuthService {
 
   static Future<ResponseApi> resendOtp({
     required String email,
+    required String type, // "register" hoặc "forgotPassword"
   }) async {
     try {
       final response = await ApiClient.dio.post(
         '/auth/resend-otp',
         data: {
           'email': email,
+          'type': type,
         },
       );
       return ResponseApi.fromJson(response.data);
@@ -153,6 +157,52 @@ class AuthService {
       );
     } catch (e) {
       return ResponseApi(status: 'error', message: 'Gửi lại OTP thất bại');
+    }
+  }
+
+  static Future<ResponseApi> forgotPassword({
+    required String email,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/forgot-password',
+        data: {
+          'email': email,
+        },
+      );
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Quên mật khẩu thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Quên mật khẩu thất bại');
+    }
+  }
+
+  static Future<ResponseApi> resetPassword({
+    required String email,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await ApiClient.dio.post(
+        '/auth/reset-password',
+        data: {
+          'email': email,
+          'newPassword': newPassword,
+        },
+      );
+      return ResponseApi.fromJson(response.data);
+    } on DioException catch (e) {
+      // 👇 Lấy message từ server nếu có
+      return ResponseApi(
+        status: 'error',
+        message: e.response?.data['message'] ?? 'Đặt lại mật khẩu thất bại',
+      );
+    } catch (e) {
+      return ResponseApi(status: 'error', message: 'Đặt lại mật khẩu thất bại');
     }
   }
 
