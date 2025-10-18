@@ -159,8 +159,13 @@ class AppRoutes {
             name: 'login',
             path: 'login',
             builder: (context, state) {
-              final email = state.extra as String?;
-              return LoginScreen(email: email);
+              final from = state.extra is Map<String, dynamic> &&
+                      (state.extra as Map<String, dynamic>).containsKey('from')
+                  ? (state.extra as Map<String, dynamic>)['from'] as String
+                  : null;
+              return LoginScreen(
+                from: from,
+              );
             },
             routes: [
               GoRoute(

@@ -87,9 +87,7 @@ class _DoctorDetailScheduleState extends State<DoctorDetailSchedule> {
 
     final currentRoute = GoRouterState.of(context).name;
     // hoặc: final currentLocation = GoRouter.of(context).location;
-
     if (currentRoute != 'booking') {
-      print('Chuyển đến trang đặt lịch khám');
       context.goNamed(
         'booking',
         pathParameters: {

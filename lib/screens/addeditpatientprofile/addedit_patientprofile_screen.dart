@@ -336,8 +336,8 @@ class _AddEditPatientProfileScreenState
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            if (widget.from == 'booking') {
-              context.goNamed('booking');
+            if (widget.from != null) {
+              context.go(widget.from!);
             } else {
               context.goNamed('home', queryParameters: {
                 'initialIndex': '1',

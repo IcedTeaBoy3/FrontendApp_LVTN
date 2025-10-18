@@ -23,11 +23,11 @@ class DetailAppointmentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clinic = context.read<ClinicProvider>().clinic;
-    final doctor = appointment.doctorService.doctor;
+    final doctor = appointment.doctorService?.doctor;
     final appointmentNumber = appointment.appointmentNumber;
     final patient = appointment.patientProfile;
     final doctorService = appointment.doctorService;
-    final service = doctorService.service;
+    final service = doctorService?.service;
     final schedule = appointment.schedule;
     final slot = appointment.slot;
     final payment = appointment.payment;
@@ -192,7 +192,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            formatDate(schedule.workday),
+                            formatDate(schedule?.workday ?? DateTime.now()),
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -216,7 +216,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            '${formatTime(slot.startTime)} - ${formatTime(slot.endTime)} (${slot.shift?.name ?? ''})',
+                            '${formatTime(slot?.startTime)} - ${formatTime(slot?.endTime)} (${slot?.shift?.name ?? ''})',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -269,7 +269,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            patient.patientProfileCode,
+                            patient?.patientProfileCode ?? '--',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -293,7 +293,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            patient.person.fullName,
+                            patient?.person.fullName ?? '--',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -317,7 +317,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            patient.person.phone ?? '--',
+                            patient?.person.phone ?? '--',
                             textAlign: TextAlign.right,
                             style:
                                 Theme.of(context).textTheme.bodyLarge!.copyWith(
@@ -354,7 +354,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                 ),
                 child: TextButton(
                   onPressed: () {
-                    handleShowDetailPatientProfile(context, patient);
+                    handleShowDetailPatientProfile(context, patient!);
                   },
                   child: const Text(
                     'Chi tiết',
@@ -512,9 +512,10 @@ class DetailAppointmentScreen extends StatelessWidget {
                 ),
                 child: TextButton(
                   onPressed: () {
-                    context.pushNamed('doctorDetail', pathParameters: {
-                      'doctorId': doctor!.doctorId.toString(),
-                    });
+                    context.goNamed(
+                      'doctorDetail',
+                      pathParameters: {'doctorId': doctor?.doctorId ?? ''},
+                    );
                   },
                   child: const Text(
                     'Chi tiết',
@@ -718,7 +719,7 @@ class DetailAppointmentScreen extends StatelessWidget {
                   if (!context.mounted) return;
                   context
                       .read<AppointmentProvider>()
-                      .enableSlot(appointment.slot);
+                      .enableSlot(appointment.slot!);
                   context.pop();
                 }
               },

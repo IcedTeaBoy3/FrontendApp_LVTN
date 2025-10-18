@@ -8,10 +8,14 @@ class Appointment {
   final String appointmentId;
   final String? appointmentCode;
   final int? appointmentNumber;
-  final Patientprofile patientProfile;
-  final DoctorService doctorService;
-  final Schedule schedule;
-  final Slot slot;
+  final Patientprofile? patientProfile;
+  final String? patientProfileId;
+  final DoctorService? doctorService;
+  final String? doctorServiceId;
+  final Schedule? schedule;
+  final String? scheduleId;
+  final Slot? slot;
+  final String? slotId;
   final String status;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -25,9 +29,13 @@ class Appointment {
     this.appointmentCode,
     required this.appointmentId,
     required this.patientProfile,
+    this.patientProfileId,
     required this.doctorService,
+    this.doctorServiceId,
     required this.schedule,
+    this.scheduleId,
     required this.slot,
+    this.slotId,
     required this.status,
     this.createdAt,
     this.updatedAt,
@@ -40,12 +48,54 @@ class Appointment {
   factory Appointment.fromJson(Map<String, dynamic> json) {
     String? parsePaymentId;
     Payment? parsePayment;
+    String? parsePatientProfileId;
+    Patientprofile? parsePatientProfile;
+    String? parseDoctorServiceId;
+    DoctorService? parseDoctorService;
+    String? parseScheduleId;
+    Schedule? parseSchedule;
+    String? parseSlotId;
+    Slot? parseSlot;
+
     final paymentData = json['payment'];
+    final patientProfileData = json['patientProfile'];
+    final doctorServiceData = json['doctorService'];
+    final scheduleData = json['schedule'];
+    final slotData = json['slot'];
+
     if (paymentData != null) {
       if (paymentData is String) {
         parsePaymentId = paymentData;
       } else if (paymentData is Map<String, dynamic>) {
         parsePayment = Payment.fromJson(paymentData);
+      }
+    }
+    if (patientProfileData != null) {
+      if (patientProfileData is String) {
+        parsePatientProfileId = patientProfileData;
+      } else if (patientProfileData is Map<String, dynamic>) {
+        parsePatientProfile = Patientprofile.fromJson(patientProfileData);
+      }
+    }
+    if (doctorServiceData != null) {
+      if (doctorServiceData is String) {
+        parseDoctorServiceId = doctorServiceData;
+      } else if (doctorServiceData is Map<String, dynamic>) {
+        parseDoctorService = DoctorService.fromJson(doctorServiceData);
+      }
+    }
+    if (scheduleData != null) {
+      if (scheduleData is String) {
+        parseScheduleId = scheduleData;
+      } else if (scheduleData is Map<String, dynamic>) {
+        parseSchedule = Schedule.fromJson(scheduleData);
+      }
+    }
+    if (slotData != null) {
+      if (slotData is String) {
+        parseSlotId = slotData;
+      } else if (slotData is Map<String, dynamic>) {
+        parseSlot = Slot.fromJson(slotData);
       }
     }
 
@@ -55,15 +105,21 @@ class Appointment {
       appointmentId: json['appointmentId'] ?? json['_id'] ?? '',
       paymentId: parsePaymentId,
       payment: parsePayment,
-      doctorService: DoctorService.fromJson(json['doctorService']),
-      patientProfile: Patientprofile.fromJson(json['patientProfile']),
-      schedule: Schedule.fromJson(json['schedule']),
-      slot: Slot.fromJson(json['slot']),
+      doctorService: parseDoctorService,
+      doctorServiceId: parseDoctorServiceId,
+      patientProfile: parsePatientProfile,
+      patientProfileId: parsePatientProfileId,
+      schedule: parseSchedule,
+      scheduleId: parseScheduleId,
+      slot: parseSlot,
+      slotId: parseSlotId,
       status: json['status'],
-      createdAt:
-          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt:
-          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt']).toLocal()
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt']).toLocal()
+          : null,
       symptoms: json['symptoms'] ?? '',
       symptomImage: json['symptomImage'] ?? '',
     );
@@ -77,10 +133,14 @@ class Appointment {
       'appointmentId': appointmentId,
       'appointmentCode': appointmentCode,
       'appointmentNumber': appointmentNumber,
-      'doctorService': doctorService.toJson(),
-      'patientProfile': patientProfile.toJson(),
-      'schedule': schedule.toJson(),
-      'slot': slot.toJson(),
+      'doctorService': doctorService?.toJson(),
+      'doctorServiceId': doctorServiceId,
+      'patientProfile': patientProfile?.toJson(),
+      'patientProfileId': patientProfileId,
+      'schedule': schedule?.toJson(),
+      'scheduleId': scheduleId,
+      'slot': slot?.toJson(),
+      'slotId': slotId,
       'status': status,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),

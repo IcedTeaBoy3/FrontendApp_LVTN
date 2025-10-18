@@ -101,8 +101,8 @@ class DoctorProvider extends ChangeNotifier {
     }
 
     // 2️⃣ Lọc theo chuyên khoa
-    if (_selectedSpecialty != null && _selectedSpecialty!.isNotEmpty) {
-      final lowerSpec = _selectedSpecialty!.toLowerCase();
+    if (_selectedSpecialty.isNotEmpty) {
+      final lowerSpec = _selectedSpecialty.toLowerCase();
       filtered = filtered.where((doctor) {
         return doctor.doctorSpecialties.any(
           (ds) => ds.specialty.name.toLowerCase().contains(lowerSpec),
@@ -111,7 +111,7 @@ class DoctorProvider extends ChangeNotifier {
     }
 
     // 3️⃣ Lọc theo dịch vụ
-    if (_selectedService != null && _selectedService!.isNotEmpty) {
+    if (_selectedService!.isNotEmpty) {
       final lowerService = _selectedService!.toLowerCase();
       filtered = filtered.where((doctor) {
         return doctor.doctorServices.any(
@@ -122,8 +122,8 @@ class DoctorProvider extends ChangeNotifier {
     }
 
     // 4️⃣ Lọc theo bằng cấp
-    if (_selectedDegree != null && _selectedDegree!.isNotEmpty) {
-      final lowerDegree = _selectedDegree!.toLowerCase();
+    if (_selectedDegree.isNotEmpty) {
+      final lowerDegree = _selectedDegree.toLowerCase();
       filtered = filtered.where((doctor) {
         final degree = doctor.degree?.title.toLowerCase() ?? '';
         return degree.contains(lowerDegree);

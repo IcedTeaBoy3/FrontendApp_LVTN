@@ -96,7 +96,15 @@ class DoctorDetailScreen extends StatelessWidget {
                   confirmText: 'Đăng nhập',
                   cancelText: 'Hủy',
                   onConfirm: () {
-                    context.goNamed('login');
+                    context.goNamed(
+                      'login',
+                      extra: {
+                        'from': context.namedLocation(
+                          'doctorDetail',
+                          pathParameters: {'doctorId': doctorId},
+                        )
+                      },
+                    );
                   },
                 );
               } else {

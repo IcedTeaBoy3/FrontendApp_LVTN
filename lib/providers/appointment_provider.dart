@@ -15,7 +15,7 @@ import 'dart:io';
 class AppointmentProvider extends ChangeNotifier {
   final WebSocketService _socketService = WebSocketService();
   late NotificationProvider _notificationProvider;
-  bool _socketListenerRegistered = false; // ⚡ chỉ 1 lần
+  bool _socketListenerRegistered = false;
 
   AppointmentProvider(this._notificationProvider) {
     _initSocket();
@@ -234,16 +234,16 @@ class AppointmentProvider extends ChangeNotifier {
     try {
       var temp = List<Appointment>.from(_appointments);
 
-      if (_filterStatus != null && _filterStatus != 'all') {
+      if (_filterStatus != 'all') {
         temp = temp.where((a) => a.status == _filterStatus).toList();
       }
 
       if (_filterDate != null) {
         temp = temp.where((a) {
-          final d = a.schedule.workday;
-          return d.year == _filterDate?.year &&
-              d.month == _filterDate?.month &&
-              d.day == _filterDate?.day;
+          final d = a.schedule?.workday;
+          return d?.year == _filterDate?.year &&
+              d?.month == _filterDate?.month &&
+              d?.day == _filterDate?.day;
         }).toList();
       }
 

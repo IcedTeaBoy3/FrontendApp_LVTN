@@ -11,7 +11,7 @@ class AppointmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final doctor = appointment.doctorService.doctor;
+    final doctor = appointment.doctorService?.doctor;
     final patient = appointment.patientProfile;
     final slot = appointment.slot;
     final schedule = appointment.schedule;
@@ -129,7 +129,7 @@ class AppointmentCard extends StatelessWidget {
                       ),
                 ),
                 Text(
-                  '${formatTime(slot.startTime)}-${formatTime(slot.endTime)} - ${formatDate(schedule.workday)}',
+                  '${formatTime(slot?.startTime)}-${formatTime(slot?.endTime)} - ${formatDate(schedule?.workday ?? DateTime.now())}',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -148,7 +148,7 @@ class AppointmentCard extends StatelessWidget {
                       ),
                 ),
                 Text(
-                  doctorService.service?.specialty?.name ?? '--',
+                  doctorService?.service?.specialty?.name ?? '--',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
@@ -167,7 +167,7 @@ class AppointmentCard extends StatelessWidget {
                       ),
                 ),
                 Text(
-                  patient.person.fullName,
+                  patient?.person.fullName ?? '--',
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,

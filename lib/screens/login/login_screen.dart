@@ -10,7 +10,8 @@ import 'package:frontend_app/providers/notification_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? email;
-  const LoginScreen({super.key, this.email});
+  final String? from; // Thêm tham số 'from' để biết đến từ đâu
+  const LoginScreen({super.key, this.email, this.from});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -21,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -64,7 +65,11 @@ class _LoginScreenState extends State<LoginScreen> {
           message: response.message,
           duration: 2,
           onClosed: () {
-            context.goNamed('home');
+            if (widget.from != null) {
+              context.go(widget.from!);
+            } else {
+              context.goNamed('home');
+            }
           },
         );
       } else {
@@ -85,6 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
     context.read<PatientprofileProvider>().fetchPatientprofiles();
     context.read<NotificationProvider>().fetchNotification(page: 1, limit: 100);
     if (result.status == 'success') {
+      debugPrint('From +${widget.from}');
       LottieDialog.show(
         context,
         animationPath: "assets/animations/Success.json",
@@ -92,7 +98,11 @@ class _LoginScreenState extends State<LoginScreen> {
         message: result.message,
         duration: 2,
         onClosed: () {
-          context.goNamed('home'); // navigate sau khi dialog đóng
+          if (widget.from != null) {
+            context.go(widget.from!);
+          } else {
+            context.goNamed('home');
+          }
         },
       );
     } else {

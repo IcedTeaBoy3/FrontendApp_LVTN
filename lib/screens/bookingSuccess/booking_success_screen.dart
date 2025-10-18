@@ -158,7 +158,7 @@ class BookingSuccessScreen extends StatelessWidget {
                               Theme.of(context).textTheme.bodyLarge?.copyWith(),
                         ),
                         Text(
-                          '${getWeekdayName(schedule.workday)}, ${formatDate(schedule.workday)}',
+                          '${getWeekdayName(schedule?.workday ?? DateTime.now())}, ${formatDate(schedule?.workday ?? DateTime.now())}',
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     fontWeight: FontWeight.w600,
@@ -177,7 +177,7 @@ class BookingSuccessScreen extends StatelessWidget {
                               Theme.of(context).textTheme.bodyLarge?.copyWith(),
                         ),
                         Text(
-                          '${formatTime(slot.startTime)} - ${formatTime(slot.endTime)} (${slot.shift?.name ?? ''})',
+                          '${formatTime(slot?.startTime)} - ${formatTime(slot?.endTime)} (${slot?.shift?.name ?? ''})',
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     fontWeight: FontWeight.w600,
@@ -211,7 +211,7 @@ class BookingSuccessScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              BookingSuccessDetaildoctor(doctorService: doctorService),
+              BookingSuccessDetaildoctor(doctorService: doctorService!),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -235,7 +235,7 @@ class BookingSuccessScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              BookingSuccessDetailPatient(patientProfile: patientProfile),
+              BookingSuccessDetailPatient(patientProfile: patientProfile!),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,

@@ -8,6 +8,7 @@ import 'package:frontend_app/screens/doctorDetail/widgets/doctor_detail_schedule
 import 'package:frontend_app/providers/appointment_provider.dart';
 import 'package:frontend_app/screens/patientProfile/widgets/card_patientprofile.dart';
 import 'package:frontend_app/screens/bookingAppointment/widgets/card_doctor_appointment.dart';
+import 'package:frontend_app/widgets/modal_detail_patientprofile.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -546,9 +547,9 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                   ),
                   onPressed: () {
                     if (patientProfile != null) {
-                      context.goNamed(
-                        'addEditPatientProfile',
-                        extra: patientProfile,
+                      handleShowDetailPatientProfile(
+                        context,
+                        patientProfile,
                       );
                     }
                   },
@@ -567,7 +568,12 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                     if (patientProfile == null) {
                       context.goNamed(
                         'addEditPatientProfile',
-                        extra: patientProfile,
+                        queryParameters: {
+                          'from': context.namedLocation(
+                            'booking',
+                            pathParameters: {'doctorId': widget.doctorId},
+                          )
+                        },
                       );
                     }
                     _handleChangePatientProfile(context);

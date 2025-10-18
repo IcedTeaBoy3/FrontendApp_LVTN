@@ -51,7 +51,7 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
             context,
             status: 'warning',
             title: 'Chưa có hồ sơ bệnh nhân',
-            message: 'Vui lòng thêm hồ sơ bệnh nhân để tiếp tục đặt lịch hẹn.',
+            message: 'Vui lòng thêm hồ sơ bệnh nhân để tiếp tục đặt lịch khám.',
           );
           return;
         }
@@ -60,7 +60,7 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
             context,
             status: 'warning',
             title: 'Chưa chọn ngày khám',
-            message: 'Vui lòng chọn ngày khám để tiếp tục đặt lịch hẹn.',
+            message: 'Vui lòng chọn ngày khám để tiếp tục đặt lịch khám.',
           );
           return;
         }
@@ -76,13 +76,40 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
       }
       setState(() => _currentStep += 1);
     } else {
+      if (patientProfile == null) {
+        CustomFlushbar.show(
+          context,
+          status: 'warning',
+          title: 'Chưa có hồ sơ bệnh nhân',
+          message: 'Vui lòng thêm hồ sơ bệnh nhân để tiếp tục đặt lịch khám.',
+        );
+        return;
+      }
+      if (schedule == null) {
+        CustomFlushbar.show(
+          context,
+          status: 'warning',
+          title: 'Chưa chọn ngày khám',
+          message: 'Vui lòng chọn ngày khám để tiếp tục đặt lịch khám.',
+        );
+        return;
+      }
+      if (slot == null) {
+        CustomFlushbar.show(
+          context,
+          status: 'warning',
+          title: 'Chưa chọn giờ khám',
+          message: 'Vui lòng chọn giờ khám.',
+        );
+        return;
+      }
       if (paymentMethod == null) {
         CustomFlushbar.show(
           context,
           status: 'warning',
           title: 'Chưa chọn phương thức thanh toán',
           message:
-              'Vui lòng chọn phương thức thanh toán để tiếp tục đặt lịch hẹn.',
+              'Vui lòng chọn phương thức thanh toán để tiếp tục đặt lịch khám.',
         );
         return;
       }
@@ -91,7 +118,7 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
           context,
           status: 'warning',
           title: 'Chưa chọn dịch vụ khám',
-          message: 'Vui lòng chọn dịch vụ khám để tiếp tục đặt lịch hẹn.',
+          message: 'Vui lòng chọn dịch vụ khám để tiếp tục đặt lịch khám.',
         );
         return;
       }
@@ -102,9 +129,9 @@ class _BookingAppointmentScreenState extends State<BookingAppointmentScreen> {
         status: result.status,
         message: result.message,
       );
-      if (result.status == 'success') {
+      if (result.status == 'success' && mounted) {
         // di chuyển đến thanh toán
-        context.read<AppointmentProvider>().disableSlot(result.data!.slot);
+        context.read<AppointmentProvider>().disableSlot(result.data!.slot!);
         if (paymentMethod == 'online') {
           if (!mounted) return;
           context.goNamed(
