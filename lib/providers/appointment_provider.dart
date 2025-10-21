@@ -39,6 +39,20 @@ class AppointmentProvider extends ChangeNotifier {
           _notificationProvider.addNotification(noti);
         }
       });
+      _socketService.on('payment_status_updated', (data) {
+        debugPrint('Received paymentStatusUpdated: $data');
+        final payment = data['payment'];
+        final notificationData = data['notification'];
+        if (payment != null) {
+          final paymentModel = Payment.fromJson(payment);
+          updatePaymentStatus(paymentModel.appointment?.appointmentId ?? '',
+              paymentModel.status);
+        }
+        if (notificationData != null) {
+          final noti = NotificationModel.fromJson(notificationData);
+          _notificationProvider.addNotification(noti);
+        }
+      });
     }
     _socketListenerRegistered = true;
   }
