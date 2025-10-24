@@ -26,6 +26,7 @@ import 'package:frontend_app/screens/accountInfo/account_info_screen.dart';
 import 'package:frontend_app/screens/notification/notification_screen.dart';
 import 'package:frontend_app/screens/forgotPassword/forgot_password_screen.dart';
 import 'package:frontend_app/screens/resetPassword/reset_password_screen.dart';
+import 'package:frontend_app/screens/medicalResult/medicalresult_screen.dart';
 
 /// 🌐 AppRoutes quản lý toàn bộ định tuyến
 class AppRoutes {
@@ -60,6 +61,13 @@ class AppRoutes {
             builder: (context, state) {
               final clinic = state.extra as Clinic;
               return ClinicDetailScreen(clinic: clinic);
+            },
+          ),
+          GoRoute(
+            name: 'medicalResult',
+            path: 'medicalResult',
+            builder: (context, state) {
+              return const MedicalResultScreen();
             },
           ),
 

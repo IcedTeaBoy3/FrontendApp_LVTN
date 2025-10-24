@@ -3,7 +3,10 @@ import '../models/payment.dart';
 
 class PaymentService {
   static Future<String> createQRCode(
-      double amount, String paymentId, String? description) async {
+    double amount,
+    String paymentId,
+    String? description,
+  ) async {
     try {
       final response = await ApiClient.dio.post(
         '/payment/create-qr-code',

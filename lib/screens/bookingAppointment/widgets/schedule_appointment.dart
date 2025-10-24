@@ -35,6 +35,7 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       showDragHandle: true,
+      isScrollControlled: true,
       backgroundColor: Colors.grey[200],
       context: context,
       builder: (BuildContext context) {
@@ -50,15 +51,40 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
               ),
               // Thêm cái nút thêm mới hồ sơ
               const SizedBox(height: 8),
+
+              Expanded(
+                child: ListView.separated(
+                  itemCount: patientProfiles.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    final profile = patientProfiles[index];
+                    return CardPatientProfile(
+                      patientprofile: profile,
+                      onTap: () {
+                        context
+                            .read<AppointmentProvider>()
+                            .setSelectedPatientProfile(profile);
+                        context.pop();
+                      },
+                      selected: profile.patientProfileId ==
+                          selectedProfile?.patientProfileId,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
               // Nút thêm hồ sơ mới
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent, // màu nổi bật
+                  backgroundColor: Colors.blue, // màu nổi bật
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16), // bo tròn
+                    borderRadius: BorderRadius.circular(8), // bo tròn
                   ),
-                  elevation: 5, // tạo bóng
+
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 12,
@@ -84,28 +110,6 @@ class _ScheduleAppointmentState extends State<ScheduleAppointment> {
                       ),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: patientProfiles.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final profile = patientProfiles[index];
-                    return CardPatientProfile(
-                      patientprofile: profile,
-                      onTap: () {
-                        context
-                            .read<AppointmentProvider>()
-                            .setSelectedPatientProfile(profile);
-                        context.pop();
-                      },
-                      selected: profile.patientProfileId ==
-                          selectedProfile?.patientProfileId,
-                    );
-                  },
                 ),
               ),
             ],

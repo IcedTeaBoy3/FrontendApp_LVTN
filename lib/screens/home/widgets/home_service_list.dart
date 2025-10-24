@@ -5,6 +5,7 @@ import 'package:frontend_app/widgets/modal_list_specialties.dart';
 import 'package:frontend_app/widgets/service_item.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import './modal_list_patientProfile.dart';
 
 class HomeServiceList extends StatelessWidget {
   const HomeServiceList({super.key});
@@ -65,9 +66,12 @@ class HomeServiceList extends StatelessWidget {
               icon: FontAwesomeIcons.briefcaseMedical,
               title: "Dịch vụ",
             ),
-            const ServiceItem(
+            ServiceItem(
               icon: FontAwesomeIcons.fileCircleCheck,
               title: "Tra cứu kết quả",
+              onTap: () {
+                openModalPatientProfile(context);
+              },
             ),
             const ServiceItem(
               icon: FontAwesomeIcons.calendarCheck,

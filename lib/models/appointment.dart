@@ -1,3 +1,5 @@
+import 'package:frontend_app/models/medicalresult.dart';
+
 import 'doctorservice.dart';
 import 'patientprofile.dart';
 import 'slot.dart';
@@ -21,6 +23,9 @@ class Appointment {
   final DateTime? updatedAt;
   final Payment? payment;
   final String? paymentId;
+  final MedicalResult? medicalResult;
+  final String? medicalResultId;
+
   final String? symptoms;
   final String? symptomImage;
 
@@ -37,6 +42,8 @@ class Appointment {
     required this.slot,
     this.slotId,
     required this.status,
+    this.medicalResult,
+    this.medicalResultId,
     this.createdAt,
     this.updatedAt,
     this.payment,
@@ -56,12 +63,15 @@ class Appointment {
     Schedule? parseSchedule;
     String? parseSlotId;
     Slot? parseSlot;
+    MedicalResult? parseMedicalResult;
+    String? parseMedicalResultId;
 
     final paymentData = json['payment'];
     final patientProfileData = json['patientProfile'];
     final doctorServiceData = json['doctorService'];
     final scheduleData = json['schedule'];
     final slotData = json['slot'];
+    final medicalResultData = json['medicalResult'];
 
     if (paymentData != null) {
       if (paymentData is String) {
@@ -98,6 +108,13 @@ class Appointment {
         parseSlot = Slot.fromJson(slotData);
       }
     }
+    if (medicalResultData != null) {
+      if (medicalResultData is String) {
+        parseMedicalResultId = medicalResultData;
+      } else if (medicalResultData is Map<String, dynamic>) {
+        parseMedicalResult = MedicalResult.fromJson(medicalResultData);
+      }
+    }
 
     return Appointment(
       appointmentNumber: json['appointmentNumber'] ?? '',
@@ -113,6 +130,8 @@ class Appointment {
       scheduleId: parseScheduleId,
       slot: parseSlot,
       slotId: parseSlotId,
+      medicalResult: parseMedicalResult,
+      medicalResultId: parseMedicalResultId,
       status: json['status'],
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt']).toLocal()
@@ -158,6 +177,8 @@ class Appointment {
     Schedule? schedule,
     Slot? slot,
     String? status,
+    MedicalResult? medicalResult,
+    String? medicalResultId,
     DateTime? createdAt,
     DateTime? updatedAt,
     Payment? payment,
@@ -173,6 +194,8 @@ class Appointment {
       doctorService: doctorService ?? this.doctorService,
       schedule: schedule ?? this.schedule,
       slot: slot ?? this.slot,
+      medicalResult: medicalResult ?? this.medicalResult,
+      medicalResultId: medicalResultId ?? this.medicalResultId,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
