@@ -57,6 +57,7 @@ void openModalPatientProfile(BuildContext context) {
                                 context
                                     .read<MedicalresultProvider>()
                                     .selectedPatientProfile = profile,
+                                context.pop(),
                                 context.goNamed('medicalResult'),
                               },
                             );

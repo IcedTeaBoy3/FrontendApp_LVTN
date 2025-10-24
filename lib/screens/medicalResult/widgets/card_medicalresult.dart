@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_app/models/medicalresult.dart';
+import 'package:frontend_app/providers/doctorreview_provider.dart';
 import 'package:frontend_app/utils/date_utils.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend_app/widgets/custom_flushbar.dart';
+import 'package:provider/provider.dart';
+import 'doctorreview_dialog.dart';
 
 class CardMedicalResult extends StatelessWidget {
   const CardMedicalResult({super.key, required this.medicalResult});
@@ -17,6 +21,36 @@ class CardMedicalResult extends StatelessWidget {
         medicalResult.appointment?.doctorService?.service?.name ?? '--';
     final appointmentDate =
         medicalResult.appointment?.schedule?.workday ?? DateTime.now();
+    final doctorId =
+        medicalResult.appointment?.doctorService?.doctor?.doctorId ?? '';
+    final appointmentId = medicalResult.appointment?.appointmentId ?? '';
+
+    void _handleShowDoctorReviewDialog(
+      BuildContext context,
+    ) async {
+      final data = await showDialog(
+        context: context,
+        builder: (context) {
+          return DoctorReviewDialog();
+        },
+      );
+      if (data != null) {
+        if (!context.mounted) return;
+        final response =
+            await context.read<DoctorreviewProvider>().createDoctorReview(
+                  doctorId: doctorId,
+                  appointmentId: appointmentId,
+                  rating: data['rating'],
+                  comment: data['comment'],
+                );
+        if (!context.mounted) return;
+        await CustomFlushbar.show(
+          context,
+          message: response.message,
+          status: response.status,
+        );
+      }
+    }
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -42,7 +76,7 @@ class CardMedicalResult extends StatelessWidget {
               const FaIcon(
                 FontAwesomeIcons.calendar,
                 color: Colors.blue,
-                size: 28,
+                size: 24,
               ),
               const SizedBox(width: 10),
               Text(
@@ -98,7 +132,7 @@ class CardMedicalResult extends StatelessWidget {
               // 🔹 Nút Đánh giá bác sĩ
               ElevatedButton.icon(
                 onPressed: () {
-                  // TODO: Xử lý khi nhấn nút "Đánh giá bác sĩ"
+                  _handleShowDoctorReviewDialog(context);
                 },
                 icon: const Icon(
                   Icons.star_rate,
@@ -107,7 +141,7 @@ class CardMedicalResult extends StatelessWidget {
                 ),
                 label: const Text(
                   'Đánh giá bác sĩ',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 15),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[100],
@@ -132,7 +166,7 @@ class CardMedicalResult extends StatelessWidget {
                     side: const BorderSide(color: Colors.blue),
                   ),
                 ),
-                child: Text('Xem chi tiết', style: TextStyle(fontSize: 16)),
+                child: Text('Xem chi tiết', style: TextStyle(fontSize: 15)),
               ),
             ],
           )
@@ -151,13 +185,13 @@ class CardMedicalResult extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          FaIcon(icon, color: Colors.blue, size: 22),
+          FaIcon(icon, color: Colors.blue, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: RichText(
               text: TextSpan(
                 style: const TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
                   color: Colors.black87,
                   height: 1.5,
                 ),
@@ -165,7 +199,10 @@ class CardMedicalResult extends StatelessWidget {
                   TextSpan(text: '$label '),
                   TextSpan(
                     text: value,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

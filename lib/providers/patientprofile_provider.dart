@@ -44,7 +44,6 @@ class PatientprofileProvider extends ChangeNotifier {
       return result;
     } catch (e) {
       // Handle error
-      debugPrint('Error adding patient profile: $e');
       return ResponseApi<Patientprofile>(
         status: 'error',
         message: 'Error adding patient profile: $e',
