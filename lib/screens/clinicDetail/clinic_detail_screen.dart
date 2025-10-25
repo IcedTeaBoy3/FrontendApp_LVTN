@@ -6,7 +6,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:frontend_app/widgets/clinic_detail_googlemap.dart';
 import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_workhours.dart';
 import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_description.dart';
-import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_specialty.dart';
+import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_service.dart';
 import 'package:frontend_app/screens/clinicDetail/widgets/clinic_detail_contact.dart';
 
 class ClinicDetailScreen extends StatefulWidget {
@@ -40,18 +40,6 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.blue.shade700,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              // Handle settings action
-            },
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -115,7 +103,7 @@ class _ClinicDetailScreenState extends State<ClinicDetailScreen> {
             const SizedBox(height: 4),
             ClinicDetailDescription(description: clinic.description),
             const SizedBox(height: 4),
-            ClinicDetailSpecialty(),
+            ClinicDetailService(services: clinic.services ?? []),
             const SizedBox(height: 4),
             ClinicDetailContact(
               email: clinic.email,

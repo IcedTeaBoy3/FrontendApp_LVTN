@@ -146,53 +146,39 @@ class _HomeClinicCardState extends State<HomeClinicCard> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            Text(
+                              clinic.criteria ?? "Chưa cập nhật tiêu chí",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(color: Colors.grey[700]),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
                             // Địa chỉ
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const FaIcon(
-                                  FontAwesomeIcons.locationDot,
-                                  size: 16,
-                                  color: Colors.blue,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    clinic.address,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(color: Colors.grey[700]),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            // Thời gian làm việc
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const FaIcon(
-                                  FontAwesomeIcons.clock,
-                                  size: 16,
-                                  color: Colors.blue,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    clinic.workHours ?? 'Chưa cập nhật',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(color: Colors.grey[700]),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   crossAxisAlignment: CrossAxisAlignment.center,
+                            //   children: [
+                            //     const FaIcon(
+                            //       FontAwesomeIcons.locationDot,
+                            //       size: 16,
+                            //       color: Colors.blue,
+                            //     ),
+                            //     const SizedBox(width: 8),
+                            //     Expanded(
+                            //       child: Text(
+                            //         clinic.address,
+                            //         style: Theme.of(context)
+                            //             .textTheme
+                            //             .bodyMedium
+                            //             ?.copyWith(color: Colors.grey[700]),
+                            //         maxLines: 2,
+                            //         overflow: TextOverflow.ellipsis,
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
                           ],
                         ),
                       ),

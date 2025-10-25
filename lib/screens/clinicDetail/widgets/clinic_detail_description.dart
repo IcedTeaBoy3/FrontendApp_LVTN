@@ -45,14 +45,18 @@ class _ClinicDetailDescriptionState extends State<ClinicDetailDescription> {
             children: [
               const FaIcon(
                 FontAwesomeIcons.circleInfo,
+                color: Colors.blueAccent,
               ),
               const SizedBox(width: 8),
               Text(
                 "Giới thiệu",
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
             ],
           ),
+          const SizedBox(height: 8),
 
           /// Nội dung
           AnimatedCrossFade(

@@ -32,7 +32,7 @@ class ClinicDetailContact extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Text(
             "Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi qua các thông tin dưới đây:",
             style: Theme.of(context).textTheme.bodyLarge,
@@ -42,6 +42,7 @@ class ClinicDetailContact extends StatelessWidget {
             children: [
               const Icon(
                 Icons.phone,
+                color: Colors.grey,
               ),
               const SizedBox(width: 8),
               Text(
@@ -57,6 +58,7 @@ class ClinicDetailContact extends StatelessWidget {
             children: [
               const Icon(
                 Icons.email,
+                color: Colors.grey,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -74,6 +76,7 @@ class ClinicDetailContact extends StatelessWidget {
             children: [
               const Icon(
                 Icons.language,
+                color: Colors.grey,
               ),
               const SizedBox(width: 8),
               Expanded(
