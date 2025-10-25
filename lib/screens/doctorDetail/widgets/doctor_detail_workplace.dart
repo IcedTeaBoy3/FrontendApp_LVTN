@@ -17,7 +17,10 @@ class DoctorDetailWorkplace extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.local_hospital, color: Colors.grey),
+              const Icon(
+                Icons.local_hospital,
+                color: Colors.blueAccent,
+              ),
               const SizedBox(width: 8),
               Text(
                 "Nơi công tác",

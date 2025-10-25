@@ -47,7 +47,7 @@ class _DoctorDetailBioState extends State<DoctorDetailBio> {
             children: [
               const FaIcon(
                 FontAwesomeIcons.circleUser,
-                color: Colors.grey,
+                color: Colors.blueAccent,
               ),
               const SizedBox(width: 8),
               Text(

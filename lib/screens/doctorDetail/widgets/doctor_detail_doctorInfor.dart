@@ -88,7 +88,7 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       "${doctor?.yearsOfExperience} năm kinh nghiệm",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 13,
                             color: Colors.grey[700],
                           ),
@@ -108,62 +108,33 @@ class DoctorDetailDoctorInfo extends StatelessWidget {
           const SizedBox(height: 12),
           const Divider(),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              Text(
-                "Chuyên khoa:",
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(width: 8),
-              specialties.isNotEmpty
-                  ? Expanded(
-                      child: Text(
-                        specialties.join(', '),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                  : Text(
-                      "Chưa cập nhật",
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-              // Expanded(
-              //   child: Wrap(
-              //     spacing: 6,
-              //     children: specialties.isNotEmpty
-              //         ? specialties
-              //             .map((spec) => Container(
-              //                   margin: const EdgeInsets.only(right: 6),
-              //                   padding: const EdgeInsets.symmetric(
-              //                       horizontal: 8, vertical: 4),
-              //                   decoration: BoxDecoration(
-              //                     color: Colors.blue.shade100,
-              //                     borderRadius: BorderRadius.circular(12),
-              //                   ),
-              //                   child: Text(
-              //                     spec,
-              //                     style: Theme.of(context)
-              //                         .textTheme
-              //                         .bodyMedium
-              //                         ?.copyWith(
-              //                           color: Colors.blue.shade800,
-              //                         ),
-              //                   ),
-              //                 ))
-              //             .toList()
-              //         : [
-              //             Text(
-              //               "Chưa cập nhật",
-              //               style: Theme.of(context).textTheme.bodySmall,
-              //             )
-              //           ],
-              //   ),
-              // )
-            ],
+          Text(
+            "Chuyên khoa:",
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
-          // Nếu có nhiều chuyên khoa thì thêm list chỗ này
+          const SizedBox(width: 8),
+          specialties.isNotEmpty
+              ? Wrap(
+                  spacing: 4,
+                  runSpacing: 8,
+                  children: List.generate(specialties.length, (index) {
+                    final spec = specialties.elementAt(index);
+                    final isLast = index == specialties.length - 1;
+                    return Text(
+                      isLast ? spec : '$spec,',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    );
+                  }),
+                )
+              : Text(
+                  "Chưa cập nhật",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.grey),
+                )
         ],
       ),
     );

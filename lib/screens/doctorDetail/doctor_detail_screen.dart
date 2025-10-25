@@ -5,6 +5,7 @@ import 'package:frontend_app/screens/doctorDetail/widgets/doctor_detail_bio.dart
 import 'package:frontend_app/screens/doctorDetail/widgets/doctor_detail_workplace.dart';
 import 'package:frontend_app/widgets/clinic_detail_googlemap.dart';
 import 'package:frontend_app/screens/doctorDetail/widgets/doctor_review_list.dart';
+import 'package:frontend_app/screens/doctorDetail/widgets/doctor_detail_service.dart';
 import 'package:frontend_app/widgets/confirm_dialog.dart';
 import 'package:frontend_app/providers/auth_provider.dart';
 import 'package:frontend_app/providers/clinic_provider.dart';
@@ -128,6 +129,10 @@ class _DoctorDetailScreenState extends State<DoctorDetailScreen>
                         address: clinic?.address ?? 'Đang cập nhật',
                       ),
                       DoctorDetailBio(doctorId: widget.doctorId),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      DoctorDetailService(doctorId: widget.doctorId),
                       const SizedBox(height: 4),
                       DoctorDetailWorkplace(doctorId: widget.doctorId),
                     ],
