@@ -110,7 +110,9 @@ class _HomeSpecialtyListState extends State<HomeSpecialtyList> {
                 side: BorderSide(color: Colors.grey.shade300),
                 backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0, vertical: 12.0),
+                  horizontal: 24.0,
+                  vertical: 12.0,
+                ),
               ),
               child: Text(
                 'Xem tất cả các chuyên khoa',

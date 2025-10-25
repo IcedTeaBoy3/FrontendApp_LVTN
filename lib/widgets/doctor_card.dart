@@ -5,6 +5,8 @@ class DoctorCard extends StatelessWidget {
   final String doctorId;
   final String name;
   final String specialtyName;
+  final double? star;
+  final int? countReview;
   final String? avatar;
   final Function()? onTap;
   const DoctorCard({
@@ -12,6 +14,8 @@ class DoctorCard extends StatelessWidget {
     required this.doctorId,
     required this.name,
     required this.specialtyName,
+    this.star,
+    this.countReview,
     this.avatar,
     this.onTap,
   });
@@ -99,15 +103,29 @@ class DoctorCard extends StatelessWidget {
                   // đánh giá
                   // ⭐ Đánh giá
                   Row(
-                    children: List.generate(5, (index) {
-                      return Icon(
-                        index < 4
-                            ? Icons.star
-                            : Icons.star_border, // ví dụ 4/5 sao
-                        color: Colors.amber,
-                        size: 18,
-                      );
-                    }),
+                    children: [
+                      if (star != null) ...[
+                        Icon(Icons.star, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          star!.toStringAsFixed(1),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[700],
+                                  ),
+                        ),
+                      ],
+                      if (countReview != null) ...[
+                        if (star != null) const SizedBox(width: 12),
+                        Text(
+                          '($countReview đánh giá)',
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey[700],
+                                  ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

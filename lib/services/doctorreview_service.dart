@@ -5,11 +5,12 @@ import 'package:frontend_app/models/responseapi.dart';
 import 'package:dio/dio.dart';
 
 class DoctorReviewService {
-  static Future<ResponseApi<DoctorReview>> createDoctorReview(
-      {required String appointmentId,
-      required String comment,
-      required String doctorId,
-      required double rating}) async {
+  static Future<ResponseApi<DoctorReview>> createDoctorReview({
+    required String appointmentId,
+    String? comment,
+    required String doctorId,
+    required double rating,
+  }) async {
     try {
       final response = await ApiClient.dio.post(
         '/doctorreview/create-doctor-review',

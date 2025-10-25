@@ -94,10 +94,10 @@ class _DoctorReviewDialogState extends State<DoctorReviewDialog> {
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: () async {
-                    if (rating == 0 || commentController.text.trim().isEmpty) {
+                    if (rating == 0) {
                       await CustomFlushbar.show(
                         context,
-                        message: 'Vui lòng cung cấp đánh giá và nhận xét.',
+                        message: 'Vui lòng cung cấp đánh giá.',
                         status: 'error',
                       );
                       return;

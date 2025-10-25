@@ -104,6 +104,8 @@ class _HomeDoctorListState extends State<HomeDoctorList> {
                     name: doctor.person.fullName,
                     specialtyName: doctor.primarySpecialtyName,
                     avatar: doctor.person.avatar,
+                    star: doctor.averageRating,
+                    countReview: doctor.doctorReviews.length,
                     onTap: () {
                       context.goNamed(
                         'doctorDetail',

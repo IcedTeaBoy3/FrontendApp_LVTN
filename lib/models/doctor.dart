@@ -1,3 +1,4 @@
+import 'package:frontend_app/models/doctorreview.dart';
 import 'package:frontend_app/models/doctorworkplace.dart';
 import 'package:frontend_app/models/person.dart';
 
@@ -16,8 +17,9 @@ class Doctor {
   final String? bio;
   final String? notes;
   final List<DoctorSpecialty> doctorSpecialties;
-  final List<DoctorWorkplace> doctorWorplaces;
+  final List<DoctorWorkplace> doctorWorkplaces;
   final List<DoctorService> doctorServices;
+  final List<DoctorReview> doctorReviews;
 
   Doctor({
     required this.doctorId,
@@ -27,8 +29,9 @@ class Doctor {
     this.degree,
     this.degreeId,
     required this.doctorSpecialties,
-    required this.doctorWorplaces,
+    required this.doctorWorkplaces,
     required this.doctorServices,
+    required this.doctorReviews,
     this.bio,
     this.notes,
   });
@@ -61,11 +64,14 @@ class Doctor {
       doctorSpecialties: json['doctorSpecialties'] != null
           ? DoctorSpecialty.doctorSpecialtiesFromJson(json['doctorSpecialties'])
           : [],
-      doctorWorplaces: json['doctorWorkplaces'] != null
+      doctorWorkplaces: json['doctorWorkplaces'] != null
           ? DoctorWorkplace.doctorWorkplacesFromJson(json['doctorWorkplaces'])
           : [],
       doctorServices: json['doctorServices'] != null
           ? DoctorService.doctorservicesFromJson(json['doctorServices'])
+          : [],
+      doctorReviews: json['doctorReviews'] != null
+          ? DoctorReview.doctorReviewsFromJson(json['doctorReviews'])
           : [],
     );
   }
@@ -87,6 +93,19 @@ class Doctor {
     return primary.specialty.name;
   }
 
+  // Tính trung bình số sao của bác sĩ
+  double get averageRating {
+    if (doctorReviews.isEmpty) return 0.0;
+
+    final total = doctorReviews.fold<double>(
+      0.0,
+      (sum, review) => sum + (review.rating?.toDouble() ?? 0.0),
+    );
+
+    return double.parse((total / doctorReviews.length).toStringAsFixed(1));
+  }
+  // điểm số đánh giá
+
   // Lấy năm kinh nghiệm của chuyên khoa chính
   int get yearsOfExperience {
     if (doctorSpecialties.isEmpty) return 0;
@@ -101,11 +120,11 @@ class Doctor {
 
   // Lấy nơi làm việc chính
   String get primaryWorkplaceName {
-    if (doctorWorplaces.isEmpty) return "Chưa cập nhật";
+    if (doctorWorkplaces.isEmpty) return "Chưa cập nhật";
 
-    final primary = doctorWorplaces.firstWhere(
+    final primary = doctorWorkplaces.firstWhere(
       (e) => e.isPrimary == true,
-      orElse: () => doctorWorplaces.first,
+      orElse: () => doctorWorkplaces.first,
     );
 
     return primary.workplace.name;
@@ -113,11 +132,11 @@ class Doctor {
 
   // Lấy chức vụ của nơi làm việc chính
   String get primaryPositionName {
-    if (doctorWorplaces.isEmpty) return "Chưa cập nhật";
+    if (doctorWorkplaces.isEmpty) return "Chưa cập nhật";
 
-    final primary = doctorWorplaces.firstWhere(
+    final primary = doctorWorkplaces.firstWhere(
       (e) => e.isPrimary == true,
-      orElse: () => doctorWorplaces.first,
+      orElse: () => doctorWorkplaces.first,
     );
 
     return primary.position.title;

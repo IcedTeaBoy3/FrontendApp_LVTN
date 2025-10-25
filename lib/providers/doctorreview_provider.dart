@@ -5,10 +5,32 @@ import 'package:frontend_app/models/responseapi.dart';
 
 class DoctorreviewProvider extends ChangeNotifier {
   List<DoctorReview> _doctorReviews = [];
+  String _selectedSortOption = 'Mới nhất';
   bool _isLoading = false;
 
-  List<DoctorReview> get doctorReviews => _doctorReviews;
+  List<DoctorReview> get doctorReviews {
+    // Trả về danh sách đã sắp xếp theo lựa chọn hiện tại
+    final sorted = List<DoctorReview>.from(_doctorReviews);
+    sorted.sort((a, b) {
+      final aDate = a.createdAt ?? DateTime(1970);
+      final bDate = b.createdAt ?? DateTime(1970);
+
+      if (_selectedSortOption == 'Mới nhất') {
+        return bDate.compareTo(aDate); // mới nhất trước
+      } else {
+        return aDate.compareTo(bDate); // cũ nhất trước
+      }
+    });
+    return sorted;
+  }
+
   bool get isLoading => _isLoading;
+  String get selectedSortOption => _selectedSortOption;
+
+  void setSortOption(String option) {
+    _selectedSortOption = option;
+    notifyListeners();
+  }
 
   Future<void> fetchDoctorReviewsByDoctorId(String doctorId) async {
     _isLoading = true;
@@ -29,9 +51,9 @@ class DoctorreviewProvider extends ChangeNotifier {
 
   Future<ResponseApi> createDoctorReview({
     required String appointmentId,
-    required String comment,
     required String doctorId,
     required double rating,
+    String? comment,
   }) async {
     _isLoading = true;
     notifyListeners();

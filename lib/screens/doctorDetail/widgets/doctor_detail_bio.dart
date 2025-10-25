@@ -62,43 +62,47 @@ class _DoctorDetailBioState extends State<DoctorDetailBio> {
           const SizedBox(height: 8),
 
           /// Nội dung
-          AnimatedCrossFade(
-            duration: const Duration(milliseconds: 300),
-            crossFadeState: _isExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            // Bản rút gọn (plain text)
-            firstChild: Text(
-              displayText,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            // Bản đầy đủ (render HTML gốc, không ép style)
-            secondChild: Html(
-              data: rawHtml,
-              style: {
-                "p": Style(
-                    fontSize: FontSize(16), margin: Margins.only(bottom: 8)),
-                "b": Style(fontWeight: FontWeight.bold, color: Colors.black87),
-                "strong":
-                    Style(fontWeight: FontWeight.bold, color: Colors.black87),
-                "i": Style(fontStyle: FontStyle.italic),
-                "em": Style(fontStyle: FontStyle.italic),
-                "u": Style(textDecoration: TextDecoration.underline),
-                "a": Style(
-                    color: Colors.blue,
-                    textDecoration: TextDecoration.underline),
-                "ul": Style(margin: Margins.only(left: 20, bottom: 8)),
-                "ol": Style(margin: Margins.only(left: 20, bottom: 8)),
-                "li": Style(margin: Margins.only(bottom: 4)),
-                "h1":
-                    Style(fontSize: FontSize(28), fontWeight: FontWeight.bold),
-                "h2":
-                    Style(fontSize: FontSize(24), fontWeight: FontWeight.w600),
-                "h3":
-                    Style(fontSize: FontSize(20), fontWeight: FontWeight.w500),
-                "br": Style(
-                    display: Display.block, margin: Margins.only(bottom: 6)),
-              },
+          SizedBox(
+            width: double.infinity,
+            child: AnimatedCrossFade(
+              duration: const Duration(milliseconds: 300),
+              crossFadeState: _isExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              // Bản rút gọn (plain text)
+              firstChild: Text(
+                displayText,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              // Bản đầy đủ (render HTML gốc, không ép style)
+              secondChild: Html(
+                data: rawHtml,
+                style: {
+                  "p": Style(
+                      fontSize: FontSize(16), margin: Margins.only(bottom: 8)),
+                  "b":
+                      Style(fontWeight: FontWeight.bold, color: Colors.black87),
+                  "strong":
+                      Style(fontWeight: FontWeight.bold, color: Colors.black87),
+                  "i": Style(fontStyle: FontStyle.italic),
+                  "em": Style(fontStyle: FontStyle.italic),
+                  "u": Style(textDecoration: TextDecoration.underline),
+                  "a": Style(
+                      color: Colors.blue,
+                      textDecoration: TextDecoration.underline),
+                  "ul": Style(margin: Margins.only(left: 20, bottom: 8)),
+                  "ol": Style(margin: Margins.only(left: 20, bottom: 8)),
+                  "li": Style(margin: Margins.only(bottom: 4)),
+                  "h1": Style(
+                      fontSize: FontSize(28), fontWeight: FontWeight.bold),
+                  "h2": Style(
+                      fontSize: FontSize(24), fontWeight: FontWeight.w600),
+                  "h3": Style(
+                      fontSize: FontSize(20), fontWeight: FontWeight.w500),
+                  "br": Style(
+                      display: Display.block, margin: Margins.only(bottom: 6)),
+                },
+              ),
             ),
           ),
           if (shouldTruncate)
